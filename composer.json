@@ -1,4 +1,15 @@
 {
-    "name": "ik_2dw3/server-blog",
-    "require": {}
+    "name": "ik_2dw3/src",
+    "authors": [
+        {
+            "name": "dotNosy",
+            "email": "61392970+dotNosy@users.noreply.github.com"
+        }
+    ],
+    "require": {
+
+    },
+    "autoload": {
+        "psr-4": {"ServerBlog\\": "Src/"}
+    }
 }

@@ -1,22 +1,32 @@
 <?php
+declare(strict_types=1);
 
-//DB properties
-$servername = "localhost";
-$dbName = "blog";
-$username = "root";
-$password = "2dw3";
+namespace ServerBlog\Services;
+use \PDO as PDO;
 
-try 
+class Connection 
 {
-  $conn = new PDO("mysql:host=$servername;dbname=$dbName", $username, $password);
+  private DatabaseConfig $config;
+  private $conn;
 
-  //Connection config / properties
-  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  echo "OK";
-} 
-catch(PDOException $e) 
-{
-  echo "Connection failed: " . $e->getMessage();
-  die();
+  public function __construct() 
+  {
+    try 
+    {
+      $config = new DatabaseConfig("dev");
+
+      $conn = new PDO("mysql:host=$config->servername;dbname=$config->dbName", $config->username, $config->password);
+
+      //propiedades / config de la conexion
+      $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+      echo "OK";
+    } 
+    catch(PDOException $e) 
+    {
+      //TODO manejar excepcion o reenviar a pagina de error
+      echo "Connection failed: " . $e->getMessage();
+      die();
+    }
+  }
 }
  
