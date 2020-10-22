@@ -19,7 +19,7 @@ class Connection
 
       //propiedades / config de la conexion
       $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-      echo "OK";
+
     } 
     catch(PDOException $e) 
     {

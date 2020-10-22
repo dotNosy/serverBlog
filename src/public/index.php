@@ -4,4 +4,6 @@ declare(strict_types=1);
 
 require_once __DIR__ . '\..\..\vendor\autoload.php';
 
-$conn = new ServerBlog\Services\Connection();
+// $conn = new ServerBlog\Services\Connection();
+$router = new ServerBlog\Services\Router();
+
