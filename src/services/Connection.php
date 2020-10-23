@@ -9,24 +9,28 @@ class Connection
   private DatabaseConfig $config;
   private $conn;
 
-  public function __construct() 
+  public function __construct($configMode) 
   {
     try 
     {
-      $config = new DatabaseConfig("dev");
+      $config = new DatabaseConfig($configMode);
 
-      $conn = new PDO("mysql:host=$config->servername;dbname=$config->dbName", $config->username, $config->password);
+      $this->conn = new PDO("mysql:host=$config->servername;dbname=$config->dbName", $config->username, $config->password);
 
       //propiedades / config de la conexion
-      $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    } 
+      $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    }
     catch(PDOException $e) 
     {
-      //TODO manejar excepcion o reenviar a pagina de error
+      //TODO: manejar excepcion o reenviar a pagina de error
       echo "Connection failed: " . $e->getMessage();
       die();
     }
+  }
+
+  public function getConnection()
+  {
+    return $this->conn;
   }
 }
  
