@@ -15,14 +15,14 @@ class Login extends Controller
         parent::__construct($params);
     }
 
-    protected function index($params = null) 
+    protected function index(array $params = null) 
     {   
         //! Añadir la informacion para recogerla en las plantillas
         $_SESSION["titulo"] = "LOGIN";
         $_SESSION["css"] = array("login.css");
 
         //!  Vista a devolver
-        $_SESSION["page"] =  __DIR__ . '\..\Views\login.php';
+        $_SESSION["page"] =  __DIR__ . '/../Views/Login.php';
 
         require_once __PARENT_TEMPLATE__;
         die();
@@ -30,7 +30,7 @@ class Login extends Controller
 
     protected function register($params = null) 
     {
-        //* VISTA FORMULARIO
+        //? VISTA FORMULARIO
         if ($_SERVER['REQUEST_METHOD'] == "GET")
         {
             //! Añadir la informacion para recogerla en las plantillas
@@ -38,13 +38,13 @@ class Login extends Controller
             $_SESSION["css"] = array("register.css");
 
             //!  Vista a devolver
-            $_SESSION["page"] =  __DIR__ . '\..\Views\register.php';
+            $_SESSION["page"] =  __DIR__ . '/../Views/Register.php';
 
             require_once __PARENT_TEMPLATE__;
             die();
         }
 
-        //* PROCESAR FORMULARIO
+        //? PROCESAR FORMULARIO
         else if ($_SERVER['REQUEST_METHOD'] == "POST")
         {
             if (isset($_POST['register']))
@@ -61,7 +61,7 @@ class Login extends Controller
                     $_SESSION['error'] = "Uno o mas campos estan vacios";
 
                     //!  Vista a devolver
-                    $_SESSION["page"] =  __DIR__ . '\..\Views\register.php';
+                    $_SESSION["page"] =  __DIR__ . '/../Views/Register.php';
 
                     require_once __PARENT_TEMPLATE__;
                     die();
@@ -74,7 +74,7 @@ class Login extends Controller
                     $_SESSION['error'] = "Las contraseñas no coinciden";
 
                     //!  Vista a devolver
-                    $_SESSION["page"] =  __DIR__ . '\..\Views\register.php';
+                    $_SESSION["page"] =  __DIR__ . '/../Views/Register.php';
 
                     require_once __PARENT_TEMPLATE__;
                     die();
@@ -95,7 +95,7 @@ class Login extends Controller
                         $_SESSION['error'] =  "Las credenciales son incorrectas.";
     
                         //!  Vista a devolver
-                        $_SESSION["page"] =  __DIR__ . '\..\Views\register.php';
+                        $_SESSION["page"] =  __DIR__ . '/../Views/Register.php';
     
                         require_once __PARENT_TEMPLATE__;
                         die();
@@ -106,7 +106,7 @@ class Login extends Controller
                         $_SESSION['error'] = "Hubo un problema de conexion.";
     
                         //!  Vista a devolver
-                        $_SESSION["page"] =  __DIR__ . '\..\Views\register.php';
+                        $_SESSION["page"] =  __DIR__ . '/../Views/Register.php';
     
                         require_once __PARENT_TEMPLATE__;
                         die();
@@ -117,7 +117,7 @@ class Login extends Controller
                         $_SESSION['error'] = "Las credenciales son incorrectas.";
     
                         //!  Vista a devolver
-                        $_SESSION["page"] =  __DIR__ . '\..\Views\register.php';
+                        $_SESSION["page"] =  __DIR__ . '/../Views/Register.php';
     
                         require_once __PARENT_TEMPLATE__;
                         die();
@@ -129,7 +129,7 @@ class Login extends Controller
                         unset($_SESSION["css"]);
     
                         //!  Vista a devolver
-                        $_SESSION["page"] =  __DIR__ . '\..\Views\Home.php';
+                        $_SESSION["page"] =  __DIR__ . '/../Views/Home.php';
     
                         require_once __PARENT_TEMPLATE__;
                         die();
@@ -140,7 +140,7 @@ class Login extends Controller
                         $_SESSION['error'] = "Hubo un error inesperado.";
     
                         //!  Vista a devolver
-                        $_SESSION["page"] =  __DIR__ . '\..\Views\register.php';
+                        $_SESSION["page"] =  __DIR__ . '/../Views/Register.php';
     
                         require_once __PARENT_TEMPLATE__;
                         die();
@@ -154,7 +154,7 @@ class Login extends Controller
                     $_SESSION['error'] = "Hubo un problema de conexion.";
 
                     //!  Vista a devolver
-                    $_SESSION["page"] =  __DIR__ . '\..\Views\register.php';
+                    $_SESSION["page"] =  __DIR__ . '/../Views/Register.php';
 
                     require_once __PARENT_TEMPLATE__;
                     die();
