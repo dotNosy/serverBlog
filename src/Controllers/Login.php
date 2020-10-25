@@ -141,7 +141,7 @@ class Login extends Controller
     
                         //!  Vista a devolver
                         $_SESSION["page"] =  __DIR__ . '/../Views/Register.php';
-    
+     
                         require_once __PARENT_TEMPLATE__;
                         die();
                     }

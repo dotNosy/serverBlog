@@ -10,5 +10,6 @@ session_start();
 
 use ServerBlog\Services\Router;
 
-$router = new Router();
+//! echo memory_get_usage(); //Saber cuanta memoria se le asigno al script ejecutado (controlador)
 
+$router = new Router();
