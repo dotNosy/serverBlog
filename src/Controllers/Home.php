@@ -11,7 +11,7 @@ class Home extends Controller
         parent::__construct($params);
     }
 
-    protected function index() 
+    protected function index(array $params = null) 
     {
 
     }

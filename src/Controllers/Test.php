@@ -13,12 +13,12 @@ class Test extends Controller
         parent::__construct($params);
     }
 
-    protected function index($params = null) 
+    protected function index(array $params = null) 
     {
         $_SESSION["titulo"] = "TEST CONTROLLER";
         unset($_SESSION["css"]);
 
-        $_SESSION["page"] =  __DIR__ . '\..\Views\testChild.php';
+        $_SESSION["page"] =  __DIR__ . '/../Views/testChild.php';
         require_once __PARENT_TEMPLATE__;
         die();
     }
@@ -27,7 +27,7 @@ class Test extends Controller
     {
         $_SESSION["titulo"] = "TEST METHOD";
 
-        $_SESSION["page"] =  __DIR__ . '\..\Views\testChild2.php';
+        $_SESSION["page"] =  __DIR__ . '/../Views/testChild2.php';
         require_once __PARENT_TEMPLATE__;
         die();
     }
