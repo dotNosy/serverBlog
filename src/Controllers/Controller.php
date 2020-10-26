@@ -35,6 +35,8 @@ class Controller
 
     protected function sendToView(array $properties) :void
     {
+        unset($_SESSION["css"]); //Reset css of the page
+
         foreach ($properties as $name => $value) 
         {
             //! Añadir la informacion para recogerla en las plantillas
