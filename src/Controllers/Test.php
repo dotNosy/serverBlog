@@ -15,20 +15,17 @@ class Test extends Controller
 
     protected function index(array $params = null) 
     {
-        $_SESSION["titulo"] = "TEST CONTROLLER";
-        unset($_SESSION["css"]);
-
-        $_SESSION["page"] =  __DIR__ . '/../Views/testChild.php';
-        require_once __PARENT_TEMPLATE__;
-        die();
+        parent::sendToView([
+             "titulo" => "TEST CONTROLLER"
+            ,"page" =>  __DIR__ . '/../Views/testChild.php'
+        ]);
     }
 
     protected function test()
     {
-        $_SESSION["titulo"] = "TEST METHOD";
-
-        $_SESSION["page"] =  __DIR__ . '/../Views/testChild2.php';
-        require_once __PARENT_TEMPLATE__;
-        die();
+        parent::sendToView([
+            "titulo" => "TEST METHOD"
+           ,"page" =>  __DIR__ . '/../Views/testChild2.php'
+       ]);
     }
 }

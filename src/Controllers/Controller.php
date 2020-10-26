@@ -36,6 +36,7 @@ class Controller
     protected function sendToView(array $properties) :void
     {
         unset($_SESSION["css"]); //Reset css of the page
+        unset($_SESSION["error"]); //Reset erorrs of the page
 
         foreach ($properties as $name => $value) 
         {
