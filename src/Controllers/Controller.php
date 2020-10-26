@@ -33,7 +33,7 @@ class Controller
         }
     }
 
-    protected function sendToview(array $properties) :void
+    protected function sendToView(array $properties) :void
     {
         foreach ($properties as $name => $value) 
         {
