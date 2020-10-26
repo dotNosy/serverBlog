@@ -16,6 +16,7 @@ class Router
         ,"home"
         ,"login"
         ,"test"
+        ,"profile"
         ,"404"
     ];
 

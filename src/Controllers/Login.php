@@ -50,6 +50,19 @@ class Login extends Controller
         }
     }
 
+    protected function logout($params = null)
+    {
+        if (isset($_SESSION['user']))
+        {
+            unset($_SESSION['user']);
+        }
+        
+        session_destroy();
+
+        header("Location: /");
+        die();
+    }
+
     protected function register($params = null) 
     {
         //? VISTA FORMULARIO
