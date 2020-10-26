@@ -44,6 +44,7 @@ class Login extends Controller
                 $username = Services\Helpers::cleanInput($_POST['username']);
                 $password = Services\Helpers::cleanInput($_POST['password']);
                 $rpassword = Services\Helpers::cleanInput($_POST['rpassword']);
+                $errorPassword = "";
 
                 //? En vez de hacer 2 calls diferentes, se podria hacer solo poner el mensaje de error en una variable y hacer una sola llamada al sendToView()
 
@@ -68,9 +69,17 @@ class Login extends Controller
 
                 //TODO: Comprobar que la password sea segura
 
-                // if(){
+                Services\Controllers\Login::checkPassword($password,$errorPassword);
 
-                // }
+                if(strlen($errorPassword)>0)
+                {
+                    parent::sendToView([
+                        "titulo" => "SIGNING UP"
+                        ,"css" => array("register.css")
+                        ,"error" => $errorPassword
+                        ,"page" => __DIR__ . '/../Views/Register.php'
+                     ]);
+                }
 
                 //TODO: Comprobar si el username existe ya
 
