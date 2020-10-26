@@ -9,35 +9,39 @@
             </div>
             <div class="col-lg-6">
                 <div class="card2 card border-0 px-4 py-5">
-                    <div class="row mb-4 px-3">
-                        <h6 class="mb-0 mr-4 mt-2">Sign in with</h6>
-                        <div class="facebook text-center mr-3">
-                            <div class="fa fa-facebook"></div>
+                    <?php if(!empty($_SESSION['user'])): ?>
+                        <div class="col-12 alert-success text-center my-3">Ya has iniciado sesion</div>
+                    <?php else: ?>
+                        <div class="row mb-4 px-3">
+                            <h6 class="mb-0 mr-4 mt-2">Sign in with</h6>
+                            <div class="facebook text-center mr-3">
+                                <div class="fa fa-facebook"></div>
+                            </div>
+                            <div class="twitter text-center mr-3">
+                                <div class="fa fa-twitter"></div>
+                            </div>
+                            <div class="linkedin text-center mr-3">
+                                <div class="fa fa-linkedin"></div>
+                            </div>
                         </div>
-                        <div class="twitter text-center mr-3">
-                            <div class="fa fa-twitter"></div>
-                        </div>
-                        <div class="linkedin text-center mr-3">
-                            <div class="fa fa-linkedin"></div>
-                        </div>
-                    </div>
-                    <form action="/login/login" method="POST">
-                        <div class="row px-3 mb-4">
-                            <div class="line"></div> <small class="or text-center">Or</small>
-                            <div class="line"></div>
-                        </div>
-                        <div class="row px-3"> <label class="mb-1">
-                                <h6 class="mb-0 text-sm">Username</h6>
-                            </label> <input class="mb-4" type="text" name="username" placeholder="Enter your username"> </div>
-                        <div class="row px-3"> <label class="mb-1">
-                                <h6 class="mb-0 text-sm">Password</h6>
-                            </label> <input type="password" name="password" placeholder="Enter password"> </div>
-                            <?php if (!empty($_SESSION["error"])):?>
-                                <?= '<div class="col-12 alert-danger text-center my-3">'. $_SESSION["error"] .'</div>' ?>
-                            <?php endif;?>
-                        <div class="row mb-3 px-3"> <button name="login" type="submit" class="btn btn-blue text-center">Login</button> </div>
-                    </form>
-                    <div class="row mb-4 px-3"> <small class="font-weight-bold">Don't have an account? <a href="/login/register" class="text-danger">Register</a></small> </div>
+                        <form action="/login/login" method="POST">
+                            <div class="row px-3 mb-4">
+                                <div class="line"></div> <small class="or text-center">Or</small>
+                                <div class="line"></div>
+                            </div>
+                            <div class="row px-3"> <label class="mb-1">
+                                    <h6 class="mb-0 text-sm">Username</h6>
+                                </label> <input class="mb-4" type="text" name="username" placeholder="Enter your username"> </div>
+                            <div class="row px-3"> <label class="mb-1">
+                                    <h6 class="mb-0 text-sm">Password</h6>
+                                </label> <input type="password" name="password" placeholder="Enter password"> </div>
+                                <?php if (!empty($_SESSION["error"])):?>
+                                    <?= '<div class="col-12 alert-danger text-center my-3">'. $_SESSION["error"] .'</div>' ?>
+                                <?php endif;?>
+                            <div class="row mb-3 px-3"> <button name="login" type="submit" class="btn btn-blue text-center">Login</button> </div>
+                        </form>
+                        <div class="row mb-4 px-3"> <small class="font-weight-bold">Don't have an account? <a href="/login/register" class="text-danger">Register</a></small> </div>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>
