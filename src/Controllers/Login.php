@@ -130,7 +130,6 @@ class Login extends Controller
                         ,"page" => __DIR__ . '/../Views/Register.php'
                      ]);
                 }
-
                if (Models\User::add($username, $password)) 
                {
                     $this->tryLogin($username, $password, __DIR__ . '/../Views/Register.php','register.css');
@@ -148,7 +147,7 @@ class Login extends Controller
         }
     }
 
-    private function tryLogin(string$username, string $password, string $error_page = __DIR__ . '/../Views/Login.php', $css = "login.css")
+    private function tryLogin(string $username, string $password, string $error_page = __DIR__ . '/../Views/Login.php', $css = "login.css")
     {
         //Logear al user y enviar al perfil
         $user = Models\User::login($username, $password);

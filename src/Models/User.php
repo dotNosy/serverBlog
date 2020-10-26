@@ -73,14 +73,30 @@ class User
 
         $pdo_conn = $connObj->getConnection();
 
-        $query = $pdo_conn->prepare("INSERT INTO user (username, password) VALUES (:username, :password)");
-        $query->bindValue("username", $username);
-        $query->bindValue("password", password_hash($password, PASSWORD_BCRYPT));
+        // $pdo_conn->beginTransaction(); //? No se si esto funciona así, PRUEBA
         
-        if ($query->execute()) {
+        $pdo_conn->beginTransaction();
+
+        try
+        {
+            $query = $pdo_conn->prepare("INSERT INTO user (username, password) VALUES (:username, :password)");
+            $query->bindValue("username", $username);
+            $query->bindValue("password", password_hash($password, PASSWORD_BCRYPT));
+
+            $query->execute();
+
+            $id = $pdo_conn->lastInsertId();
+
+            Profile::add($id, $pdo_conn);
+
+            // $pdo_conn->commit();
+
             return true;
-        }
-        else {
+
+            
+        }catch(Exception $e){
+            throw $e;
+            // $pdo_conn->rollback();
             return false;
         }
 
