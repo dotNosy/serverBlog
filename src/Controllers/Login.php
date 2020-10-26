@@ -17,15 +17,11 @@ class Login extends Controller
 
     protected function index(array $params = null) 
     {   
-        //! Añadir la informacion para recogerla en las plantillas
-        $_SESSION["titulo"] = "LOGIN";
-        $_SESSION["css"] = array("login.css");
-
-        //!  Vista a devolver
-        $_SESSION["page"] =  __DIR__ . '/../Views/Login.php';
-
-        require_once __PARENT_TEMPLATE__;
-        die();
+        parent::sendToView([
+           "titulo" => "LOGIN"
+           ,"css" => array("login.css")
+           ,"page" => __DIR__ . '/../Views/Login.php'
+        ]);
     }
 
     protected function register($params = null) 
@@ -33,15 +29,11 @@ class Login extends Controller
         //? VISTA FORMULARIO
         if ($_SERVER['REQUEST_METHOD'] == "GET")
         {
-            //! Añadir la informacion para recogerla en las plantillas
-            $_SESSION["titulo"] = "SIGNING UP";
-            $_SESSION["css"] = array("register.css");
-
-            //!  Vista a devolver
-            $_SESSION["page"] =  __DIR__ . '/../Views/Register.php';
-
-            require_once __PARENT_TEMPLATE__;
-            die();
+            parent::sendToView([
+                "titulo" => "SIGNING UP"
+                ,"css" => array("register.css")
+                ,"page" => __DIR__ . '/../Views/Register.php'
+             ]);
         }
 
         //? PROCESAR FORMULARIO
@@ -53,34 +45,32 @@ class Login extends Controller
                 $password = Services\Helpers::cleanInput($_POST['password']);
                 $rpassword = Services\Helpers::cleanInput($_POST['rpassword']);
 
+                //? En vez de hacer 2 calls diferentes, se podria hacer solo poner el mensaje de error en una variable y hacer una sola llamada al sendToView()
+
                 if (empty($username) || empty($password) || empty($rpassword)) 
-                {
-                    //! Añadir la informacion para recogerla en las plantillas
-                    $_SESSION["titulo"] = "SIGNING UP";
-                    $_SESSION["css"] = array("register.css");
-                    $_SESSION['error'] = "Uno o mas campos estan vacios";
-
-                    //!  Vista a devolver
-                    $_SESSION["page"] =  __DIR__ . '/../Views/Register.php';
-
-                    require_once __PARENT_TEMPLATE__;
-                    die();
+                {   
+                    parent::sendToView([
+                        "titulo" => "SIGNING UP"
+                        ,"css" => array("register.css")
+                        ,"error" => "Uno o mas campos estan vacios"
+                        ,"page" => __DIR__ . '/../Views/Register.php'
+                     ]);
                 }
                 else if ($password !== $rpassword)
                 {
-                    //! Añadir la informacion para recogerla en las plantillas
-                    $_SESSION["titulo"] = "SIGNING UP";
-                    $_SESSION["css"] = array("register.css");
-                    $_SESSION['error'] = "Las contraseñas no coinciden";
-
-                    //!  Vista a devolver
-                    $_SESSION["page"] =  __DIR__ . '/../Views/Register.php';
-
-                    require_once __PARENT_TEMPLATE__;
-                    die();
+                    parent::sendToView([
+                        "titulo" => "SIGNING UP"
+                        ,"css" => array("register.css")
+                        ,"error" => "Las contraseñas no coinciden"
+                        ,"page" => __DIR__ . '/../Views/Register.php'
+                     ]);
                 }
 
                 //TODO: Comprobar que la password sea segura
+
+                // if(){
+
+                // }
 
                 //TODO: Comprobar si el username existe ya
 
@@ -90,74 +80,53 @@ class Login extends Controller
                     $user = Models\User::login($username, $password);
 
                     if (empty($user)) {
-                        $_SESSION["titulo"] = "SIGNING UP";
-                        $_SESSION["css"] = array("register.css");
-                        $_SESSION['error'] =  "Las credenciales son incorrectas.";
-    
-                        //!  Vista a devolver
-                        $_SESSION["page"] =  __DIR__ . '/../Views/Register.php';
-    
-                        require_once __PARENT_TEMPLATE__;
-                        die();
+                        parent::sendToView([
+                            "titulo" => "SIGNING UP"
+                            ,"css" => array("register.css")
+                            ,"error" => "Las credenciales son incorrectas."
+                            ,"page" => __DIR__ . '/../Views/Register.php'
+                         ]);
                     }
                     else if ($user == "error conexion"){
-                        $_SESSION["titulo"] = "SIGNING UP";
-                        $_SESSION["css"] = array("register.css");
-                        $_SESSION['error'] = "Hubo un problema de conexion.";
-    
-                        //!  Vista a devolver
-                        $_SESSION["page"] =  __DIR__ . '/../Views/Register.php';
-    
-                        require_once __PARENT_TEMPLATE__;
-                        die();
+                        parent::sendToView([
+                            "titulo" => "SIGNING UP"
+                            ,"css" => array("register.css")
+                            ,"error" => "Hubo un problema de conexion."
+                            ,"page" => __DIR__ . '/../Views/Register.php'
+                         ]);
                     }
                     else if ($user == "credenciales incorrectas"){
-                        $_SESSION["titulo"] = "SIGNING UP";
-                        $_SESSION["css"] = array("register.css");
-                        $_SESSION['error'] = "Las credenciales son incorrectas.";
-    
-                        //!  Vista a devolver
-                        $_SESSION["page"] =  __DIR__ . '/../Views/Register.php';
-    
-                        require_once __PARENT_TEMPLATE__;
-                        die();
+                        parent::sendToView([
+                            "titulo" => "SIGNING UP"
+                            ,"css" => array("register.css")
+                            ,"error" => "Las credenciales son incorrectas."
+                            ,"page" => __DIR__ . '/../Views/Register.php'
+                         ]);
                     }
                     else if (!empty($user) && $user instanceof Models\User) {
-                        $_SESSION['user'] = serialize($user);
-
-                        $_SESSION["titulo"] = "HOME";
-                        unset($_SESSION["css"]);
-    
-                        //!  Vista a devolver
-                        $_SESSION["page"] =  __DIR__ . '/../Views/Home.php';
-    
-                        require_once __PARENT_TEMPLATE__;
-                        die();
+                        parent::sendToView([
+                            "user" => serialize($user)
+                            ,"titulo" => "HOME"
+                            ,"page" => __DIR__ . '/../Views/Home.php'
+                         ]);
                     }
                     else {
-                        $_SESSION["titulo"] = "SIGNING UP";
-                        $_SESSION["css"] = array("register.css");
-                        $_SESSION['error'] = "Hubo un error inesperado.";
-    
-                        //!  Vista a devolver
-                        $_SESSION["page"] =  __DIR__ . '/../Views/Register.php';
-     
-                        require_once __PARENT_TEMPLATE__;
-                        die();
+                        parent::sendToView([
+                            "titulo" => "SIGNING UP"
+                            ,"css" => array("register.css")
+                            ,"error" => "Hubo un error inesperado."
+                            ,"page" => __DIR__ . '/../Views/Register.php'
+                         ]);
                     }
                }
                else
                {
-                    //! Añadir la informacion para recogerla en las plantillas
-                    $_SESSION["titulo"] = "SIGNING UP";
-                    $_SESSION["css"] = array("register.css");
-                    $_SESSION['error'] = "Hubo un problema de conexion.";
-
-                    //!  Vista a devolver
-                    $_SESSION["page"] =  __DIR__ . '/../Views/Register.php';
-
-                    require_once __PARENT_TEMPLATE__;
-                    die();
+                parent::sendToView([
+                    "titulo" => "SIGNING UP"
+                    ,"css" => array("register.css")
+                    ,"error" => "Hubo un problema de conexion."
+                    ,"page" => __DIR__ . '/../Views/Register.php'
+                 ]);
                }
             }
         }
