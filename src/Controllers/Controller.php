@@ -32,4 +32,16 @@ class Controller
             $this->index($params);
         }
     }
+
+    protected function sendToview(array $properties) :void
+    {
+        foreach ($properties as $name => $value) 
+        {
+            //! Añadir la informacion para recogerla en las plantillas
+            $_SESSION[$name] = $value;
+        }
+        
+        require_once __PARENT_TEMPLATE__;
+        die();
+    }
 }
