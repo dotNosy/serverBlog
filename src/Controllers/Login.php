@@ -92,7 +92,7 @@ class Login extends Controller
                      ]);
                 }
 
-                //TODO: Comprobar que la password sea segura
+                //* Comprobacion contraseña segura
 
                 Services\Controllers\Login::checkPassword($password,$errorPassword);
 
@@ -106,7 +106,17 @@ class Login extends Controller
                      ]);
                 }
 
-                //TODO: Comprobar si el username existe ya
+                //* Comprobación de que el usuario no exista
+
+                if(Models\User::userExists($username))
+                {
+                    parent::sendToView([
+                        "titulo" => "SIGNING UP"
+                        ,"css" => array("register.css")
+                        ,"error" => "El usuario elegido ya está registrado. Por favor escoja otro."
+                        ,"page" => __DIR__ . '/../Views/Register.php'
+                     ]);
+                }
 
                if (Models\User::add($username, $password)) 
                {

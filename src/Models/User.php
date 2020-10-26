@@ -86,4 +86,30 @@ class User
 
         $pdo_conn = NULL;
     }
+
+    public static function userExists(string $username)
+    {
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+
+        $pdo_conn = $connObj->getConnection();
+
+        $query = $pdo_conn->prepare("SELECT * FROM user WHERE username=:username");
+        $query->bindValue("username", $username);
+
+        if (!$query->execute()) {
+            //! Si no se ha podido hacer la consulta
+            //TODO: Hacer algo si no se ha podido hacer la consulta
+        }
+
+        if ($query->rowCount() > 0) {
+            //? Hay resultado
+            return true;
+        }
+        else{
+            //? No hay resultado
+            return false;
+        }
+
+        $pdo_conn = NULL;
+    }
 }
