@@ -52,14 +52,9 @@ class Login extends Controller
 
     protected function logout($params = null)
     {
-        if (isset($_SESSION['user']))
-        {
-            unset($_SESSION['user']);
-        }
-        
-        session_destroy();
+        Models\User::logout();
 
-        header("Location: /");
+        header("Location: /login");
         die();
     }
 

@@ -52,9 +52,24 @@ class User
         $pdo_conn = null;
     }
 
-    public function logout() 
+    public static function logout() 
     {
+        if (isset($_SESSION['user']))
+        {
+            unset($_SESSION['user']);
+        }
+        
+        session_destroy();
+    }
 
+    public static function getUser()
+    {
+        if (!empty($_SESSION['user'])) {
+            return unserialize($_SESSION['user']);
+        }
+        else {
+            return null;
+        }
     }
 
     public function getUsername () :string
