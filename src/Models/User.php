@@ -97,16 +97,20 @@ class User
 
             $query->execute();
 
+            //* Se guarda el ultimo id insertado (el del registro)
             $id = $pdo_conn->lastInsertId();
 
+            //* Se añade un perfil para el usuario recien registrado
             Profile::add($id, $pdo_conn);
 
+            //* Si todo sale bien, se hace un commit de las dos tablas
             $pdo_conn->commit();
 
             return true;
         }
         catch(Exception $e) 
         {
+            //! Si no sale bien se hace un rollback de todas las transacciones (tanto usuario como perfil)
             $pdo_conn->rollback();
             throw $e;
             return false;
@@ -115,16 +119,19 @@ class User
         $pdo_conn = NULL;
     }
 
+    //* Funcion que busca si el usuario con el que se intenta registrar existe
     public static function userExists(string $username)
     {
         $connObj = new Services\Connection(Services\Helpers::getEnviroment());
         $pdo_conn = $connObj->getConnection();
 
+
+        //* Se busca el usuario introducido
         $query = $pdo_conn->prepare("SELECT * FROM user WHERE username=:username");
         $query->bindValue("username", $username);
 
+        //! Si no se ha podido hacer la consulta
         if (!$query->execute()) {
-            //! Si no se ha podido hacer la consulta
             //TODO: Hacer algo si no se ha podido hacer la consulta
         }
         //? Hay resultado
@@ -135,7 +142,6 @@ class User
         else {
             return false;
         }
-
         $pdo_conn = NULL;
     }
 }

@@ -54,8 +54,7 @@ class Login extends Controller
     {
         Models\User::logout();
 
-        header("Location: /login");
-        die();
+        Services\Helpers::sendToController("/home");
     }
 
     protected function register($params = null) 
@@ -177,11 +176,7 @@ class Login extends Controller
         //? USUARIO CORRECTO
         else if (!empty($user) && $user instanceof Models\User) 
         {
-            parent::sendToView([
-                "user" => serialize($user)
-                ,"titulo" => "HOME"
-                ,"page" => __DIR__ . '/../Views/Home.php'
-             ]);
+            Services\Helpers::sendToController("/home");
         }
         else 
         {
