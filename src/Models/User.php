@@ -25,7 +25,7 @@ class User
 
         $pdo_conn = $connObj->getConnection();
 
-        $query = $pdo_conn->prepare("SELECT id, username, password FROM USER WHERE USERNAME = :username");
+        $query = $pdo_conn->prepare("SELECT id, username, password FROM user WHERE username = :username");
         $query->bindValue("username", $username);
 
         if ($query->execute())
@@ -48,7 +48,6 @@ class User
         else {
             return "error conexion";
         }
-
         $pdo_conn = null;
     }
 
@@ -83,12 +82,10 @@ class User
     }
 
     public static function add(string $username, string $password)
-    {
+    {   
         $connObj = new Services\Connection(Services\Helpers::getEnviroment());
 
         $pdo_conn = $connObj->getConnection();
-
-        // $pdo_conn->beginTransaction(); //? No se si esto funciona así, PRUEBA
         
         $pdo_conn->beginTransaction();
 
@@ -104,14 +101,14 @@ class User
 
             Profile::add($id, $pdo_conn);
 
-            // $pdo_conn->commit();
+            $pdo_conn->commit();
 
             return true;
-
-            
-        }catch(Exception $e){
+        }
+        catch(Exception $e) 
+        {
+            $pdo_conn->rollback();
             throw $e;
-            // $pdo_conn->rollback();
             return false;
         }
 
@@ -121,7 +118,6 @@ class User
     public static function userExists(string $username)
     {
         $connObj = new Services\Connection(Services\Helpers::getEnviroment());
-
         $pdo_conn = $connObj->getConnection();
 
         $query = $pdo_conn->prepare("SELECT * FROM user WHERE username=:username");
@@ -131,13 +127,12 @@ class User
             //! Si no se ha podido hacer la consulta
             //TODO: Hacer algo si no se ha podido hacer la consulta
         }
-
+        //? Hay resultado
         if ($query->rowCount() > 0) {
-            //? Hay resultado
             return true;
         }
-        else{
-            //? No hay resultado
+        //? No hay resultado
+        else {
             return false;
         }
 

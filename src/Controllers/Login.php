@@ -115,7 +115,7 @@ class Login extends Controller
                 }
 
                 //* Comprobación de que el usuario no exista
-
+                
                 if(Models\User::userExists($username))
                 {
                     parent::sendToView([
