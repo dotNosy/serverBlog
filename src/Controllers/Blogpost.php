@@ -9,8 +9,6 @@ use ServerBlog\Services\Helpers;
 
 use ServerBlog\Models\User;
 
-use ServerBlog\Services\Helpers;
-
 class Blogpost extends Controller
 {
     public function __construct(array $params = null) 
@@ -48,11 +46,10 @@ class Blogpost extends Controller
             else
             {
                 Helpers::sendToController("/Blogpost/list",
-            [
-                "error" => "Tienes que estar logueado para ver tus posts."
-            ]);
+                [
+                    "error" => "Tienes que estar logueado para ver tus posts."
+                ]);
             }
-            
         }   
     }
 
@@ -80,11 +77,11 @@ class Blogpost extends Controller
                 else
                 {
                    //* Te envia a la view de la lista
-                parent::sendToView([
-                    "titulo" => "LIST"
-                    ,"list" => $list
-                    ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
-                ]); 
+                    parent::sendToView([
+                        "titulo" => "LIST"
+                        ,"list" => $list
+                        ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+                    ]); 
                 }
             }
             else
@@ -94,7 +91,7 @@ class Blogpost extends Controller
         }
         else
         {
-           Helpers::sendToController("/login",
+            Helpers::sendToController("/login",
             [
                 "error" => "Tienes que estar logueado para ver tus posts."
             ]);
