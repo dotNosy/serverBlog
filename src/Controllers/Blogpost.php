@@ -27,12 +27,6 @@ class Blogpost extends Controller
     {
         if(!empty($params[2]) && is_int($params[2]))
         {
-            // parent::sendToView([
-            //     "titulo" => "LIST"
-            //     ,"error" => "No existe ese post."
-            //     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
-            // ]);
-            
             Helpers::sendToController("/Blogpost/list",
             [
                 "error" => "Tienes que estar logueado para ver tus posts."
@@ -53,11 +47,6 @@ class Blogpost extends Controller
             }
             else
             {
-                // parent::sendToView([
-                //     "titulo" => "LIST"
-                //     ,"error" => "No existe ese post."
-                //     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
-                // ]);
                 Helpers::sendToController("/Blogpost/list",
             [
                 "error" => "Tienes que estar logueado para ver tus posts."
