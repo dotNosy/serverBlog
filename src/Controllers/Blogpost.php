@@ -55,6 +55,7 @@ class Blogpost extends Controller
         }   
     }
 
+    //! Los possts del usuario logueado
     protected function list(array $params = null)
     {
         //* Se recoge el id del usuario en la sesion actual
@@ -65,7 +66,8 @@ class Blogpost extends Controller
             $list = Models\BlogPostModel::list(intval($user->id));
             
             if(!empty($list))
-            {
+            {   
+                //? enviar a la view SIN PARAMETROS adicionales
                 if(!empty($_SESSION['URL_PARAMS']))
                 {
                     parent::sendToView([
@@ -75,9 +77,9 @@ class Blogpost extends Controller
                     ]
                     ,$_SESSION["URL_PARAMS"]); 
                 }
+                //? enviar a la view CON PARAMETROS adicionales
                 else
                 {
-                   //* Te envia a la view de la lista
                     parent::sendToView([
                         "titulo" => "LIST"
                         ,"list" => $list
@@ -88,6 +90,12 @@ class Blogpost extends Controller
             else
             {
                 //TODO: No tienes posts
+                parent::sendToView([
+                    "titulo" => "LIST"
+                    ,"list" => $list
+                    ,"error" => "No has publicado ningun post todavia."
+                    ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+                ]); 
             }
         }
         else
@@ -97,6 +105,52 @@ class Blogpost extends Controller
                 "error" => "Tienes que estar logueado para ver tus posts."
             ]);
         }  
+    }
+
+    //! Todos los posts por orden cronologico
+    protected function all(array $params)
+    {
+        //* Me devuelve de la BD todos los registros del usuario del id
+        $list = Models\BlogPostModel::all();
+        
+        if(!empty($list))
+        {
+            //? enviar a la view CON PARAMETROS adicionales
+            if(!empty($_SESSION['URL_PARAMS']))
+            {
+                parent::sendToView([
+                    "titulo" => "LIST"
+                    ,"list" => $list
+                    ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+                ]
+                ,$_SESSION["URL_PARAMS"]); 
+            }
+            //? enviar a la view SIN PARAMETROS adicionales
+            else
+            {
+                parent::sendToView([
+                    "titulo" => "LIST"
+                    ,"list" => $list
+                    ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+                ]); 
+            }
+        }
+        else
+        {
+            //TODO: No hay posts
+            parent::sendToView([
+                "titulo" => "LIST"
+                ,"list" => $list
+                ,"error" => "No se han publicado posts todavia."
+                ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+            ]); 
+        }
+    }
+
+    //! Todos los posts de X autor(user)
+    protected function author(array $params)
+    {
+        
     }
 
     protected function create(array $params = null)
