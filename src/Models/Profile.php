@@ -17,25 +17,29 @@ class Profile
         $this->id = $id;
     }
 
-    public static function add(string $id, PDO $PDOconnection)
+    public static function add(int $id, PDO &$PDOconnection)
     {
         try
-        {
+        {   
             //* Se intenta insertar un perfil con el id del usuario recien registrado
             $query = $PDOconnection->prepare("INSERT INTO profile (user_id) VALUES (:id)");
             $query->bindValue("id", $id);
-            $query->execute();
-
-            //* Si la query funciona se hacen un commit
-            $PDOconnection->commit();
+            if($query->execute())
+            {
+                //* Si la query funciona se hacen un commit
+                $PDOconnection->commit();
+            }else
+            {
+                $PDOconnection->rollback();
+            }            
         } 
-        catch (Exception $e) 
+        catch (PDOException $e) 
         {
             //! Si no funciona la query se hace un rollback tanto de perfil como de usuario
+            echo "Connection failed: " . $e->getMessage();
+            die();
             $PDOconnection->rollback();
             throw $e;
         }
-
-        $pdo_conn = NULL;
     }
 }

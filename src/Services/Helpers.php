@@ -7,7 +7,7 @@ class Helpers
 {
     public static function sendTo404()
     {
-        require_once  __DIR__ . '\..\Views\404.php';
+        require_once  __DIR__ . '/../Views/404.php';
         die();
     }
 

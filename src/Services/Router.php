@@ -18,6 +18,7 @@ class Router
         ,"test"
         ,"profile"
         ,"404"
+        ,"blogpost"
     ];
 
     public function __construct()

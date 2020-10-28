@@ -31,6 +31,7 @@ class Login extends Controller
             $username = Services\Helpers::cleanInput($_POST['username']);
             $password = Services\Helpers::cleanInput($_POST['password']);
 
+            //? Error credenciales vacias
             if (empty($username) || empty($password)) 
             {   
                 parent::sendToView([
@@ -40,6 +41,7 @@ class Login extends Controller
                     ,"page" => __DIR__ . '/../Views/Login.php'
                 ]);
             }
+            //? DO LOGIN
             else
             {
                 $this->tryLogin($username, $password);
@@ -59,6 +61,7 @@ class Login extends Controller
 
     protected function register($params = null) 
     {
+        
         //? VISTA FORMULARIO
         if ($_SERVER['REQUEST_METHOD'] == "GET")
         {
@@ -77,9 +80,8 @@ class Login extends Controller
                 $password = Services\Helpers::cleanInput($_POST['password']);
                 $rpassword = Services\Helpers::cleanInput($_POST['rpassword']);
                 $errorPassword = "";
-
+                
                 //? En vez de hacer 2 calls diferentes, se podria hacer solo poner el mensaje de error en una variable y hacer una sola llamada al sendToView()
-
                 if (empty($username) || empty($password) || empty($rpassword)) 
                 {   
                     parent::sendToView([
@@ -98,12 +100,11 @@ class Login extends Controller
                         ,"page" => __DIR__ . '/../Views/Register.php'
                      ]);
                 }
-
+                
                 //* Comprobacion contraseña segura
-
                 Services\Controllers\Login::checkPassword($password,$errorPassword);
-
-                if(strlen($errorPassword)>0)
+                //? Si hay errores de critero en la password, devolver vista con errores 
+                if(strlen($errorPassword) > 0)
                 {
                     parent::sendToView([
                         "titulo" => "SIGNING UP"
@@ -113,8 +114,7 @@ class Login extends Controller
                      ]);
                 }
 
-                //* Comprobación de que el usuario no exista
-                
+                //? Comprobacr que el usuario no exista
                 if(Models\User::userExists($username))
                 {
                     parent::sendToView([
@@ -124,26 +124,29 @@ class Login extends Controller
                         ,"page" => __DIR__ . '/../Views/Register.php'
                      ]);
                 }
-               if (Models\User::add($username, $password)) 
-               {
+
+                //? Si se pudo crear el usuario, lo logueamos
+                if (Models\User::add($username, $password)) 
+                {
                     $this->tryLogin($username, $password, __DIR__ . '/../Views/Register.php','register.css');
-               }
-               else
-               {
+                }
+                //? hubo error al crear el usuario, vovler al registro
+                else
+                {
                     parent::sendToView([
                         "titulo" => "SIGNING UP"
                         ,"css" => array("register.css")
                         ,"error" => "Hubo un problema de conexion."
                         ,"page" => __DIR__ . '/../Views/Register.php'
                     ]);
-               }
+                }
             }
         }
     }
 
     private function tryLogin(string $username, string $password, string $error_page = __DIR__ . '/../Views/Login.php', $css = "login.css")
     {
-        //Logear al user y enviar al perfil
+        //*Logear al user y enviar al perfil
         $user = Models\User::login($username, $password);
 
         if (empty($user)) 
@@ -176,6 +179,11 @@ class Login extends Controller
         //? USUARIO CORRECTO
         else if (!empty($user) && $user instanceof Models\User) 
         {
+            $_SESSION['user'] = json_encode([
+                'id' => $user->getId(),
+                'username' => $user->getUsername()
+                ]);
+    
             Services\Helpers::sendToController("/home");
         }
         else 
