@@ -34,10 +34,10 @@ class BlogPostModel
                 $list = $query->fetchAll();
 
                 //* Si esta vacia te devuelve NULL y sino te devuelve un array con todos los posts del usuario logeado
-                
+                return $list;
             }
             else {
-                return "error conexion";
+                return $list;
             }
         $pdo_conn = NULL;
     }

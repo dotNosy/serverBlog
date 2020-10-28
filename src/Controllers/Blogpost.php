@@ -9,8 +9,6 @@ use ServerBlog\Services\Helpers;
 
 use ServerBlog\Models\User;
 
-use ServerBlog\Services\Helpers;
-
 class Blogpost extends Controller
 {
     public function __construct(array $params = null) 
@@ -27,9 +25,10 @@ class Blogpost extends Controller
     {
         if(!empty($params[2]) && is_int($params[2]))
         {
+            
             Helpers::sendToController("/Blogpost/list",
             [
-                "error" => "Tienes que estar logueado para ver tus posts."
+                "error" => "No existe este post."
             ]);
 
         }
@@ -41,7 +40,8 @@ class Blogpost extends Controller
                 parent::sendToView([
                     "titulo" => "POST"
                     ,"css" => array("post.css")
-                    ,"blogPost" => $view
+                    ,"blogPost" => json_encode($view)
+                    ,"autor" => User::getUsernameById(intval($view->user_id))
                     ,"page" => __DIR__ . '/../Views/BlogPost/View.php'
                 ]);
             }
@@ -49,7 +49,7 @@ class Blogpost extends Controller
             {
                 Helpers::sendToController("/Blogpost/list",
             [
-                "error" => "Tienes que estar logueado para ver tus posts."
+                "error" => "No existe este post."
             ]);
             }
             
@@ -60,7 +60,6 @@ class Blogpost extends Controller
     {
         //* Se recoge el id del usuario en la sesion actual
         $user = User::getUser();
-
         if(!empty($user))
         {
             //* Me devuelve de la BD todos los registros del usuario del id

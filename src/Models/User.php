@@ -144,4 +144,28 @@ class User
     {
         return $this->id;
     }
+
+    public function getUsernameById (int $id) :string
+    {
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+
+        $pdo_conn = $connObj->getConnection();
+
+
+        //* Se recogen los posts de la persona buscada por el id
+            $query = $pdo_conn->prepare("SELECT username FROM user WHERE id = :id");
+            $query->bindValue("id", $id);
+
+            if ($query->execute())
+            {
+                //* Mete todos los datos en un array
+                $post = $query->fetch(PDO::FETCH_OBJ);
+
+                //* Si esta vacia te devuelve NULL y sino te devuelve un array con todos los posts del usuario logeado
+                return $post->username;
+            }
+            else {
+                return null;
+            }
+    }
 }
