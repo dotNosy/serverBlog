@@ -96,14 +96,16 @@ class BlogPostModel
 
         $pdo_conn = $connObj->getConnection();
 
-        //* Se recogen los posts de la persona logeada actualmente
-        $query = $pdo_conn->prepare("SELECT id, user_id, title, text, date FROM post WHERE id = :post_id AND visible=1");
-        $query->bindValue("post_id", $id);
+        //* Se hacen dos querys 
+        $query = $pdo_conn->prepare("SELECT id, title, text, date FROM post WHERE user_id = :user_id");
+        $query->bindValue("user_id", $id);
+        $query2 = $pdo_conn->prepare("SELECT id, title, text, date FROM post WHERE user_id = :user_id");
+        $query2->bindValue("user_id", $id);
 
         if ($query->execute())
         {
             //* Mete todos los datos en un array
-            $post = $query->fetch(PDO::FETCH_OBJ);
+            $post = $query->fetchAll();
 
             //* Si esta vacia te devuelve NULL y sino te devuelve un array con todos los posts del usuario logeado
             return $post;
