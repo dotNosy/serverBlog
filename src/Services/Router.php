@@ -18,7 +18,7 @@ class Router
         ,"test"
         ,"profile"
         ,"404"
-        ,"blogpost"
+        ,"post"
     ];
 
     public function __construct()
@@ -52,8 +52,16 @@ class Router
             {
                 $isValidController = true;
 
-                if ($url[0] == "") {
-                    $url[0] = "home";
+                //? Controlador
+                switch ($url[0])
+                {
+                    case "":
+                        $url[0] = "home";
+                    break;
+
+                    case "post":
+                        $url[0] = "blogpost";
+                    break;
                 }
             }
         }

@@ -11,6 +11,7 @@ use ServerBlog\Models\User;
 
 class Blogpost extends Controller
 {
+    //! Desde la URL este controlador tiene de alias post
     public function __construct(array $params = null) 
     {
         parent::__construct($params);
@@ -26,7 +27,7 @@ class Blogpost extends Controller
         //? La posicion 2 es el id del post
         if(!empty($params[2]) && is_int($params[2]))
         {
-            Helpers::sendToController("/Blogpost/all",
+            Helpers::sendToController("/post/all",
             [
                 "error" => "No existe este post."
             ]);
@@ -46,7 +47,7 @@ class Blogpost extends Controller
             }
             else
             {
-                Helpers::sendToController("/Blogpost/all",
+                Helpers::sendToController("/post/all",
                 [
                     "error" => "No existe este post."
                 ]);
