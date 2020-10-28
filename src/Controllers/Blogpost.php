@@ -52,7 +52,6 @@ class Blogpost extends Controller
                 "error" => "No existe este post."
             ]);
             }
-            
         }   
     }
 
@@ -79,11 +78,11 @@ class Blogpost extends Controller
                 else
                 {
                    //* Te envia a la view de la lista
-                parent::sendToView([
-                    "titulo" => "LIST"
-                    ,"list" => $list
-                    ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
-                ]); 
+                    parent::sendToView([
+                        "titulo" => "LIST"
+                        ,"list" => $list
+                        ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+                    ]); 
                 }
             }
             else
@@ -93,7 +92,7 @@ class Blogpost extends Controller
         }
         else
         {
-           Helpers::sendToController("/login",
+            Helpers::sendToController("/login",
             [
                 "error" => "Tienes que estar logueado para ver tus posts."
             ]);
