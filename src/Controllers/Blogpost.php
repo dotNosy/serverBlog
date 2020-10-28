@@ -23,14 +23,13 @@ class Blogpost extends Controller
 
     protected function view(array $params)
     {
+        //? La posicion 2 es el id del post
         if(!empty($params[2]) && is_int($params[2]))
         {
-            
-            Helpers::sendToController("/Blogpost/list",
+            Helpers::sendToController("/Blogpost/all",
             [
                 "error" => "No existe este post."
             ]);
-
         }
         else
         {
@@ -47,10 +46,10 @@ class Blogpost extends Controller
             }
             else
             {
-                Helpers::sendToController("/Blogpost/list",
-            [
-                "error" => "No existe este post."
-            ]);
+                Helpers::sendToController("/Blogpost/all",
+                [
+                    "error" => "No existe este post."
+                ]);
             }
         }   
     }
@@ -60,6 +59,7 @@ class Blogpost extends Controller
     {
         //* Se recoge el id del usuario en la sesion actual
         $user = User::getUser();
+
         if(!empty($user))
         {
             //* Me devuelve de la BD todos los registros del usuario del id
@@ -67,29 +67,14 @@ class Blogpost extends Controller
             
             if(!empty($list))
             {   
-                //? enviar a la view SIN PARAMETROS adicionales
-                if(!empty($_SESSION['URL_PARAMS']))
-                {
-                    parent::sendToView([
-                        "titulo" => "LIST"
-                        ,"list" => $list
-                        ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
-                    ]
-                    ,$_SESSION["URL_PARAMS"]); 
-                }
-                //? enviar a la view CON PARAMETROS adicionales
-                else
-                {
-                    parent::sendToView([
-                        "titulo" => "LIST"
-                        ,"list" => $list
-                        ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
-                    ]); 
-                }
+                parent::sendToView([
+                    "titulo" => "LIST"
+                    ,"list" => $list
+                    ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+                ]); 
             }
             else
             {
-                //TODO: No tienes posts
                 parent::sendToView([
                     "titulo" => "LIST"
                     ,"list" => $list
@@ -98,6 +83,7 @@ class Blogpost extends Controller
                 ]); 
             }
         }
+        //? No estas logueado
         else
         {
             Helpers::sendToController("/login",
@@ -110,34 +96,19 @@ class Blogpost extends Controller
     //! Todos los posts por orden cronologico
     protected function all(array $params)
     {
-        //* Me devuelve de la BD todos los registros del usuario del id
+        //* Todos los posts, los nuevos primero
         $list = Models\BlogPostModel::all();
         
         if(!empty($list))
         {
-            //? enviar a la view CON PARAMETROS adicionales
-            if(!empty($_SESSION['URL_PARAMS']))
-            {
-                parent::sendToView([
-                    "titulo" => "LIST"
-                    ,"list" => $list
-                    ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
-                ]
-                ,$_SESSION["URL_PARAMS"]); 
-            }
-            //? enviar a la view SIN PARAMETROS adicionales
-            else
-            {
-                parent::sendToView([
-                    "titulo" => "LIST"
-                    ,"list" => $list
-                    ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
-                ]); 
-            }
+            parent::sendToView([
+                "titulo" => "LIST"
+                ,"list" => $list
+                ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+            ]); 
         }
         else
         {
-            //TODO: No hay posts
             parent::sendToView([
                 "titulo" => "LIST"
                 ,"list" => $list

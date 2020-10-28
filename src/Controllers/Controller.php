@@ -35,21 +35,28 @@ class Controller
 
 
     //! Esta funcion solo se puede usar para redirigir a una vista de un mismo controllador
-    protected function sendToView(array $controllerParams, array $urlParams = null) :void
-    {
-        unset($_SESSION["css"]); //Reset css of the page
-        unset($_SESSION["error"]); //Reset erorrs of the page
+    //* Los parametros del controlador son para vistas del mismo controlador o funcion
+    //* Los parametros de url se obtienen de una llamada desde otro controlador u otra funcion del mismo usando Helpers::sendToController()
+    protected function sendToView(array $controllerParams) :void
+    {   
+        //* CONTROLLER PARAMS
 
-        //* Propiedades del controlador
+        //Limpiar restos de vistas hijas
+        unset($_SESSION["css"]); 
+        unset($_SESSION["error"]);
+
         foreach ($controllerParams as $name => $value) 
         {
             //! Añadir la informacion para recogerla en las plantillas
             $_SESSION[$name] = $value;
         }
 
+        //* URL PARAMS
+       
+        $urlParams = $_SESSION["URL_PARAMS"] ?: null;
+
         if (!empty($urlParams))
         {
-            // * Parametros de la URL
             foreach ($urlParams as $name => $value) 
             {
                 //! Añadir la informacion para recogerla en las plantillas

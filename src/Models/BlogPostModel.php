@@ -35,7 +35,7 @@ class BlogPostModel
             return $list;
         }
         else {
-            return $list;
+            return null;
         }
 
         $pdo_conn = NULL;
@@ -59,7 +59,7 @@ class BlogPostModel
             return $list;
         }
         else {
-            return $list;
+            return null;
         }
 
         $pdo_conn = NULL;
