@@ -52,15 +52,13 @@ class Profile
 
             $query->execute();
 
-            // $pdo_conn->commit();
-
             $PDOconnection->commit();
 
         } catch (Exception $e) {
             $PDOconnection->rollback();
             throw $e;
         }
-        $pdo_conn = NULL;
+        $PDOconnection = NULL;
     }
 
     public static function addName(string $name, PDO $PDOconnection)
@@ -72,15 +70,13 @@ class Profile
 
             $query->execute();
 
-            // $pdo_conn->commit();
-
             $PDOconnection->commit();
 
         } catch (Exception $e) {
             $PDOconnection->rollback();
             throw $e;
         }
-        $pdo_conn = NULL;
+        $PDOconnection = NULL;
     }
 
     public static function updateName(string $name, PDO $PDOconnection)
@@ -92,15 +88,13 @@ class Profile
 
             $query->execute();
 
-            // $pdo_conn->commit();
-
             $PDOconnection->commit();
 
         } catch (Exception $e) {
             $PDOconnection->rollback();
             throw $e;
         }
-        $pdo_conn = NULL;
+        $PDOconnection = NULL;
     }
 
     public static function addSurname(string $surname, PDO $PDOconnection)
@@ -112,15 +106,13 @@ class Profile
 
             $query->execute();
 
-            // $pdo_conn->commit();
-
             $PDOconnection->commit();
 
         } catch (Exception $e) {
             $PDOconnection->rollback();
             throw $e;
         }
-        $pdo_conn = NULL;
+        $PDOconnection = NULL;
     }
 
     public static function updateSurname(string $surname, PDO $PDOconnection)
@@ -132,15 +124,13 @@ class Profile
 
             $query->execute();
 
-            // $pdo_conn->commit();
-
             $PDOconnection->commit();
 
         } catch (Exception $e) {
             $PDOconnection->rollback();
             throw $e;
         }
-        $pdo_conn = NULL;
+        $PDOconnection = NULL;
     }
 
     public static function addEmail(string $email, PDO $PDOconnection)
@@ -152,15 +142,13 @@ class Profile
 
             $query->execute();
 
-            // $pdo_conn->commit();
-
             $PDOconnection->commit();
 
         } catch (Exception $e) {
             $PDOconnection->rollback();
             throw $e;
         }
-        $pdo_conn = NULL;
+        $PDOconnection = NULL;
     }
 
     public static function updateEmail(string $email, PDO $PDOconnection)
@@ -172,15 +160,13 @@ class Profile
 
             $query->execute();
 
-            // $pdo_conn->commit();
-
             $PDOconnection->commit();
 
         } catch (Exception $e) {
             $PDOconnection->rollback();
             throw $e;
         }
-        $pdo_conn = NULL;
+        $PDOconnection = NULL;
     }
 
     public static function addBirth(string $birthdate, PDO $PDOconnection)
@@ -192,15 +178,13 @@ class Profile
 
             $query->execute();
 
-            // $pdo_conn->commit();
-
             $PDOconnection->commit();
 
         } catch (Exception $e) {
             $PDOconnection->rollback();
             throw $e;
         }
-        $pdo_conn = NULL;
+        $PDOconnection = NULL;
     }
 
     public static function updateBirth(string $birthdate, PDO $PDOconnection)
@@ -212,15 +196,13 @@ class Profile
 
             $query->execute();
 
-            // $pdo_conn->commit();
-
             $PDOconnection->commit();
 
         } catch (Exception $e) {
             $PDOconnection->rollback();
             throw $e;
         }
-        $pdo_conn = NULL;
+        $PDOconnection = NULL;
     }
 
     
