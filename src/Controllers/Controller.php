@@ -24,7 +24,7 @@ class Controller
                 $method = $params[1];
                 $this->$method($params);
             } else {
-                Services\Helpers::sendTo404();   
+                Helpers::sendTo404();   
             }
         }
         //? si pasa algo que no se esperaba
@@ -33,17 +33,32 @@ class Controller
         }
     }
 
-    protected function sendToView(array $properties) :void
+
+    //! Esta funcion solo se puede usar para redirigir a una vista de un mismo controllador
+    protected function sendToView(array $controllerParams, array $urlParams = null) :void
     {
         unset($_SESSION["css"]); //Reset css of the page
         unset($_SESSION["error"]); //Reset erorrs of the page
 
-        foreach ($properties as $name => $value) 
+        //* Propiedades del controlador
+        foreach ($controllerParams as $name => $value) 
         {
             //! Añadir la informacion para recogerla en las plantillas
             $_SESSION[$name] = $value;
         }
-        
+
+        if (!empty($urlParams))
+        {
+            // * Parametros de la URL
+            foreach ($urlParams as $name => $value) 
+            {
+                //! Añadir la informacion para recogerla en las plantillas
+                $_SESSION[$name] = $value;
+            }
+            
+            unset($_SESSION['URL_PARAMS']);
+        }
+
         require_once __PARENT_TEMPLATE__;
         die();
     }

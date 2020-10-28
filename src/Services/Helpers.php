@@ -11,8 +11,14 @@ class Helpers
         die();
     }
 
-    public static function sendToController(string $url = "/")
+    public static function sendToController(string $url = "/", array $urlParams = null)
     {
+        //* Add parametros de url a la sesion
+        if (!empty($urlParams))
+        {
+            $_SESSION['URL_PARAMS'] = $urlParams;
+        }
+
         header("Location: $url");
         die();
     }

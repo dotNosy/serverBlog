@@ -33,8 +33,7 @@ class Router
         if (count($url_splitted) > 0 ) 
         {
             //* pasar a minus todos los parametros de la url
-            for($i = 0; $i < count($url_splitted); $i++)
-            {
+            for($i = 0; $i < count($url_splitted); $i++) {
                 $url_splitted[$i] = trim(strtolower($url_splitted[$i]));
             }
 
@@ -65,8 +64,7 @@ class Router
 
             new $controller($url);
         }
-        else
-        {   
+        else {   
            Helpers::sendTo404();
         }
     }

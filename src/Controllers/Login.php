@@ -17,11 +17,26 @@ class Login extends Controller
 
     protected function index(array $params = null) 
     {   
-        parent::sendToView([
-           "titulo" => "LOGIN"
-           ,"css" => array("login.css")
-           ,"page" => __DIR__ . '/../Views/Login.php'
-        ]);
+        //? Si hay parametros adicionales en la URL
+        if (!empty($params) && !empty($_SESSION['URL_PARAMS']))
+        {   
+            //* Los parametros de Index tienen que ser unicamente para la vista
+            parent::sendToView(
+            [
+                "titulo" => "LOGIN"
+                ,"css" => array("login.css")
+                ,"page" => __DIR__ . '/../Views/Login.php'
+            ]
+            ,$_SESSION['URL_PARAMS']);
+        }
+        else
+        {
+            parent::sendToView([
+                "titulo" => "LOGIN"
+                ,"css" => array("login.css")
+                ,"page" => __DIR__ . '/../Views/Login.php'
+             ]);
+        }
     }
 
     protected function login()

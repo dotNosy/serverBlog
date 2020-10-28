@@ -28,6 +28,7 @@
                                 <div class="fa fa-linkedin"></div>
                             </div>
                         </div>
+                        <!-- action="/controlador/funcion" -->
                         <form action="/login/login" method="POST">
                             <div class="row px-3 mb-4">
                                 <div class="line"></div> <small class="or text-center">Or</small>
