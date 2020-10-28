@@ -30,10 +30,12 @@ class User
 
         if ($query->execute())
         {
+            //* obtener la row como objeto
             $user = $query->fetch(PDO::FETCH_OBJ);
 
             if (!empty($user)) 
             {
+                //? Si el hash de las contraseñas coincide, Return una instancia del objeto User
                 if (password_verify($password, $user->password)) {
                     return new self(intval($user->id), $user->username);
                 }
@@ -52,33 +54,13 @@ class User
     }
 
     public static function logout() 
-    {
-        if (isset($_SESSION['user']))
+    {   
+        if (isset($_SESSION['user']) || !empty($_SESSION['user']))
         {
             unset($_SESSION['user']);
         }
         
         session_destroy();
-    }
-
-    public static function getUser()
-    {
-        if (!empty($_SESSION['user'])) {
-            return unserialize($_SESSION['user']);
-        }
-        else {
-            return null;
-        }
-    }
-
-    public function getUsername () :string
-    {
-        return $this->username;
-    }
-
-    public function getId () :int
-    {
-        return $this->id;
     }
 
     public static function add(string $username, string $password)
@@ -101,17 +83,17 @@ class User
             $id = $pdo_conn->lastInsertId();
 
             //* Se añade un perfil para el usuario recien registrado
-            Profile::add($id, $pdo_conn);
+            Profile::add(intval($id), $pdo_conn);
 
             //* Si todo sale bien, se hace un commit de las dos tablas
-            $pdo_conn->commit();
+            //$pdo_conn->commit();
 
             return true;
         }
         catch(Exception $e) 
         {
             //! Si no sale bien se hace un rollback de todas las transacciones (tanto usuario como perfil)
-            $pdo_conn->rollback();
+            //$pdo_conn->rollback();
             throw $e;
             return false;
         }
@@ -124,7 +106,6 @@ class User
     {
         $connObj = new Services\Connection(Services\Helpers::getEnviroment());
         $pdo_conn = $connObj->getConnection();
-
 
         //* Se busca el usuario introducido
         $query = $pdo_conn->prepare("SELECT * FROM user WHERE username=:username");
@@ -143,5 +124,26 @@ class User
             return false;
         }
         $pdo_conn = NULL;
+    }
+
+    public static function getUser()
+    {
+        //? Devolver objeto $user como json
+        if (!empty($_SESSION['user'])) {
+            return json_decode($_SESSION['user']);
+        }
+        else {
+            return null;
+        }
+    }
+
+    public function getUsername () :string
+    {
+        return $this->username;
+    }
+
+    public function getId () :int
+    {
+        return $this->id;
     }
 }

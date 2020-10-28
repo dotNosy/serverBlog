@@ -3,8 +3,8 @@
 
     $user = User::getUser();
 
-    if ($user)
+    if (!empty($user))
     {
-        echo $user->getId();
-        echo $user->getUsername();
+        echo $user->id;
+        echo $user->username;
     }

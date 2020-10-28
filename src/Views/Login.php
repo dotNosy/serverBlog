@@ -9,9 +9,13 @@
             </div>
             <div class="col-lg-6">
                 <div class="card2 card border-0 px-4 py-5">
-                    <?php if(!empty($_SESSION['user'])): ?>
-                        <div class="col-12 alert-success text-center my-3">Ya has iniciado sesion</div>
-                    <?php else: ?>
+                    <?php 
+                        use ServerBlog\Models\User;
+                        $user = User::getUser();
+                        if(!empty($user)): ?>
+                            <?php var_dump($_SESSION['user']) ?>
+                                <div class="col-12 alert-success text-center my-3">Ya has iniciado sesion</div>
+                            <?php else: ?>
                         <div class="row mb-4 px-3">
                             <h6 class="mb-0 mr-4 mt-2">Sign in with</h6>
                             <div class="facebook text-center mr-3">
