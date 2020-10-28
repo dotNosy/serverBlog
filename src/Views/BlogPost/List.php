@@ -1,5 +1,5 @@
 <?php use ServerBlog\Models\User ?>
-
+<!-- <?php var_dump($_SESSION); ?> -->
 <section id="gallery">
   <div class="container">
     <div class="row">

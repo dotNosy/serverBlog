@@ -53,12 +53,11 @@ class Controller
 
         //* URL PARAMS
        
-        $urlParams = empty($_SESSION["URL_PARAMS"]) ?: $_SESSION["URL_PARAMS"];
-
-        if (!$urlParams)
+        if (!empty($_SESSION["URL_PARAMS"]))
         {
-            foreach ($urlParams as $name => $value) 
+            foreach ($_SESSION["URL_PARAMS"] as $name => $value) 
             {
+                
                 //! Añadir la informacion para recogerla en las plantillas
                 $_SESSION[$name] = $value;
             }

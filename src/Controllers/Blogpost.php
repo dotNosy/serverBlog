@@ -121,7 +121,40 @@ class Blogpost extends Controller
 
     protected function feed(array $params)
     {
-        $list = Models\BlogPostModel::all();
+        //* Se recoge el id del usuario en la sesion actual
+        $user = User::getUser();
+
+        if(!empty($user))
+        {
+            //* Me devuelve de la BD todos los registros del usuario del id
+            $feed = Models\BlogPostModel::feed(intval($user->id));
+            
+            if(!empty($feed))
+            {   
+                parent::sendToView([
+                    "titulo" => "FEED"
+                    ,"feed" => $feed
+                    ,"page" => __DIR__ . '/../Views/BlogPost/Feed.php'
+                ]); 
+            }
+            else
+            {
+                parent::sendToView([
+                    "titulo" => "LIST"
+                    ,"feed" => $feed
+                    ,"error" => "Tu feed está vacio."
+                    ,"page" => __DIR__ . '/../Views/BlogPost/Feed.php'
+                ]); 
+            }
+        }
+        //? No estas logueado
+        else
+        {
+            Helpers::sendToController("/login",
+            [
+                "error" => "Tienes que estar logueado para ver tu feed."
+            ]);
+        }  
     }
 
     //! Todos los posts de X autor(user)
