@@ -53,7 +53,7 @@ class Controller
 
         //* URL PARAMS
        
-        $urlParams = $_SESSION["URL_PARAMS"] ?: null;
+        $urlParams = empty($_SESSION["URL_PARAMS"]) ?: $_SESSION["URL_PARAMS"];
 
         if (!empty($urlParams))
         {
