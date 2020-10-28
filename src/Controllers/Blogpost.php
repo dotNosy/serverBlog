@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ServerBlog\Controllers;
 
 use ServerBlog\Models as Models;
+use ServerBlog\Services\Helpers;
 
 use ServerBlog\Models\User;
 
@@ -30,8 +31,8 @@ class Blogpost extends Controller
         //* Se recoge el id del usuario en la sesion actual
         $user = User::getUser();
 
-        if(!empty($user)){
-            echo "debug";
+        if(!empty($user))
+        {
             //* Me devuelve de la BD todos los registros del usuario del id
             $list = Models\BlogPostModel::list(intval($user->id));
             
@@ -51,11 +52,9 @@ class Blogpost extends Controller
         }
         else
         {
-            parent::sendToView([
-                "titulo" => "SIGNING UP"
-                ,"css" => array("login.css")
-                ,"error" => "Para ver tus posts debes estar registrado."
-                ,"page" => __DIR__ . '/../Views/Login.php'
+           Helpers::sendToController("/login",
+            [
+                "error" => "Tienes que estar logueado para ver tus posts."
             ]);
         }  
     }
