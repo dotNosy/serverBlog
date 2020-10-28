@@ -13,7 +13,6 @@
                         use ServerBlog\Models\User;
                         $user = User::getUser();
                         if(!empty($user)): ?>
-                            <?php var_dump($_SESSION['user']) ?>
                                 <div class="col-12 alert-success text-center my-3">Ya has iniciado sesion</div>
                             <?php else: ?>
                         <div class="row mb-4 px-3">
