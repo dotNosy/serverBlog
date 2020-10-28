@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ServerBlog\Models;
 
 use ServerBlog\Services as Services;
+
 use \PDO;
 
 class User
@@ -76,7 +77,7 @@ class User
             $query = $pdo_conn->prepare("INSERT INTO user (username, password) VALUES (:username, :password)");
             $query->bindValue("username", $username);
             $query->bindValue("password", password_hash($password, PASSWORD_BCRYPT));
-
+            
             $query->execute();
 
             //* Se guarda el ultimo id insertado (el del registro)
@@ -84,16 +85,13 @@ class User
 
             //* Se añade un perfil para el usuario recien registrado
             Profile::add(intval($id), $pdo_conn);
-
-            //* Si todo sale bien, se hace un commit de las dos tablas
-            //$pdo_conn->commit();
-
+            
             return true;
         }
         catch(Exception $e) 
         {
             //! Si no sale bien se hace un rollback de todas las transacciones (tanto usuario como perfil)
-            //$pdo_conn->rollback();
+            $pdo_conn->rollback();
             throw $e;
             return false;
         }
