@@ -9,6 +9,8 @@ use ServerBlog\Services\Helpers;
 
 use ServerBlog\Models\User;
 
+use ServerBlog\Services\Helpers;
+
 class Blogpost extends Controller
 {
     public function __construct(array $params = null) 
@@ -23,7 +25,46 @@ class Blogpost extends Controller
 
     protected function view(array $params)
     {
+        if(!empty($params[2]) && is_int($params[2]))
+        {
+            // parent::sendToView([
+            //     "titulo" => "LIST"
+            //     ,"error" => "No existe ese post."
+            //     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+            // ]);
+            
+            Helpers::sendToController("/Blogpost/list",
+            [
+                "error" => "Tienes que estar logueado para ver tus posts."
+            ]);
 
+        }
+        else
+        {
+            $view = Models\BlogPostModel::view(intval($params[2]));
+            if(!empty($view))
+            {
+                parent::sendToView([
+                    "titulo" => "POST"
+                    ,"css" => array("post.css")
+                    ,"blogPost" => $view
+                    ,"page" => __DIR__ . '/../Views/BlogPost/View.php'
+                ]);
+            }
+            else
+            {
+                // parent::sendToView([
+                //     "titulo" => "LIST"
+                //     ,"error" => "No existe ese post."
+                //     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+                // ]);
+                Helpers::sendToController("/Blogpost/list",
+            [
+                "error" => "Tienes que estar logueado para ver tus posts."
+            ]);
+            }
+            
+        }   
     }
 
     protected function list(array $params = null)
@@ -38,12 +79,24 @@ class Blogpost extends Controller
             
             if(!empty($list))
             {
-                //* Te envia a la view de la lista
+                if(!empty($_SESSION['URL_PARAMS']))
+                {
+                    parent::sendToView([
+                        "titulo" => "LIST"
+                        ,"list" => $list
+                        ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+                    ]
+                    ,$_SESSION["URL_PARAMS"]); 
+                }
+                else
+                {
+                   //* Te envia a la view de la lista
                 parent::sendToView([
                     "titulo" => "LIST"
                     ,"list" => $list
                     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
-                ]);
+                ]); 
+                }
             }
             else
             {
