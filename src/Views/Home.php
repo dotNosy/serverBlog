@@ -1,9 +1,10 @@
 <?php 
+    use ServerBlog\Models\User;
 
-    if (!empty($_SESSION['user'])) 
+    $user = User::getUser();
+
+    if ($user)
     {
-        $user = unserialize($_SESSION['user']);
-
         echo $user->getId();
         echo $user->getUsername();
     }

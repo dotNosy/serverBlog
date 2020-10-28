@@ -13,10 +13,26 @@ class Home extends Controller
 
     protected function index(array $params = null) 
     {
-        parent::sendToView([
-            "user" => serialize($user)
-            ,"titulo" => "HOME"
-            ,"page" => __DIR__ . '/../Views/Home.php'
-         ]);
+
+    }
+
+    protected function view(array $params)
+    {
+
+    }
+
+    protected function list(array $params = null)
+    {
+
+    }
+
+    protected function create(array $params = null)
+    {
+        
+    }
+
+    protected function edit(array $params)
+    {
+
     }
 }

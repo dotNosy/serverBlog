@@ -11,6 +11,12 @@ class Helpers
         die();
     }
 
+    public static function sendToController(string $url = "/")
+    {
+        header("Location: $url");
+        die();
+    }
+
     public static function cleanInput($input)
     {
         return htmlspecialchars(trim($input));

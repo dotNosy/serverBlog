@@ -52,15 +52,9 @@ class Login extends Controller
 
     protected function logout($params = null)
     {
-        if (isset($_SESSION['user']))
-        {
-            unset($_SESSION['user']);
-        }
-        
-        session_destroy();
+        Models\User::logout();
 
-        header("Location: /");
-        die();
+        Services\Helpers::sendToController("/home");
     }
 
     protected function register($params = null) 
@@ -120,7 +114,7 @@ class Login extends Controller
                 }
 
                 //* Comprobación de que el usuario no exista
-
+                
                 if(Models\User::userExists($username))
                 {
                     parent::sendToView([
@@ -182,11 +176,7 @@ class Login extends Controller
         //? USUARIO CORRECTO
         else if (!empty($user) && $user instanceof Models\User) 
         {
-            parent::sendToView([
-                "user" => serialize($user)
-                ,"titulo" => "HOME"
-                ,"page" => __DIR__ . '/../Views/Home.php'
-             ]);
+            Services\Helpers::sendToController("/home");
         }
         else 
         {

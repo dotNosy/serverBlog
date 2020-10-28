@@ -7,16 +7,16 @@ use \PDO as PDO;
 class Connection 
 {
   private DatabaseConfig $config;
-  private $conn;
+  private PDO $conn;
 
   public function __construct($configMode) 
   {
     try 
     {
-      $config = new DatabaseConfig($configMode);
+      $config = new DataBaseConfig($configMode);
 
       $this->conn = new PDO("mysql:host=$config->servername;dbname=$config->dbName", $config->username, $config->password);
-
+      
       //propiedades / config de la conexion
       $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     }
@@ -25,6 +25,10 @@ class Connection
       //TODO: manejar excepcion o reenviar a pagina de error
       echo "Connection failed: " . $e->getMessage();
       die();
+    }
+    catch(Exception $e)
+    {
+      echo $e->getMessage();
     }
   }
 

@@ -17,35 +17,28 @@ class Profile
         $this->id = $id;
     }
 
-    
-        // $connObj = new Services\Connection(Services\Helpers::getEnviroment());
-
-        // $pdo_conn = $connObj->getConnection();
-
-        // $query = $pdo_conn->prepare("SELECT id, username, password FROM USER WHERE USERNAME = :username");
-        // $query->bindValue("username", $username);
-
-        
-
     public static function add(string $id, PDO $PDOconnection)
     {
         try
         {
+            //* Se intenta insertar un perfil con el id del usuario recien registrado
             $query = $PDOconnection->prepare("INSERT INTO profile (user_id) VALUES (:id)");
             $query->bindValue("id", $id);
-
             $query->execute();
 
-            // $pdo_conn->commit();
-
+            //* Si la query funciona se hacen un commit
             $PDOconnection->commit();
-
-        } catch (Exception $e) {
+        } 
+        catch (Exception $e) 
+        {
+            //! Si no funciona la query se hace un rollback tanto de perfil como de usuario
             $PDOconnection->rollback();
             throw $e;
         }
+
         $pdo_conn = NULL;
     }
+<<<<<<< HEAD
 
     public static function updateId(string $id, PDO $PDOconnection)
     {
@@ -232,4 +225,6 @@ class Profile
 
 
 
+=======
+>>>>>>> ab35736aed50b0c5be9fbbc891cdff5d887349ba
 }

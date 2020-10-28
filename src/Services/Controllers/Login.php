@@ -19,17 +19,16 @@ class Login
         // $errors_init = $errors;
         $errors = "";
         if (strlen($pwd) < 8) {
-            $errors .= "Password too short!<br>";
+            $errors .= "La contraseña es demasiado corta! (Al menos 8 caracteres)<br>";
         }
     
         if (!preg_match("#[0-9]+#", $pwd)) {
-            $errors .= "Password must include at least one number!<br>";
+            $errors .= "La contraseña tiene que tener por lo menos un numero!<br>";
         }
     
         if (!preg_match("#[a-zA-Z]+#", $pwd)) {
-            $errors .= "Password must include at least one letter!<br>";
+            $errors .= "La contraseña debe tener por lo menos una letra!<br>";
         }     
-    
         return $errors;//($errors == $errors_init);
     }
 
