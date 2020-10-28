@@ -41,4 +41,38 @@ class BlogPostModel
             }
         $pdo_conn = NULL;
     }
+
+    public static function add(int $id, string $titulo, string $mensaje, int $visible)
+    {
+        // //* Se recoge el id del usuario en la sesion actual
+
+        $today = date("Y/m/d h:i:s");
+
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+
+        $pdo_conn = $connObj->getConnection();
+
+        //    //* Se hace un insert con los datos del post
+
+                $query = $pdo_conn->prepare("INSERT INTO post (user_id, title, text, date, visible) VALUES (:user_id, :titulo, :mensaje, :today, :visible)");
+                $query->bindValue("user_id", $id);
+                $query->bindValue("titulo", $titulo);
+                $query->bindValue("mensaje", $mensaje);
+                $query->bindValue("today", $today);
+                $query->bindValue("visible", $visible);
+
+            if($query->execute())
+            {
+                //* Si la query funciona se hacen un commit
+                $pdo_conn->commit();
+                return true;
+            }else
+            {
+                $pdo_conn->rollback();
+                return false;
+            }  
+            // //? Usuario no logueado
+        $pdo_conn = NULL; 
+    }
+        
 }
