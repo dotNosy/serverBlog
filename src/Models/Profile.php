@@ -38,7 +38,6 @@ class Profile
 
         $pdo_conn = NULL;
     }
-<<<<<<< HEAD
 
     public static function updateId(string $id, PDO $PDOconnection)
     {
@@ -225,6 +224,4 @@ class Profile
 
 
 
-=======
->>>>>>> ab35736aed50b0c5be9fbbc891cdff5d887349ba
 }
