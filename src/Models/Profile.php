@@ -20,16 +20,16 @@ class Profile
     public static function add(int $id, PDO &$PDOconnection)
     {
         try
-        {   
+        {               
             //* Se intenta insertar un perfil con el id del usuario recien registrado
             $query = $PDOconnection->prepare("INSERT INTO profile (user_id) VALUES (:id)");
             $query->bindValue("id", $id);
-            if($query->execute())
-            {
+
+            if($query->execute()) {
                 //* Si la query funciona se hacen un commit
                 $PDOconnection->commit();
-            }else
-            {
+            }
+            else {
                 $PDOconnection->rollback();
             }            
         } 

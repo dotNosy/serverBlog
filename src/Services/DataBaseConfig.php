@@ -33,6 +33,11 @@ class DatabaseConfig
                 $this->dbName = "blog";
                 $this->username = "root";
                 $this->password = "";
+            case "nosy":
+                $this->servername = "localhost";
+                $this->dbName = "blog";
+                $this->username = "root";
+                $this->password = "Nosy123";
             break;
         }
     }
