@@ -57,7 +57,6 @@ class Controller
         {
             foreach ($_SESSION["URL_PARAMS"] as $name => $value) 
             {
-                
                 //! Añadir la informacion para recogerla en las plantillas
                 $_SESSION[$name] = $value;
             }
