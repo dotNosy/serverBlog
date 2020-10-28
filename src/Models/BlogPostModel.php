@@ -114,4 +114,29 @@ class BlogPostModel
 
         $pdo_conn = NULL;
     }
+
+    public static function addTofavorites(int $id, int $user_id)
+    {
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+
+        $pdo_conn = $connObj->getConnection();
+
+        //* Se recogen los posts de la persona logeada actualmente
+        $query = $pdo_conn->prepare("INSERT INTO [like](post_id, user_id) VALUES(:post, :user) ");
+        $query->bindValue("post", $id);
+        $query->bindValue("post", $user_id);
+
+        if ($query->execute())
+        {
+            //* Mete todos los datos en un array
+            $post = $query->fetch(PDO::FETCH_OBJ);
+
+            return true;
+        }
+        else {
+            return false;
+        }
+
+        $pdo_conn = NULL;
+    }
 }

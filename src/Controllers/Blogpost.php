@@ -139,4 +139,21 @@ class Blogpost extends Controller
     {
 
     }
+
+    protected function favorites($params = null)
+    {
+        if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['type']))
+        {
+            $type = Helpers::cleanInput($_POST['type']);
+            
+            if ($type == "favoritos")
+            {
+                echo "favoritos stuff";
+            }
+            else if($type == "feed")
+            {
+                echo "feed stuff";
+            }
+        }
+    }
 }
