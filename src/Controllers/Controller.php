@@ -55,7 +55,7 @@ class Controller
        
         $urlParams = empty($_SESSION["URL_PARAMS"]) ?: $_SESSION["URL_PARAMS"];
 
-        if (!empty($urlParams))
+        if (!$urlParams)
         {
             foreach ($urlParams as $name => $value) 
             {
