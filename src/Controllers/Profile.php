@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace ServerBlog\Controllers;
 
+use ServerBlog\Services as Services;
+
+use ServerBlog\Models as Models;
+
 class Profile extends Controller
 {
     public function __construct(array $params = null) 
@@ -27,3 +31,26 @@ class Profile extends Controller
         }
     }
 }
+
+    function addName()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['addName']))
+        {
+            $name = Services\Helpers::cleanInput($_POST['addName']);
+
+            //? Error credenciales vacias
+            if (empty($name)) 
+            {   
+            echo  "Los campos estan vacios";
+            }
+            //? DO LOGIN
+            else
+            {
+                $this->addName($name);
+                echo "los datos se han insertado correctamente";
+            }
+        }
+        else {
+            Services\Helpers::sendTo404();
+        }
+    }

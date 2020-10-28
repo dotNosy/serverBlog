@@ -2,20 +2,9 @@
     <hr>
   <div class="card bg-light">
     <article class="card-body mx-auto" style="max-width: 400px">
-      <h4 class="card-title mt-3 text-center">Create Account</h4>
-      <p class="text-center">Get started with your free account</p>
-      <p>
-        <a href="" class="btn btn-block btn-twitter">
-          <i class="fab fa-twitter"></i>   Login via Twitter</a
-        >
-        <a href="" class="btn btn-block btn-facebook">
-          <i class="fab fa-facebook-f"></i>   Login via facebook</a
-        >
-      </p>
-      <p class="divider-text">
-        <span class="bg-light">OR</span>
-      </p>
-      <form>
+      <h4 class="card-title mt-3 text-center">PERFIL</h4>
+      <form action="/profile" method="POST">
+      <!--  action="/profile" method="POST" -->
         <div class="form-group input-group">
           <div class="input-group-prepend">
             <span class="input-group-text"> <i class="fa fa-user"></i> </span>
@@ -23,7 +12,18 @@
           <input
             name=""
             class="form-control"
-            placeholder="Full name"
+            placeholder="Nombre"
+            type="text"
+          />
+        </div>
+        <div class="form-group input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+          </div>
+          <input
+            name=""
+            class="form-control"
+            placeholder="Apellido"
             type="text"
           />
         </div>
@@ -37,8 +37,22 @@
           <input
             name=""
             class="form-control"
-            placeholder="Email address"
+            placeholder="Email"
             type="email"
+          />
+        </div>
+        <!-- form-group// -->
+        <div class="form-group input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">
+              <i class="fa fa-user"></i>
+            </span>
+          </div>
+          <input
+            name=""
+            class="form-control"
+            placeholder="Fecha de nacimiento"
+            type="date"
           />
         </div>
         <!-- form-group end.// -->
@@ -48,29 +62,31 @@
           </div>
           <input
             class="form-control"
-            placeholder="Create password"
+            placeholder="Contraseña"
             type="password"
           />
         </div>
-        <!-- form-group// -->
+        <!-- form-group end.// -->
         <div class="form-group input-group">
           <div class="input-group-prepend">
             <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
           </div>
           <input
             class="form-control"
-            placeholder="Repeat password"
+            placeholder="Confirmar contraseña"
             type="password"
           />
         </div>
         <!-- form-group// -->
         <div class="form-group">
-          <button type="submit" class="btn btn-primary btn-block">
-            Create Account
+          <button type="submit" name="insertar" class="btn btn-primary btn-block">
+            Insertar datos
+          </button>
+          <button type="submit" name="modificar" class="btn btn-primary btn-block">
+            Modificar datos
           </button>
         </div>
         <!-- form-group// -->
-        <p class="text-center">Have an account? <a href="/login">Log In</a></p>
       </form>
     </article>
   </div>
