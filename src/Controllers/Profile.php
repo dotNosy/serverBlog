@@ -17,8 +17,8 @@ class Profile extends Controller
         {
             parent::sendToView([
                 "titulo" => "TEST CONTROLLER"
-               ,"page" =>  __DIR__ . '/../Views/Profile.php'
-           ]);
+            ,"page" =>  __DIR__ . '/../Views/Profile.php'
+        ]);
         }
         else
         {
