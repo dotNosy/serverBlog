@@ -118,6 +118,11 @@ class Blogpost extends Controller
         }
     }
 
+    protected function feed(array $params)
+    {
+        $list = Models\BlogPostModel::all();
+    }
+
     //! Todos los posts de X autor(user)
     protected function author(array $params)
     {
