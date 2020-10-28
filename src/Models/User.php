@@ -93,7 +93,7 @@ class User
         catch(Exception $e) 
         {
             //! Si no sale bien se hace un rollback de todas las transacciones (tanto usuario como perfil)
-            //$pdo_conn->rollback();
+            $pdo_conn->rollback();
             throw $e;
             return false;
         }
