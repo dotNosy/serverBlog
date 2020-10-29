@@ -3,6 +3,13 @@
     $post=json_decode($_SESSION["blogPost"]);
 } ?>
 
+<?php 
+  use ServerBlog\Models\User;
+  use ServerBlog\Models\BlogPostModel;
+
+  $user = User::getUser();
+?>
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container">
       <a class="navbar-brand" href="#">Start Bootstrap</a>
@@ -68,11 +75,12 @@
         <div class="card my-4">
           <h5 class="card-header">Leave a Comment:</h5>
           <div class="card-body">
-            <form>
+            <form method = "POST" action="/post/addComment/">
               <div class="form-group">
-                <textarea class="form-control" rows="3"></textarea>
+              <input type="hidden" name="id" <?= (!empty($user->id) ? "value='$user->id'" : '') ?>>
+                <textarea class="form-control" rows="3" name = "text"></textarea>
               </div>
-              <button type="submit" class="btn btn-primary">Submit</button>
+              <button type="submit" class="btn btn-primary" name="comment">Submit</button>
             </form>
           </div>
         </div>
