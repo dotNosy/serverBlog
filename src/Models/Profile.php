@@ -100,25 +100,6 @@ class Profile
         $PDOconnection = NULL;
     }
 
-    public static function addEmail(string $email, PDO $PDOconnection)
-    {
-        try
-        {
-            $query = $PDOconnection->prepare("INSERT INTO profile (email) VALUES (:email)");
-            $query->bindValue("email", $email);
-
-            $query->execute();
-
-            $PDOconnection->commit();
-
-        } catch (Exception $e) {
-            $PDOconnection->rollback();
-            throw $e;
-        }
-
-        $PDOconnection = NULL;
-    }
-
     public static function updateEmail(string $email, PDO $PDOconnection)
     {
         try
