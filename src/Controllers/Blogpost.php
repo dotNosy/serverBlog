@@ -133,6 +133,7 @@ class Blogpost extends Controller
             if(!empty($feed))
             {   
                 var_dump($feed);
+                die();
                 parent::sendToView([
                     "titulo" => "FEED"
                     ,"feed" => $feed
@@ -248,13 +249,11 @@ class Blogpost extends Controller
             
                     if ($type == "favoritos")
                     {
-                        echo "favoritos stuff";
-                        
                         //TODO: si el post esta ya en el feed lo quitamos y si no lo metemos
                         
-                        $done = Models\BlogPostModel::addToFavorites(intval($post_id), $user->id);
+                        $added = Models\BlogPostModel::addToFavorites(intval($post_id), $user->id);
                         
-                        if ($done)
+                        if ($added)
                         {
                             Helpers::sendToController("/post/all");
                         }
@@ -268,13 +267,11 @@ class Blogpost extends Controller
                     }
                     else if($type == "feed")
                     {
-                        echo "feed stuff";
-
                         //TODO: si el post esta ya en favoritos lo quitamos y si no lo metemos
 
-                        $done = Models\BlogPostModel::addToFeed($post_id, $user->id);
+                        $added = Models\BlogPostModel::addToFeed($post_id, $user->id);
                         
-                        if ($done)
+                        if ($added)
                         {
                             Helpers::sendToController($_SERVER['PHP_SELF']);
                         }
@@ -287,6 +284,7 @@ class Blogpost extends Controller
                         }
                     }
                 }
+                //? No hay post
                 else
                 {
                     Helpers::sendToController("/post/all",
