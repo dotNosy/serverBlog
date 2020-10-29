@@ -83,28 +83,88 @@ class Profile
         $PDOconnection = NULL;
     }
 
-    public static function prueba()
+    public static function prueba(int $id, string $name)
     {
-        try
-        {   
-            $name= "juantxo";
-            $userid = "76";
 
-            $query = $PDOconnection->prepare("UPDATE profile SET name=:name WHERE user_id=:userid");
-            //El :name guarda el contenido de $name
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+
+        $pdo_conn = $connObj->getConnection();
+        $pdo_conn->beginTransaction();
+
+        try
+        {
+            $stm = "";
+            //name=:name, surname=:surname, email=:email, birth_date=:birth_date
+
+            if (!empty($name)) {
+                $stm += "name=:name";
+            
+            //* Se recogen los posts de la persona logeada actualmente
+            $query = $pdo_conn->prepare("UPDATE profile SET $stm WHERE user_id=:userid");
             $query->bindValue("name", $name);
             $query->bindValue("userid", $userid);
 
-            $query->execute();
+            if ($query->execute())
+            {
+                //* Mete todos los datos en un array
+                $pdo_conn->commit();
 
-            $PDOconnection->commit();
-
-        } catch (Exception $e) {
-            $PDOconnection->rollback();
+                return true;
+            }
+            else
+            {
+                $pdo_conn->rollback();
+                return false;
+            }
+        }
+    }
+        catch (Exception $e)
+        {
+            $pdo_conn->rollback();
             throw $e;
+            return false;
         }
 
-        $PDOconnection = NULL;
+        $pdo_conn = NULL;
+
+        // $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+
+        // $pdo_conn = $connObj->getConnection();
+
+        // $pdo_conn->beginTransaction();
+
+        // try
+        // {   
+
+        //     $name= "jacinto";
+        //     $userid = "74";
+
+        //     $query = $pdo_conn->prepare("UPDATE profile SET name=:name WHERE user_id=:userid");
+        //     //El :name guarda el contenido de $name
+        //     $query->bindValue("name", $name);
+        //     $query->bindValue("userid", $userid);
+
+        //     $query->execute();
+
+        //     $query->commit();
+
+        //     return true;
+
+        //     // if($query->execute()){
+        //     //     $pdo_conn->commit();
+        //     //     return true;
+        //     // }
+        //     // else{
+        //     //     $pdo_conn->rollback();
+        //     //     return false;
+        //     // }
+
+        // } catch (Exception $e) {
+        //     throw $e;
+        //     return false;
+        // }
+
+        // $pdo_conn = NULL;
     }
 
 

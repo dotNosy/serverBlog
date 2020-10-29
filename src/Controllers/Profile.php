@@ -47,7 +47,13 @@ class Profile extends Controller
             $birthdate = Services\Helpers::cleanInput($_POST['date']);
 
             //updateProfile($user->id, $name, $surname, $email, $birthdate);
-            Models\Profile::prueba();
+            if(Models\Profile::prueba()){
+                echo "makina";
+            }
+            else
+            {
+                echo "nope";
+            }
 
 
             /*if (empty($name)) {   
