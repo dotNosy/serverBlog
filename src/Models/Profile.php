@@ -46,8 +46,26 @@ class Profile
     public static function updateProfile(int $id, string $name, string $surname, string $email,string $birthdate, PDO $PDOconnection)
     {
         try
-        {
-            $query = $PDOconnection->prepare("UPDATE profile SET name=:name, surname=:surname, email=:email, birth_date=:birth_date WHERE user_id=:user_id");
+        {   
+            $stm = "";
+            //name=:name, surname=:surname, email=:email, birth_date=:birth_date
+
+            if (!empty($name)) {
+                $stm += " name=:name";
+            }
+            if (!empty($surname)) {
+                $stm += " ,surname=:surname";
+            }
+            if (!empty($email)) {
+                $stm += " ,email=:email";
+            }
+            if (!empty($birthdate)) {
+                $stm += " ,birth_date=:birth_date";
+            }
+
+
+
+            $query = $PDOconnection->prepare("UPDATE profile SET $stm  WHERE user_id=:user_id");
             //El :name guarda el contenido de $name
             $query->bindValue("name", $name);
             $query->bindValue("surname", $surname);
@@ -68,10 +86,40 @@ class Profile
     }
 
     //Recoge NAME de la DB en caso de hacer un update con el NAME null
-    public static function selectName($id){
+    public static function selectName(int $id){
         try
         {
             $query = $PDOconnection->prepare("SELECT name FROM profile WHERE user_id = :id");
+            $query->bindValue("id", $id);
+
+            $query->execute();
+
+            if ($query->execute())
+            {
+            //* Mete todos los datos en un array
+            $post = $query->fetch(PDO::FETCH_OBJ);
+
+            //* Si esta vacia te devuelve NULL y sino te devuelve un array con todos los posts del usuario logeado
+            return $post;
+            }
+            else {
+                return null;
+            }
+
+            $PDOconnection->commit();
+
+        } catch (Exception $e) {
+            $PDOconnection->rollback();
+            throw $e;
+        }
+
+        $PDOconnection = NULL;
+    }
+
+    public static function selectSurname(int $id){
+        try
+        {
+            $query = $PDOconnection->prepare("SELECT surname FROM profile WHERE user_id = :id");
             $query->bindValue("id", $id);
 
             $query->execute();
@@ -85,9 +133,42 @@ class Profile
 
         $PDOconnection = NULL;
     }
+
+    public static function selectEmail (int $id){
+        try
+        {
+            $query = $PDOconnection->prepare("SELECT email FROM profile WHERE user_id = :id");
+            $query->bindValue("id", $id);
+
+            $query->execute();
+
+            $PDOconnection->commit();
+
+        } catch (Exception $e) {
+            $PDOconnection->rollback();
+            throw $e;
+        }
+
+        $PDOconnection = NULL;
     }
 
+    public static function selectBirthdate(int $id){
+        try
+        {
+            $query = $PDOconnection->prepare("SELECT birth_date FROM profile WHERE user_id = :id");
+            $query->bindValue("id", $id);
 
+            $query->execute();
+
+            $PDOconnection->commit();
+
+        } catch (Exception $e) {
+            $PDOconnection->rollback();
+            throw $e;
+        }
+
+        $PDOconnection = NULL;
+    }
 
     /*
     public static function updateSurname(string $surname, PDO $PDOconnection)

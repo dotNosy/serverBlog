@@ -45,24 +45,25 @@ class Profile extends Controller
             $surname = Services\Helpers::cleanInput($_POST['surname']);
             $email = Services\Helpers::cleanInput($_POST['email']);
             $birthdate = Services\Helpers::cleanInput($_POST['date']);
+
             if (empty($name)) {   
                 $nameReturn = selectName($user->id);
-                $this->addName($namereturn);
+                $this->addName($nameReturn);
             }
 
             if(!empty($surname)){
                 $surnameReturn = selectSurname($user->id);
-                $this->addSurname($namereturn);
+                $this->addSurname($surnameReturn);
             }
 
             if(!empty($email)){
                 $emailReturn = selectEmail($user->id);
-                $this->addName($namereturn);
+                $this->addName($emailReturn);
             }
 
             if(!empty($birthdate)){
                 $birthdateReturn = selectBirthdate($user->id);
-                $this->addName($namereturn);
+                $this->addName($birthdateReturn);
             }
             //? DO LOGIN
             else
