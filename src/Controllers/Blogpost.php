@@ -120,43 +120,6 @@ class Blogpost extends Controller
         }
     }
 
-    protected function feed(array $params)
-    {
-        //* Se recoge el id del usuario en la sesion actual
-        $user = User::getUser();
-
-        if(!empty($user))
-        {
-            //* Me devuelve de la BD todos los registros del usuario del id
-            $feed = Models\BlogPostModel::feed(intval($user->id));
-            
-            if(!empty($feed))
-            {   
-                parent::sendToView([
-                    "titulo" => "FEED"
-                    ,"list" => $feed
-                    ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
-                ]); 
-            }
-            else
-            {
-                parent::sendToView([
-                    "titulo" => "LIST"
-                    ,"error" => "Tu feed está vacio."
-                    ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
-                ]); 
-            }
-        }
-        //? No estas logueado
-        else
-        {
-            Helpers::sendToController("/login",
-            [
-                "error" => "Tienes que estar logueado para ver tu feed."
-            ]);
-        }  
-    }
-
     //! Todos los posts de X autor(user)
     protected function author(array $params)
     {
@@ -227,6 +190,79 @@ class Blogpost extends Controller
     protected function edit(array $params)
     {
 
+    }
+
+    protected function feed(array $params)
+    {
+        //* Se recoge el id del usuario en la sesion actual
+        $user = User::getUser();
+
+        if(!empty($user))
+        {
+            //* Me devuelve de la BD todos los registros del usuario del id
+            $feed = Models\BlogPostModel::feed(intval($user->id));
+            
+            if(!empty($feed))
+            {   
+                parent::sendToView([
+                    "titulo" => "FEED"
+                    ,"list" => $feed
+                    ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+                ]); 
+            }
+            else
+            {
+                parent::sendToView([
+                    "titulo" => "LIST"
+                    ,"error" => "Tu feed está vacio."
+                    ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+                ]); 
+            }
+        }
+        //? No estas logueado
+        else
+        {
+            Helpers::sendToController("/login",
+            [
+                "error" => "Tienes que estar logueado para ver tu feed."
+            ]);
+        }  
+    }
+
+    protected function favoritos($params = null) 
+    {
+        $user = User::getUser();
+
+        if(!empty($user))
+        {
+            //* Me devuelve de la BD todos los registros del usuario del id
+            $favs = Models\BlogPostModel::favorites(intval($user->id));
+            
+            if(!empty($favs))
+            {   
+                parent::sendToView([
+                    "titulo" => "FEED"
+                    ,"list" => $favs
+                    ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+                ]); 
+            }
+            else
+            {
+                parent::sendToView([
+                    "titulo" => "LIST"
+                    ,"error" => "No tienes ningun post favoritos."
+                    ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+                ]); 
+            }
+        }
+        //? No estas logueado
+        else
+        {
+            Helpers::sendToController("/login",
+            [
+                "error" => "Tienes que estar logueado para ver tus psots favoritos."
+            ]);
+        }  
     }
 
     protected function addFavoritesOrFeed($params = null)

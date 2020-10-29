@@ -90,18 +90,17 @@ class BlogPostModel
         $pdo_conn = NULL;
     }
 
-    public static function feed(int $id)
+    public static function favorites(int $id)
     {
         $connObj = new Services\Connection(Services\Helpers::getEnviroment());
 
         $pdo_conn = $connObj->getConnection();
 
         //* Se hacen dos querys 
-        $query = $pdo_conn->prepare("(SELECT id, date as date, title as title, text as text FROM post WHERE user_id = :user_id)
-            UNION
-            (SELECT post.id, retweet.`date` as date, post.title as title, post.`text` as text FROM post
-            INNER JOIN retweet ON post.id = retweet.post_id
-            WHERE retweet.user_id = :user_id) ORDER BY `date` DESC");
+        $query = $pdo_conn->prepare("SELECT post.id, fav.`date` as date, post.title as title, post.`text` as text FROM post
+                INNER JOIN `like` as fav ON post.id = fav.post_id
+                WHERE fav.user_id = :user_id ORDER BY `date` DESC");
+
         $query->bindValue("user_id", $id);
 
         if ($query->execute())
@@ -222,6 +221,35 @@ class BlogPostModel
         {
             throw $e;
             return false;
+        }
+
+        $pdo_conn = NULL;
+    }
+
+    public static function feed(int $id)
+    {
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+
+        $pdo_conn = $connObj->getConnection();
+
+        //* Se hacen dos querys 
+        $query = $pdo_conn->prepare("(SELECT id, date as date, title as title, text as text FROM post WHERE user_id = :user_id)
+            UNION
+            (SELECT post.id, retweet.`date` as date, post.title as title, post.`text` as text FROM post
+            INNER JOIN retweet ON post.id = retweet.post_id
+            WHERE retweet.user_id = :user_id) ORDER BY `date` DESC");
+        $query->bindValue("user_id", $id);
+
+        if ($query->execute())
+        {
+            //* Mete todos los datos en un array
+            $feed = $query->fetchAll();
+
+            //* Si esta vacia te devuelve NULL y sino te devuelve un array con todos los posts del usuario logeado
+            return $feed;
+        }
+        else {
+            return null;
         }
 
         $pdo_conn = NULL;
