@@ -43,31 +43,17 @@ class Profile
         }
     }
 
-    public static function updateId(string $id, PDO $PDOconnection)
+    public static function updateProfile(int $id, string $name, string $surname, string $email,string $birthdate, PDO $PDOconnection)
     {
         try
         {
-            $query = $PDOconnection->prepare("UPDATE profile (user_id) VALUES (:id)");
-            $query->bindValue("id", $id);
-
-            $query->execute();
-
-            $PDOconnection->commit();
-
-        } catch (Exception $e) {
-            $PDOconnection->rollback();
-            throw $e;
-        }
-        
-        $PDOconnection = NULL;
-    }
-
-    public static function updateName(string $name, PDO $PDOconnection)
-    {
-        try
-        {
-            $query = $PDOconnection->prepare("UPDATE profile (name) VALUES (:name)");
+            $query = $PDOconnection->prepare("UPDATE profile SET name=:name, surname=:surname, email=:email, birth_date=:birth_date WHERE user_id=:user_id");
+            //El :name guarda el contenido de $name
             $query->bindValue("name", $name);
+            $query->bindValue("surname", $surname);
+            $query->bindValue("email", $email);
+            $query->bindValue("birth_date", $birthdate);
+            $query->bindValue("user_id", $id);
 
             $query->execute();
 
@@ -81,6 +67,7 @@ class Profile
         $PDOconnection = NULL;
     }
 
+    /*
     public static function updateSurname(string $surname, PDO $PDOconnection)
     {
         try
@@ -137,4 +124,5 @@ class Profile
 
         $PDOconnection = NULL;
     }
+    */
 }
