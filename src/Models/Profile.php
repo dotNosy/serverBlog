@@ -67,6 +67,28 @@ class Profile
         $PDOconnection = NULL;
     }
 
+    //Recoge NAME de la DB en caso de hacer un update con el NAME null
+    public static function selectName($id){
+        try
+        {
+            $query = $PDOconnection->prepare("SELECT name FROM profile WHERE user_id = :id");
+            $query->bindValue("id", $id);
+
+            $query->execute();
+
+            $PDOconnection->commit();
+
+        } catch (Exception $e) {
+            $PDOconnection->rollback();
+            throw $e;
+        }
+
+        $PDOconnection = NULL;
+    }
+    }
+
+
+
     /*
     public static function updateSurname(string $surname, PDO $PDOconnection)
     {

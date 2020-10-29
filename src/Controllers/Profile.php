@@ -30,18 +30,34 @@ class Profile extends Controller
             echo "sesion no encontrada";
         }
     }
-}
 
-    function addName()
+    public function updateProfile($params = null)
     {
-        if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['addName']))
-        {
-            $name = Services\Helpers::cleanInput($_POST['addName']);
+        $user = Models\User::getUser();
+        //echo $user->id;
+        //die();
 
+        if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['update']))
+        {
             //? Error credenciales vacias
-            if (empty($name)) 
-            {   
-            echo  "Los campos estan vacios";
+            $name = Services\Helpers::cleanInput($_POST['name']);
+            $surname = Services\Helpers::cleanInput($_POST['surname']);
+            $email = Services\Helpers::cleanInput($_POST['email']);
+            $birthdate = Services\Helpers::cleanInput($_POST['date']);
+            if (empty($name)) {   
+                selectName();
+            }
+
+            if(!empty($surname)){
+                
+            }
+
+            if(!empty($email)){
+                
+            }
+
+            if(!empty($birthdate)){
+                
             }
             //? DO LOGIN
             else
@@ -54,3 +70,6 @@ class Profile extends Controller
             Services\Helpers::sendTo404();
         }
     }
+}
+
+    
