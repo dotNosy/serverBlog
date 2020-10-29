@@ -189,66 +189,109 @@ class Blogpost extends Controller
 
     protected function edit(array $params)
     {
-        //POST EXISTE
-            
-                //POST ES DEL USUARIO LOGEADO
-
-                    //Se ha enviado la solicitud de enviar
+        //* Se recoge el usuario
         $user = User::getUser();
-
         if(!empty($user))
         {
+            //? Si se envia el formulario (CON POST)
             if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['edit']))
             {
-                
-                $tituloPost = Helpers::cleanInput($_POST['titulo']);
-                $mensajePost = Helpers::cleanInput($_POST['mensaje']);
-                $radioPost = Helpers::cleanInput($_POST['visibleRadio']);
-    
-                //? Si el radibutton no devulve 0 o 1
-                if($radioPost!=0 && $radioPost!=1){
-                    //TODO: Poner datos incorrectos en rojo
-                }
-                //? Error titulo o mensaje vacio
-                else if (empty($tituloPost) || empty($mensajePost)) 
-                {   
-                    // TODO: Ponerle en rojo los datos que estan vacios
-                }
-                //? Creacion del post
-                else
+                $id_post = Helpers::cleanInput($_POST['id']);
+                $view = Models\BlogPostModel::viewConInvisibles(intval($id_post));
+
+                //? El post existe
+                if(!empty($view))
                 {
-                    //* Va al model para intentar crear el post
-                    $id_post = Models\BlogPostModel::edit($user->id,$tituloPost,$mensajePost,intval($radioPost));
-                    
-                    //* Si ha devuelto un id es que se ha creado, y por lo tanto te devuelve el view del post creado
-                    if(!empty($id_post))
-                    {
-                        Helpers::sendToController("/post/view/$id_post");
+                    //? El post pertenece al usuario
+                    //? Está aqui para no dejar que harcodeen la URL para editar el de los demas
+                    if($user->id == $view->user_id)
+                    { 
+                        //* Se recogen las variables sin caracteres especiales
+                        $id = Helpers::cleanInput($_POST['id']);
+                        $titulo = Helpers::cleanInput($_POST['titulo']);
+                        $mensaje = Helpers::cleanInput($_POST['mensaje']);
+                        $visibleRadio = Helpers::cleanInput($_POST['visibleRadio']);
+
+                        //? Se ha updateado correctamente
+                        if(Models\BlogPostModel::edit(intval($view->id),$titulo,$mensaje,intval($visibleRadio)))
+                        {
+                           //* La llamada a la vista
+                            Helpers::sendToController("/post/view/$view->id"); 
+                        }
+                        //? Ha fallado el update
+                        else
+                        {
+
+                            //TODO: Error "LA SENTENCIA SQL HA FALLADO"
+
+                        }
                     }
                     else
                     {
-                        //TODO: si no se ha podido crear el post
+                        //* No es un post tuyo
+                        Helpers::sendToController("/post/all",
+                        [
+                            "error" => "No eres el creador de este post."
+                        ]); 
                     }
-                    
-    
-                    //TODO: Enviar a la funcion view que te devuelve el post que se acaba de crear
                 }
+                else
+                {
+                    //* No existe un post con ese id
+                    Helpers::sendToController("/post/all",
+                    [
+                            "error" => "No existe este post."
+                    ]);
+                }                  
             }
-            //? Si no se ha enviado el formulario de creacion de post te devuelve la vista para crearlo
-            else 
+            //? Si entra por get (URL)
+            else
             {
-                parent::sendToView([
-                    "titulo" => "EDIT POST"
-                    ,"page" => __DIR__ . '/../Views/BlogPost/Edit.php'
-                ]);
-            }
+                //? La posicion 2 es el id del post
+                if(!empty($params[2]) && is_int(intval($params[2])))
+                {  
+                    $view = Models\BlogPostModel::viewConInvisibles(intval($params[2]));
+                    if(!empty($view))
+                    {
+                        //? El post pertenece al usuario
+                        //? Está aqui para no dejar que harcodeen la URL para editar el de los demas
+                        if($user->id == $view->user_id)
+                        { 
+                            //* Se llama a la vista del edit
+                            parent::sendToView([
+                                "titulo" => "EDIT POST"
+                                ,"css" => array("post.css")
+                                ,"blogPost" => json_encode($view)
+                                ,"autor" => User::getUsernameById(intval($view->user_id))
+                                ,"page" => __DIR__ . '/../Views/BlogPost/Edit.php'
+                                ]);
+                        }
+                        else
+                        {
+                            //* Este post no es tuyo
+                            Helpers::sendToController("/post/all",
+                            [
+                                "error" => "No eres el creador de este post."
+                            ]); 
+                        }
+                    }
+                }
+                else
+                {
+                    Helpers::sendToController("/post/all",
+                    [
+                        "error" => "No existe este post."
+                    ]);
+                }
+                
+            } 
         }
         //? Usuario no logueado
         else
         {
             Helpers::sendToController("/login/index"
             ,[
-                "error" => "Para crear un post debes estar logeado."
+                "error" => "Para editar un post debes estar logeado."
              ]);
         }
     }

@@ -96,6 +96,31 @@ class BlogPostModel
         $pdo_conn = NULL;
     }
 
+    public static function viewConInvisibles(int $id)
+    {
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+
+        $pdo_conn = $connObj->getConnection();
+
+        //* Se recogen los posts de la persona logeada actualmente
+        $query = $pdo_conn->prepare("SELECT id, user_id, title, text, date, visible FROM post WHERE id = :post_id");
+        $query->bindValue("post_id", $id);
+
+        if ($query->execute())
+        {
+            //* Mete todos los datos en un array
+            $post = $query->fetch(PDO::FETCH_OBJ);
+
+            //* Si esta vacia te devuelve NULL y sino te devuelve un array con todos los posts del usuario logeado
+            return $post;
+        }
+        else {
+            return null;
+        }
+
+        $pdo_conn = NULL;
+    }
+
     public static function favorites(int $id)
     {
         $connObj = new Services\Connection(Services\Helpers::getEnviroment());
@@ -433,25 +458,22 @@ class BlogPostModel
         $pdo_conn->beginTransaction();
 
         try {
-            //* Se hace un insert con los datos del post a crear
+            //* Se hace un update del post a cambiar
             $query = $pdo_conn->prepare("UPDATE post SET title=:titulo,text=:mensaje,date=NOW(),visible=:visible WHERE id=:id_post");
-            $query->bindValue("user_id", $id);
-            echo $id . "<br>";
+            $query->bindValue("id_post", $id);
             $query->bindValue("titulo", $titulo);
-            echo $titulo . "<br>";
             $query->bindValue("mensaje", $mensaje);
-            echo $mensaje . "<br>";
             $query->bindValue("visible", $visible, PDO::PARAM_INT);
-            echo $visible . "<br>";
+
+
 
             //* Si la query funciona se hacen un commit
             if($query->execute())
             {
                 //* Se coge el id del post insertado para abrirlo al crearlo
-                $id_post = $pdo_conn->lastInsertId();
                 
                 $pdo_conn->commit();
-                return $id_post;
+                return true;
             }
             else
             {
