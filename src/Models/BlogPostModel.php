@@ -23,7 +23,7 @@ class BlogPostModel
         $pdo_conn = $connObj->getConnection();
 
         //* Se recogen los posts de la persona logeada actualmente
-        $query = $pdo_conn->prepare("SELECT post.id, post.user_id , u.username title, text, date 
+        $query = $pdo_conn->prepare("SELECT post.id, post.user_id , u.username, title, text, date 
                                     FROM post
                                     INNER JOIN user u on u.id = post.user_id 
                                     WHERE user_id = :user_id");
@@ -414,6 +414,54 @@ class BlogPostModel
             }  
         } 
         catch (\Throwable $th) {
+            echo $th;
+            $pdo_conn->rollback();
+            return false;
+        }
+        
+        //? Usuario no logueado
+        $pdo_conn = NULL; 
+    } 
+
+    public static function edit(int $id, string $titulo, string $mensaje, int $visible)
+    {
+
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+
+        $pdo_conn = $connObj->getConnection();
+
+        $pdo_conn->beginTransaction();
+
+        try {
+            //* Se hace un insert con los datos del post a crear
+            $query = $pdo_conn->prepare("UPDATE post SET title=:titulo,text=:mensaje,date=NOW(),visible=:visible WHERE id=:id_post");
+            $query->bindValue("user_id", $id);
+            echo $id . "<br>";
+            $query->bindValue("titulo", $titulo);
+            echo $titulo . "<br>";
+            $query->bindValue("mensaje", $mensaje);
+            echo $mensaje . "<br>";
+            $query->bindValue("visible", $visible, PDO::PARAM_INT);
+            echo $visible . "<br>";
+
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $id_post = $pdo_conn->lastInsertId();
+                
+                $pdo_conn->commit();
+                return $id_post;
+            }
+            else
+            {
+                
+                $pdo_conn->rollback();
+                return false;
+            }  
+        } 
+        catch (\Throwable $th)
+        {
             echo $th;
             $pdo_conn->rollback();
             return false;
