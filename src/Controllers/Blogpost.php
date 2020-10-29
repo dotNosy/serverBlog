@@ -27,6 +27,7 @@ class Blogpost extends Controller
         //? La posicion 2 es el id del post
         if(!empty($params[2]) && is_int($params[2]))
         {
+
             Helpers::sendToController("/post/all",
             [
                 "error" => "No existe este post."
@@ -94,10 +95,6 @@ class Blogpost extends Controller
         }  
     }
 
-    protected function add(array $params = null)
-    {
-    }
-
     //! Todos los posts por orden cronologico
     protected function all(array $params)
     {
@@ -135,6 +132,7 @@ class Blogpost extends Controller
             
             if(!empty($feed))
             {   
+                var_dump($feed);
                 parent::sendToView([
                     "titulo" => "FEED"
                     ,"feed" => $feed
@@ -145,9 +143,8 @@ class Blogpost extends Controller
             {
                 parent::sendToView([
                     "titulo" => "LIST"
-                    ,"feed" => $feed
                     ,"error" => "Tu feed está vacio."
-                    ,"page" => __DIR__ . '/../Views/BlogPost/Feed.php'
+                    ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                 ]); 
             }
         }
@@ -167,7 +164,7 @@ class Blogpost extends Controller
         
     }
 
-    protected function create(array $params = null)
+    protected function add(array $params = null)
     {
         $user = User::getUser();
 
@@ -175,6 +172,7 @@ class Blogpost extends Controller
         {
             if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['add']))
             {
+                
                 $tituloPost = Helpers::cleanInput($_POST['titulo']);
                 $mensajePost = Helpers::cleanInput($_POST['mensaje']);
                 $radioPost = Helpers::cleanInput($_POST['visibleRadio']);
@@ -192,20 +190,20 @@ class Blogpost extends Controller
                 else
                 {
                     //* Va al model para intentar crear el post
-                    if(Models\BlogPostModel::add(intval($user->id),$tituloPost,$mensajePost,intval($radioPost)))
+                    $id_post = Models\BlogPostModel::add($user->id,$tituloPost,$mensajePost,intval($radioPost));
+                    
+                    //* Si ha devuelto un id es que se ha creado, y por lo tanto te devuelve el view del post creado
+                    if(!empty($id_post))
                     {
-                        echo "insertado";
+                        Helpers::sendToController("/post/view/$id_post");
                     }
                     else
                     {
-                        echo "no insertado";
+                        //TODO: si no se ha podido crear el post
                     }
+                    
     
                     //TODO: Enviar a la funcion view que te devuelve el post que se acaba de crear
-                    echo $tituloPost . "<br>";
-                    echo $mensajePost . "<br>";
-                    echo $radioPost . "<br>";
-    
                 }
             }
             //? Si no se ha enviado el formulario de creacion de post te devuelve la vista para crearlo
@@ -236,16 +234,75 @@ class Blogpost extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['type']))
         {
-            $type = Helpers::cleanInput($_POST['type']);
+            $user = User::getUser();
+
+            if(!empty($user))
+            {
+                $post_id = Helpers::cleanInput($_POST['id']);
+
+                $post = Models\BlogPostModel::view(intval($post_id));
+
+                if(!empty($post))
+                {
+                    $type = Helpers::cleanInput($_POST['type']);
             
-            if ($type == "favoritos")
-            {
-                echo "favoritos stuff";
+                    if ($type == "favoritos")
+                    {
+                        echo "favoritos stuff";
+                        
+                        //TODO: si el post esta ya en el feed lo quitamos y si no lo metemos
+                        
+                        $done = Models\BlogPostModel::addToFavorites(intval($post_id), $user->id);
+                        
+                        if ($done)
+                        {
+                            Helpers::sendToController("/post/all");
+                        }
+                        else
+                        {
+                            Helpers::sendToController("/post/all",
+                            [
+                                "error" => "no se pudo añadir a favoritos :("
+                            ]);
+                        }
+                    }
+                    else if($type == "feed")
+                    {
+                        echo "feed stuff";
+
+                        //TODO: si el post esta ya en favoritos lo quitamos y si no lo metemos
+
+                        $done = Models\BlogPostModel::addToFeed($post_id, $user->id);
+                        
+                        if ($done)
+                        {
+                            Helpers::sendToController($_SERVER['PHP_SELF']);
+                        }
+                        else
+                        {
+                            Helpers::sendToController($_SERVER['PHP_SELF'],
+                            [
+                                "error" => "no se pudo añadir al feed :("
+                            ]);
+                        }
+                    }
+                }
+                else
+                {
+                    Helpers::sendToController("/post/all",
+                    [
+                        "error" => "El post que intentas añadir no existe."
+                    ]);
+                }
             }
-            else if($type == "feed")
+            //? No estas logueado
+            else
             {
-                echo "feed stuff";
-            }
+                Helpers::sendToController("/login",
+                [
+                    "error" => "Tienes que estar logueado para ver tu feed."
+                ]);
+            }  
         }
     }
 }

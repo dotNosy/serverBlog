@@ -142,7 +142,7 @@ class User
 
     public function getId () :int
     {
-        return $this->id;
+        return intval($this->id);
     }
 
     public function getUsernameById (int $id) :string

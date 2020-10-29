@@ -1,5 +1,10 @@
-<?php use ServerBlog\Models\User ?>
-<!-- <?php var_dump($_SESSION); ?> -->
+<?php 
+  use ServerBlog\Models\User;
+  use ServerBlog\Models\BlogPostModel;
+
+  $user = User::getUser();
+?>
+
 <section id="gallery">
   <div class="container">
     <div class="row">
@@ -33,16 +38,18 @@
               <a <?="href='/post/view/".$post["id"]."'"?>  class="btn btn-outline-success btn-sm mx-2 mb-3">Read More</a>
 
               <!-- Favoritos -->
-              <form <?="action='/post/favorites/".$post["id"]."'"?>  
+              <form <?="action='/post/favorites/'"?>  
                 method="post">
+                <input type="hidden" name='id' <?= "value='".$post['id']."'" ?>>
                 <button 
+                  <?php echo BlogPostModel::isInFavorites(intval($post['id']), intval($user->id)) ? "class='btn btn-danger btn-sm mx-2'" : "class='btn btn-outline-danger btn-sm mx-2'";  ?>
                   type="submit" 
                   name="type"
                   value="favoritos"
-                  class="btn btn-outline-danger btn-sm mx-2" 
                   data-toggle="tooltip" 
                   data-placement="top" 
-                  title="Favoritos">
+                  <?php echo BlogPostModel::isInFavorites(intval($post['id']), intval($user->id)) ? "title='Remove from Favoritos'" : "title='Add to Favoritos'";  ?>
+                  >
                   <i class="far fa-heart"></i>
                 </button>
                 <button 
@@ -54,12 +61,6 @@
                   title="Add to feed">
                   <i class="far fa-plus-square"></i>
                 </button>
-              </form>
-              
-              <!-- FEED -->
-              <form action="/post/favorites/" <?= $post['id']?> 
-                method="post">
-               
               </form>
             </div>
           </div>

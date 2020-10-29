@@ -36,6 +36,7 @@ class Profile extends Controller
         $user = Models\User::getUser();
         //echo $user->id;
         //die();
+    
 
         if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['update']))
         {
@@ -45,24 +46,31 @@ class Profile extends Controller
             $email = Services\Helpers::cleanInput($_POST['email']);
             $birthdate = Services\Helpers::cleanInput($_POST['date']);
             if (empty($name)) {   
-                selectName();
+                $nameReturn = selectName($user->id);
+                $this->addName($namereturn);
             }
 
             if(!empty($surname)){
-                
+                $surnameReturn = selectSurname($user->id);
+                $this->addSurname($namereturn);
             }
 
             if(!empty($email)){
-                
+                $emailReturn = selectEmail($user->id);
+                $this->addName($namereturn);
             }
 
             if(!empty($birthdate)){
-                
+                $birthdateReturn = selectBirthdate($user->id);
+                $this->addName($namereturn);
             }
             //? DO LOGIN
             else
             {
                 $this->addName($name);
+                $this->addSurname($surname);
+                $this->addEmail($email);
+                $this->addBirthdate($birthdate);
                 echo "los datos se han insertado correctamente";
             }
         }
