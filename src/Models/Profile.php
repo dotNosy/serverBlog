@@ -138,25 +138,6 @@ class Profile
         $PDOconnection = NULL;
     }
 
-    public static function addBirth(string $birthdate, PDO $PDOconnection)
-    {
-        try
-        {
-            $query = $PDOconnection->prepare("INSERT INTO profile (birth_date) VALUES (:birthdate)");
-            $query->bindValue("birthdate", $birthdate);
-
-            $query->execute();
-
-            $PDOconnection->commit();
-
-        } catch (Exception $e) {
-            $PDOconnection->rollback();
-            throw $e;
-        }
-
-        $PDOconnection = NULL;
-    }
-
     public static function updateBirth(string $birthdate, PDO $PDOconnection)
     {
         try
