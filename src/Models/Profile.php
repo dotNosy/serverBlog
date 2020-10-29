@@ -63,9 +63,7 @@ class Profile
                 $stm += " ,birth_date=:birth_date";
             }
 
-
-
-            $query = $PDOconnection->prepare("UPDATE profile SET $stm  WHERE user_id=:user_id");
+            $query = $PDOconnection->prepare("UPDATE profile SET $stm WHERE user_id=:user_id");
             //El :name guarda el contenido de $name
             $query->bindValue("name", $name);
             $query->bindValue("surname", $surname);
@@ -85,7 +83,34 @@ class Profile
         $PDOconnection = NULL;
     }
 
+    public static function prueba()
+    {
+        try
+        {   
+            $name= "juantxo";
+            $userid = "76";
+
+            $query = $PDOconnection->prepare("UPDATE profile SET name=:name WHERE user_id=:userid");
+            //El :name guarda el contenido de $name
+            $query->bindValue("name", $name);
+            $query->bindValue("userid", $userid);
+
+            $query->execute();
+
+            $PDOconnection->commit();
+
+        } catch (Exception $e) {
+            $PDOconnection->rollback();
+            throw $e;
+        }
+
+        $PDOconnection = NULL;
+    }
+
+
+    
     //Recoge NAME de la DB en caso de hacer un update con el NAME null
+    /*
     public static function selectName(int $id){
         try
         {
@@ -169,7 +194,7 @@ class Profile
 
         $PDOconnection = NULL;
     }
-
+    */
     /*
     public static function updateSurname(string $surname, PDO $PDOconnection)
     {

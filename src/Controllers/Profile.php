@@ -46,7 +46,11 @@ class Profile extends Controller
             $email = Services\Helpers::cleanInput($_POST['email']);
             $birthdate = Services\Helpers::cleanInput($_POST['date']);
 
-            if (empty($name)) {   
+            //updateProfile($user->id, $name, $surname, $email, $birthdate);
+            Models\Profile::prueba();
+
+
+            /*if (empty($name)) {   
                 $nameReturn = selectName($user->id);
                 $this->addName($nameReturn);
             }
@@ -73,7 +77,7 @@ class Profile extends Controller
                 $this->addEmail($email);
                 $this->addBirthdate($birthdate);
                 echo "los datos se han insertado correctamente";
-            }
+            }*/
         }
         else {
             Services\Helpers::sendTo404();
