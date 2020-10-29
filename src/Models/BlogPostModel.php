@@ -97,7 +97,11 @@ class BlogPostModel
         $pdo_conn = $connObj->getConnection();
 
         //* Se hacen dos querys 
-        $query = $pdo_conn->prepare("(SELECT id as id_post, date FROM post WHERE user_id = :user_id) UNION (SELECT post_id as id_post, date FROM retweet WHERE user_id = :user_id) ORDER BY `date` DESC");
+        $query = $pdo_conn->prepare("(SELECT id as id_post, date as date, title as title, text as text FROM post WHERE user_id = :user_id)
+            UNION
+            (SELECT post.id as id_post, retweet.`date` as date, post.title as title, post.`text` as text FROM post
+            INNER JOIN retweet ON post.id = retweet.post_id
+            WHERE retweet.user_id = :user_id) ORDER BY `date` DESC");
         $query->bindValue("user_id", $id);
 
         if ($query->execute())
@@ -228,7 +232,7 @@ class BlogPostModel
         $pdo_conn = $connObj->getConnection();
 
         //* Se recogen los posts de la persona logeada actualmente
-        $query = $pdo_conn->prepare("SELECT ID FROM retweet WHERE post_id = :post_id AND user_id = :user_id");
+        $query = $pdo_conn->prepare("SELECT ID FROM retweet WHERE post_id = :post AND user_id = :user");
         $query->bindValue("post", $id);
         $query->bindValue("user", $user_id);
 

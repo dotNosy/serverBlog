@@ -6,7 +6,7 @@
       <?php if (!empty($_SESSION["error"])):?>
         <?= '<div class="col-12 alert-danger text-center my-3">'. $_SESSION["error"] .'</div>' ?>
       <?php endif;?>
-
+        
       <?php foreach($_SESSION['feed'] as $post): ?>
         <div class="col-lg-4 my-4">
           <div class="card">

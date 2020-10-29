@@ -132,8 +132,6 @@ class Blogpost extends Controller
             
             if(!empty($feed))
             {   
-                var_dump($feed);
-                die();
                 parent::sendToView([
                     "titulo" => "FEED"
                     ,"feed" => $feed
@@ -273,13 +271,13 @@ class Blogpost extends Controller
                         
                         if ($added)
                         {
-                            Helpers::sendToController($_SERVER['PHP_SELF']);
+                            Helpers::sendToController("/post/all");
                         }
                         else
                         {
-                            Helpers::sendToController($_SERVER['PHP_SELF'],
+                            Helpers::sendToController("/post/all",
                             [
-                                "error" => "no se pudo añadir al feed :("
+                                "error" => "no se pudo añadir a favoritos :("
                             ]);
                         }
                     }
