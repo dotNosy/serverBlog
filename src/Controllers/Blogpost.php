@@ -253,6 +253,31 @@ class Blogpost extends Controller
         }
     }
 
+    protected function addComment($params = NULL)
+    {
+        $user = User::getUser();
+
+        if(!empty($user))
+        {
+            if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['comment']))
+            {
+                echo "post";
+                die();
+            }
+            else {
+                Helpers::sendTo404();
+            }
+        }
+        //? Usuario no logueado
+        else
+        {
+            Helpers::sendToController("/login/index"
+            ,[
+                "error" => "Para crear un post debes estar logeado."
+             ]);
+        }
+    }
+
     protected function feed(array $params)
     {
         //? Usuario mirando su feed

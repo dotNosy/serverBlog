@@ -470,4 +470,9 @@ class BlogPostModel
         //? Usuario no logueado
         $pdo_conn = NULL; 
     } 
+
+    public static function addComment()
+    {
+        
+    }
 }
