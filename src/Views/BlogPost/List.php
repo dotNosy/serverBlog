@@ -39,29 +39,31 @@
                 method="post">
                 <a <?="href='/post/view/".$post["id"]."'"?>  class="btn btn-outline-success btn-sm mx-2">Read More</a>
                 <input type="hidden" name='id' <?= "value='".$post['id']."'" ?>>
-                <!-- Favoritos -->
-                <button 
-                  <?php echo BlogPostModel::isInFavorites(intval($post['id']), intval($user->id)) ? "class='btn btn-danger btn-sm mx-2'" : "class='btn btn-outline-danger btn-sm mx-2'";  ?>
-                  type="submit" 
-                  name="type"
-                  value="favoritos"
-                  data-toggle="tooltip" 
-                  data-placement="top" 
-                  <?php echo BlogPostModel::isInFavorites(intval($post['id']), intval($user->id)) ? "title='Remove from Favoritos'" : "title='Add to Favoritos'";  ?>
-                  >
-                  <i class="far fa-heart"></i>
-                </button>
-                <!-- Feed -->
-                <button 
-                  type="submit" 
-                  name="type"
-                  value="feed"
-                  <?php echo BlogPostModel::isInFeed(intval($post['id']), intval($user->id)) ? "class='btn btn-primary btn-sm mx-2'" : "class='btn btn-outline-primary btn-sm mx-2'";  ?> 
-                  data-toggle="tooltip" 
-                  data-placement="top" 
-                  <?php echo BlogPostModel::isInFeed(intval($post['id']), intval($user->id)) ? "title='Remove from Feed'" : "title='Add to Feed'";  ?>>
-                  <i class="far fa-plus-square"></i>
-                </button>
+                <?php if (!empty($user->id)): ?>
+                  <!-- Favoritos -->
+                  <button 
+                    <?php echo BlogPostModel::isInFavorites(intval($post['id']), intval($user->id)) ? "class='btn btn-danger btn-sm mx-2'" : "class='btn btn-outline-danger btn-sm mx-2'";  ?>
+                    type="submit" 
+                    name="type"
+                    value="favoritos"
+                    data-toggle="tooltip" 
+                    data-placement="top" 
+                    <?php echo BlogPostModel::isInFavorites(intval($post['id']), intval($user->id)) ? "title='Remove from Favoritos'" : "title='Add to Favoritos'";  ?>
+                    >
+                    <i class="far fa-heart"></i>
+                  </button>
+                  <!-- Feed -->
+                  <button 
+                    type="submit" 
+                    name="type"
+                    value="feed"
+                    <?php echo BlogPostModel::isInFeed(intval($post['id']), intval($user->id)) ? "class='btn btn-primary btn-sm mx-2'" : "class='btn btn-outline-primary btn-sm mx-2'";  ?> 
+                    data-toggle="tooltip" 
+                    data-placement="top" 
+                    <?php echo BlogPostModel::isInFeed(intval($post['id']), intval($user->id)) ? "title='Remove from Feed'" : "title='Add to Feed'";  ?>>
+                    <i class="far fa-plus-square"></i>
+                  </button>
+                  <?php endif; ?>
                 <!-- Edit -->
                 <?php if (!empty($user->id) && $post['user_id'] == $user->id): ?>
                   <a <?="href='/post/edit/".$post["id"]."'"?>  class="btn btn-outline-dark btn-sm mx-2"><i class="far fa-edit"></i></a>
