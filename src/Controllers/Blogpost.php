@@ -198,7 +198,7 @@ class Blogpost extends Controller
 
         if(!empty($user))
         {
-            if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['add']))
+            if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['edit']))
             {
                 
                 $tituloPost = Helpers::cleanInput($_POST['titulo']);
@@ -218,7 +218,7 @@ class Blogpost extends Controller
                 else
                 {
                     //* Va al model para intentar crear el post
-                    $id_post = Models\BlogPostModel::add($user->id,$tituloPost,$mensajePost,intval($radioPost));
+                    $id_post = Models\BlogPostModel::edit($user->id,$tituloPost,$mensajePost,intval($radioPost));
                     
                     //* Si ha devuelto un id es que se ha creado, y por lo tanto te devuelve el view del post creado
                     if(!empty($id_post))
@@ -238,8 +238,8 @@ class Blogpost extends Controller
             else 
             {
                 parent::sendToView([
-                    "titulo" => "ADD POST"
-                    ,"page" => __DIR__ . '/../Views/BlogPost/Add.php'
+                    "titulo" => "EDIT POST"
+                    ,"page" => __DIR__ . '/../Views/BlogPost/Edit.php'
                 ]);
             }
         }

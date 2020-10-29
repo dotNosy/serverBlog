@@ -62,6 +62,10 @@
                   <?php echo BlogPostModel::isInFeed(intval($post['id']), intval($user->id)) ? "title='Remove from Feed'" : "title='Add to Feed'";  ?>>
                   <i class="far fa-plus-square"></i>
                 </button>
+                <!-- Edit -->
+                <?php if (!empty($user->id) && $post['user_id'] == $user->id): ?>
+                  <a <?="href='/post/edit/".$post["id"]."'"?>  class="btn btn-outline-dark btn-sm mx-2"><i class="far fa-edit"></i></a>
+                <?php endif; ?>
               </form>
             </div>
           </div>
