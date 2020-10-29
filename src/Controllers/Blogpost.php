@@ -250,7 +250,7 @@ class Blogpost extends Controller
             {
                 parent::sendToView([
                     "titulo" => "LIST"
-                    ,"error" => "No tienes ningun post favoritos."
+                    ,"error" => "No tienes ningun post favorito."
                     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                 ]); 
             }

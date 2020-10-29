@@ -233,9 +233,9 @@ class BlogPostModel
         $pdo_conn = $connObj->getConnection();
 
         //* Se hacen dos querys 
-        $query = $pdo_conn->prepare("(SELECT id, date as date, title as title, text as text FROM post WHERE user_id = :user_id)
+        $query = $pdo_conn->prepare("(SELECT id,post.user_id, date as date, title as title, text as text FROM post WHERE user_id = :user_id)
             UNION
-            (SELECT post.id, retweet.`date` as date, post.title as title, post.`text` as text FROM post
+            (SELECT post.id, post.user_id, retweet.`date` as date, post.title as title, post.`text` as text FROM post
             INNER JOIN retweet ON post.id = retweet.post_id
             WHERE retweet.user_id = :user_id) ORDER BY `date` DESC");
         $query->bindValue("user_id", $id);
