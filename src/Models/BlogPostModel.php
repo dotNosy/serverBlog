@@ -23,7 +23,10 @@ class BlogPostModel
         $pdo_conn = $connObj->getConnection();
 
         //* Se recogen los posts de la persona logeada actualmente
-        $query = $pdo_conn->prepare("SELECT id, title, text, date FROM post WHERE user_id = :user_id");
+        $query = $pdo_conn->prepare("SELECT post.id, post.user_id , u.username title, text, date 
+                                    FROM post
+                                    INNER JOIN user u on u.id = post.user_id 
+                                    WHERE user_id = :user_id");
         $query->bindValue("user_id", $id);
 
         if ($query->execute())
@@ -48,7 +51,10 @@ class BlogPostModel
         $pdo_conn = $connObj->getConnection();
 
         //* Se recogen todos los posts de la base de datos
-        $query = $pdo_conn->prepare("SELECT id, user_id, title, text, date FROM post ORDER BY date DESC");
+        $query = $pdo_conn->prepare("SELECT p.id, p.user_id,u.username, p.title, p.text, p.date 
+                                    FROM post p
+                                    INNER JOIN user u on u.id = p.user_id 
+                                    ORDER BY date DESC");
         
         if ($query->execute())
         {
@@ -97,9 +103,11 @@ class BlogPostModel
         $pdo_conn = $connObj->getConnection();
 
         //* Se hacen dos querys 
-        $query = $pdo_conn->prepare("SELECT post.id, fav.`date` as date, post.title as title, post.`text` as text FROM post
-                INNER JOIN `like` as fav ON post.id = fav.post_id
-                WHERE fav.user_id = :user_id ORDER BY `date` DESC");
+        $query = $pdo_conn->prepare("SELECT p.id,p.user_id, u.username, fav.`date` as date, p.title as title, p.`text` as text 
+                                    FROM post p
+                                    INNER JOIN `like` as fav ON p.id = fav.post_id
+                                    INNER JOIN user u on u.id = p.user_id 
+                                    WHERE fav.user_id = :user_id ORDER BY `date` DESC");
 
         $query->bindValue("user_id", $id);
 
@@ -226,19 +234,28 @@ class BlogPostModel
         $pdo_conn = NULL;
     }
 
-    public static function feed(int $id)
+    public static function feed(string $username)
     {
         $connObj = new Services\Connection(Services\Helpers::getEnviroment());
 
         $pdo_conn = $connObj->getConnection();
 
         //* Se hacen dos querys 
-        $query = $pdo_conn->prepare("(SELECT id,post.user_id, date as date, title as title, text as text FROM post WHERE user_id = :user_id)
-            UNION
-            (SELECT post.id, post.user_id, retweet.`date` as date, post.title as title, post.`text` as text FROM post
-            INNER JOIN retweet ON post.id = retweet.post_id
-            WHERE retweet.user_id = :user_id) ORDER BY `date` DESC");
-        $query->bindValue("user_id", $id);
+        $query = $pdo_conn->prepare("(SELECT p.id, p.user_id, u.username , date, title , text 
+        FROM post p
+        INNER JOIN user u on u.id = p.user_id 
+        WHERE u.username = :username)
+        UNION
+        (SELECT post.id, post.user_id, u2.username ,retweet.`date` as date, post.title as title, post.`text` as text 
+        FROM post 
+        INNER JOIN retweet ON post.id = retweet.post_id
+        INNER JOIN user u on u.id = retweet.user_id
+        INNER JOIN user u2 on u2.id  = post.user_id
+        WHERE retweet.user_id = u.id  and u.username = :username) ORDER BY `date` DESC");
+
+        $query->bindValue("username", $username);
+        $query->bindValue("user_id", $username);
+
 
         if ($query->execute())
         {

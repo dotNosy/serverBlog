@@ -189,7 +189,68 @@ class Blogpost extends Controller
 
     protected function edit(array $params)
     {
+        //POST EXISTE
+            
+                //POST ES DEL USUARIO LOGEADO
 
+                    //Se ha enviado la solicitud de enviar
+        $user = User::getUser();
+
+        if(!empty($user))
+        {
+            if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['add']))
+            {
+                
+                $tituloPost = Helpers::cleanInput($_POST['titulo']);
+                $mensajePost = Helpers::cleanInput($_POST['mensaje']);
+                $radioPost = Helpers::cleanInput($_POST['visibleRadio']);
+    
+                //? Si el radibutton no devulve 0 o 1
+                if($radioPost!=0 && $radioPost!=1){
+                    //TODO: Poner datos incorrectos en rojo
+                }
+                //? Error titulo o mensaje vacio
+                else if (empty($tituloPost) || empty($mensajePost)) 
+                {   
+                    // TODO: Ponerle en rojo los datos que estan vacios
+                }
+                //? Creacion del post
+                else
+                {
+                    //* Va al model para intentar crear el post
+                    $id_post = Models\BlogPostModel::add($user->id,$tituloPost,$mensajePost,intval($radioPost));
+                    
+                    //* Si ha devuelto un id es que se ha creado, y por lo tanto te devuelve el view del post creado
+                    if(!empty($id_post))
+                    {
+                        Helpers::sendToController("/post/view/$id_post");
+                    }
+                    else
+                    {
+                        //TODO: si no se ha podido crear el post
+                    }
+                    
+    
+                    //TODO: Enviar a la funcion view que te devuelve el post que se acaba de crear
+                }
+            }
+            //? Si no se ha enviado el formulario de creacion de post te devuelve la vista para crearlo
+            else 
+            {
+                parent::sendToView([
+                    "titulo" => "ADD POST"
+                    ,"page" => __DIR__ . '/../Views/BlogPost/Add.php'
+                ]);
+            }
+        }
+        //? Usuario no logueado
+        else
+        {
+            Helpers::sendToController("/login/index"
+            ,[
+                "error" => "Para crear un post debes estar logeado."
+             ]);
+        }
     }
 
     protected function feed(array $params)
@@ -197,11 +258,46 @@ class Blogpost extends Controller
         //* Se recoge el id del usuario en la sesion actual
         $user = User::getUser();
 
-        if(!empty($user))
+        //? Usuario mirando su feed
+        if (empty($params[2]))
+        {
+            if(!empty($user))
+            {
+                //* Me devuelve de la BD todos los registros del usuario del id
+                $feed = Models\BlogPostModel::feed($user->username);
+                
+                if(!empty($feed))
+                {   
+                    parent::sendToView([
+                        "titulo" => "FEED"
+                        ,"list" => $feed
+                        ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+                    ]); 
+                }
+                else
+                {
+                    parent::sendToView([
+                        "titulo" => "LIST"
+                        ,"error" => "Tu feed está vacio."
+                        ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+                    ]); 
+                }
+            }
+            //? No estas logueado
+            else
+            {
+                Helpers::sendToController("/login",
+                [
+                    "error" => "Tienes que estar logueado para ver tu feed."
+                ]);
+            }  
+        }
+        //? Usuario (logueado o no) mirando un feed
+        else
         {
             //* Me devuelve de la BD todos los registros del usuario del id
-            $feed = Models\BlogPostModel::feed(intval($user->id));
-            
+            $feed = Models\BlogPostModel::feed($params[2]);
+                
             if(!empty($feed))
             {   
                 parent::sendToView([
@@ -214,19 +310,11 @@ class Blogpost extends Controller
             {
                 parent::sendToView([
                     "titulo" => "LIST"
-                    ,"error" => "Tu feed está vacio."
+                    ,"error" => "El usuario que intentas buscar no existe"
                     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                 ]); 
             }
         }
-        //? No estas logueado
-        else
-        {
-            Helpers::sendToController("/login",
-            [
-                "error" => "Tienes que estar logueado para ver tu feed."
-            ]);
-        }  
     }
 
     protected function favoritos($params = null) 

@@ -28,7 +28,7 @@
 
               <!-- AUTHOR -->
               <?php if(!empty($post['user_id'])): ?>
-                <p class="lead"><a href="#">Por: <?= User::getUsernameById(intval($post['user_id'])) ?></a></p>
+                <p class="lead"><a <?= "href='/post/feed/".$post['username']."'"?>>Por: <?= User::getUsernameById(intval($post['user_id'])) ?></a></p>
               <?php endif;?>
 
               <!-- FECHA CREACION -->
