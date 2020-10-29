@@ -255,12 +255,13 @@ class Blogpost extends Controller
 
     protected function feed(array $params)
     {
-        //* Se recoge el id del usuario en la sesion actual
-        $user = User::getUser();
-
         //? Usuario mirando su feed
+        //*param 2 es el username en la url
         if (empty($params[2]))
         {
+            //* Se recoge el id del usuario en la sesion actual
+            $user = User::getUser();
+
             if(!empty($user))
             {
                 //* Me devuelve de la BD todos los registros del usuario del id
@@ -310,7 +311,7 @@ class Blogpost extends Controller
             {
                 parent::sendToView([
                     "titulo" => "LIST"
-                    ,"error" => "El usuario que intentas buscar no existe"
+                    ,"error" => "El usuario que intentas buscar no existe o no tiene posts."
                     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                 ]); 
             }
