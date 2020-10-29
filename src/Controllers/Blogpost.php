@@ -19,7 +19,7 @@ class Blogpost extends Controller
 
     protected function index(array $params = null) 
     {
-        echo "index";
+        Helpers::sendToController("/post/all");
     }
 
     protected function view(array $params)
@@ -134,8 +134,8 @@ class Blogpost extends Controller
             {   
                 parent::sendToView([
                     "titulo" => "FEED"
-                    ,"feed" => $feed
-                    ,"page" => __DIR__ . '/../Views/BlogPost/Feed.php'
+                    ,"list" => $feed
+                    ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                 ]); 
             }
             else
@@ -229,7 +229,7 @@ class Blogpost extends Controller
 
     }
 
-    protected function favorites($params = null)
+    protected function addFavoritesOrFeed($params = null)
     {
         if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['type']))
         {
@@ -247,38 +247,74 @@ class Blogpost extends Controller
             
                     if ($type == "favoritos")
                     {
-                        //TODO: si el post esta ya en el feed lo quitamos y si no lo metemos
-                        
-                        $added = Models\BlogPostModel::addToFavorites(intval($post_id), $user->id);
-                        
-                        if ($added)
+                        //? BORRAR DE FAVORITOS
+                        if (Models\BlogPostModel::isInFavorites(intval($post_id), intval($user->id)))
                         {
-                            Helpers::sendToController("/post/all");
+                            $deleted = Models\BlogPostModel::deleteFromFavorites(intval($post_id), intval($user->id));
+
+                            if ($deleted) {
+                                //TODO: Redirigir a la pagina desde donde se hizo el like
+                                Helpers::sendToController("/post/all");
+                            }
+                            else {
+                                Helpers::sendToController("/post/all",
+                                [
+                                    "error" => "no se pudo eliminar de favoritos :("
+                                ]);
+                            }
                         }
+                        //? AÑADIR A FAVORITOS
                         else
                         {
-                            Helpers::sendToController("/post/all",
-                            [
-                                "error" => "no se pudo añadir a favoritos :("
-                            ]);
+                            $added = Models\BlogPostModel::addToFavorites(intval($post_id), $user->id);
+                        
+                            if ($added)
+                            {
+                                //TODO: Redirigir a la pagina desde donde se hizo el add to feed
+                                Helpers::sendToController("/post/all");
+                            }
+                            else
+                            {
+                                Helpers::sendToController("/post/all",
+                                [
+                                    "error" => "no se pudo añadir a favoritos :("
+                                ]);
+                            }
                         }
                     }
                     else if($type == "feed")
                     {
-                        //TODO: si el post esta ya en favoritos lo quitamos y si no lo metemos
-
-                        $added = Models\BlogPostModel::addToFeed($post_id, $user->id);
-                        
-                        if ($added)
+                        //? borrar del feed
+                        if (Models\BlogPostModel::isInFeed(intval($post_id), intval($user->id)))
                         {
-                            Helpers::sendToController("/post/all");
+                            $deleted = Models\BlogPostModel::deleteFromFeed(intval($post_id), intval($user->id));
+
+                            if ($deleted) {
+                                Helpers::sendToController("/post/all");
+                            }
+                            else {
+                                Helpers::sendToController("/post/all",
+                                [
+                                    "error" => "no se pudo eliminar de favoritos :("
+                                ]);
+                            }
                         }
+                        //? AÑADIR Al FEED
                         else
                         {
-                            Helpers::sendToController("/post/all",
-                            [
-                                "error" => "no se pudo añadir a favoritos :("
-                            ]);
+                            $added = Models\BlogPostModel::addToFeed(intval($post_id), $user->id);
+                        
+                            if ($added)
+                            {
+                                Helpers::sendToController("/post/all");
+                            }
+                            else
+                            {
+                                Helpers::sendToController("/post/all",
+                                [
+                                    "error" => "no se pudo añadir a favoritos :("
+                                ]);
+                            }
                         }
                     }
                 }

@@ -35,12 +35,11 @@
               <p>Creado el: <?= $post['date'] ?></p>
 
               <!-- BOTONES -->
-              <a <?="href='/post/view/".$post["id"]."'"?>  class="btn btn-outline-success btn-sm mx-2 mb-3">Read More</a>
-
-              <!-- Favoritos -->
-              <form <?="action='/post/favorites/'"?>  
+              <form <?="action='/post/addFavoritesOrFeed/'"?>  
                 method="post">
+                <a <?="href='/post/view/".$post["id"]."'"?>  class="btn btn-outline-success btn-sm mx-2">Read More</a>
                 <input type="hidden" name='id' <?= "value='".$post['id']."'" ?>>
+                <!-- Favoritos -->
                 <button 
                   <?php echo BlogPostModel::isInFavorites(intval($post['id']), intval($user->id)) ? "class='btn btn-danger btn-sm mx-2'" : "class='btn btn-outline-danger btn-sm mx-2'";  ?>
                   type="submit" 
@@ -52,13 +51,15 @@
                   >
                   <i class="far fa-heart"></i>
                 </button>
+                <!-- Feed -->
                 <button 
                   type="submit" 
                   name="type"
                   value="feed"
-                  class="btn btn-outline-primary btn-sm mx-2" data-toggle="tooltip" 
+                  <?php echo BlogPostModel::isInFeed(intval($post['id']), intval($user->id)) ? "class='btn btn-primary btn-sm mx-2'" : "class='btn btn-outline-primary btn-sm mx-2'";  ?> 
+                  data-toggle="tooltip" 
                   data-placement="top" 
-                  title="Add to feed">
+                  <?php echo BlogPostModel::isInFeed(intval($post['id']), intval($user->id)) ? "title='Remove from Feed'" : "title='Add to Feed'";  ?>>
                   <i class="far fa-plus-square"></i>
                 </button>
               </form>

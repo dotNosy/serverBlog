@@ -97,9 +97,9 @@ class BlogPostModel
         $pdo_conn = $connObj->getConnection();
 
         //* Se hacen dos querys 
-        $query = $pdo_conn->prepare("(SELECT id as id_post, date as date, title as title, text as text FROM post WHERE user_id = :user_id)
+        $query = $pdo_conn->prepare("(SELECT id, date as date, title as title, text as text FROM post WHERE user_id = :user_id)
             UNION
-            (SELECT post.id as id_post, retweet.`date` as date, post.title as title, post.`text` as text FROM post
+            (SELECT post.id, retweet.`date` as date, post.title as title, post.`text` as text FROM post
             INNER JOIN retweet ON post.id = retweet.post_id
             WHERE retweet.user_id = :user_id) ORDER BY `date` DESC");
         $query->bindValue("user_id", $id);
@@ -145,7 +145,43 @@ class BlogPostModel
                 $pdo_conn->rollback();
                 return false;
             }
-            echo"execute falla";
+        }
+        catch (Exception $e)
+        {
+            $pdo_conn->rollback();
+            throw $e;
+            return false;
+        }
+
+        $pdo_conn = NULL;
+    }
+
+    public static function deleteFromFavorites(int $id, int $user_id)
+    { 
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+
+        $pdo_conn = $connObj->getConnection();
+        $pdo_conn->beginTransaction();
+
+        try
+        {
+            //* Se recogen los posts de la persona logeada actualmente
+            $query = $pdo_conn->prepare("DELETE FROM `like` WHERE post_id = :post AND user_id = :user");
+            $query->bindValue("post", $id);
+            $query->bindValue("user", $user_id);
+
+            if ($query->execute())
+            {
+                //* Mete todos los datos en un array
+                $pdo_conn->commit();
+
+                return true;
+            }
+            else
+            {
+                $pdo_conn->rollback();
+                return false;
+            }
         }
         catch (Exception $e)
         {
@@ -218,6 +254,43 @@ class BlogPostModel
         }
         catch (Exception $e)
         {
+            throw $e;
+            return false;
+        }
+
+        $pdo_conn = NULL;
+    }
+
+    public static function deleteFromFeed(int $id, int $user_id)
+    { 
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+
+        $pdo_conn = $connObj->getConnection();
+        $pdo_conn->beginTransaction();
+
+        try
+        {
+            //* Se recogen los posts de la persona logeada actualmente
+            $query = $pdo_conn->prepare("DELETE FROM retweet WHERE post_id = :post AND user_id = :user");
+            $query->bindValue("post", $id);
+            $query->bindValue("user", $user_id);
+
+            if ($query->execute())
+            {
+                //* Mete todos los datos en un array
+                $pdo_conn->commit();
+
+                return true;
+            }
+            else
+            {
+                $pdo_conn->rollback();
+                return false;
+            }
+        }
+        catch (Exception $e)
+        {
+            $pdo_conn->rollback();
             throw $e;
             return false;
         }
