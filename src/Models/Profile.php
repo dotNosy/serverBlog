@@ -20,16 +20,16 @@ class Profile
     public static function add(int $id, PDO &$PDOconnection)
     {
         try
-        {   
+        {               
             //* Se intenta insertar un perfil con el id del usuario recien registrado
             $query = $PDOconnection->prepare("INSERT INTO profile (user_id) VALUES (:id)");
             $query->bindValue("id", $id);
-            if($query->execute())
-            {
+
+            if($query->execute()) {
                 //* Si la query funciona se hacen un commit
                 $PDOconnection->commit();
-            }else
-            {
+            }
+            else {
                 $PDOconnection->rollback();
             }            
         } 
@@ -58,24 +58,7 @@ class Profile
             $PDOconnection->rollback();
             throw $e;
         }
-        $PDOconnection = NULL;
-    }
-
-    public static function addName(string $name, PDO $PDOconnection)
-    {
-        try
-        {
-            $query = $PDOconnection->prepare("INSERT INTO profile (name) VALUES (:name)");
-            $query->bindValue("name", $name);
-
-            $query->execute();
-
-            $PDOconnection->commit();
-
-        } catch (Exception $e) {
-            $PDOconnection->rollback();
-            throw $e;
-        }
+        
         $PDOconnection = NULL;
     }
 
@@ -94,24 +77,7 @@ class Profile
             $PDOconnection->rollback();
             throw $e;
         }
-        $PDOconnection = NULL;
-    }
 
-    public static function addSurname(string $surname, PDO $PDOconnection)
-    {
-        try
-        {
-            $query = $PDOconnection->prepare("INSERT INTO profile (surname) VALUES (:surname)");
-            $query->bindValue("surname", $surname);
-
-            $query->execute();
-
-            $PDOconnection->commit();
-
-        } catch (Exception $e) {
-            $PDOconnection->rollback();
-            throw $e;
-        }
         $PDOconnection = NULL;
     }
 
@@ -130,6 +96,7 @@ class Profile
             $PDOconnection->rollback();
             throw $e;
         }
+
         $PDOconnection = NULL;
     }
 
@@ -148,6 +115,7 @@ class Profile
             $PDOconnection->rollback();
             throw $e;
         }
+
         $PDOconnection = NULL;
     }
 
@@ -166,6 +134,7 @@ class Profile
             $PDOconnection->rollback();
             throw $e;
         }
+
         $PDOconnection = NULL;
     }
 
@@ -184,6 +153,7 @@ class Profile
             $PDOconnection->rollback();
             throw $e;
         }
+
         $PDOconnection = NULL;
     }
 
@@ -202,12 +172,7 @@ class Profile
             $PDOconnection->rollback();
             throw $e;
         }
+
         $PDOconnection = NULL;
     }
-
-    
-
-
-
-
 }

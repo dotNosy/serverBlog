@@ -26,8 +26,7 @@ class Login extends Controller
                 "titulo" => "LOGIN"
                 ,"css" => array("login.css")
                 ,"page" => __DIR__ . '/../Views/Login.php'
-            ]
-            ,$_SESSION['URL_PARAMS']);
+            ]);
         }
         else
         {

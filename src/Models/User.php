@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ServerBlog\Models;
 
 use ServerBlog\Services as Services;
+
 use \PDO;
 
 class User
@@ -76,7 +77,7 @@ class User
             $query = $pdo_conn->prepare("INSERT INTO user (username, password) VALUES (:username, :password)");
             $query->bindValue("username", $username);
             $query->bindValue("password", password_hash($password, PASSWORD_BCRYPT));
-
+            
             $query->execute();
 
             //* Se guarda el ultimo id insertado (el del registro)
@@ -84,16 +85,13 @@ class User
 
             //* Se añade un perfil para el usuario recien registrado
             Profile::add(intval($id), $pdo_conn);
-
-            //* Si todo sale bien, se hace un commit de las dos tablas
-            //$pdo_conn->commit();
-
+            
             return true;
         }
         catch(Exception $e) 
         {
             //! Si no sale bien se hace un rollback de todas las transacciones (tanto usuario como perfil)
-            //$pdo_conn->rollback();
+            $pdo_conn->rollback();
             throw $e;
             return false;
         }
@@ -145,5 +143,29 @@ class User
     public function getId () :int
     {
         return $this->id;
+    }
+
+    public function getUsernameById (int $id) :string
+    {
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+
+        $pdo_conn = $connObj->getConnection();
+
+
+        //* Se recogen los posts de la persona buscada por el id
+            $query = $pdo_conn->prepare("SELECT username FROM user WHERE id = :id");
+            $query->bindValue("id", $id);
+
+            if ($query->execute())
+            {
+                //* Mete todos los datos en un array
+                $post = $query->fetch(PDO::FETCH_OBJ);
+
+                //* Si esta vacia te devuelve NULL y sino te devuelve un array con todos los posts del usuario logeado
+                return $post->username;
+            }
+            else {
+                return null;
+            }
     }
 }
