@@ -87,6 +87,7 @@
           <?php if (!empty($_SESSION["msg_comment"])):?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
               <?=  $_SESSION["msg_comment"] ?>
+              <?php unset($_SESSION["msg_comment"]) ?>
               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
@@ -103,16 +104,19 @@
       </div>
 
       <!-- Single Comment -->
-      <div class="media mb-4">
-        <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-        <div class="media-body">
-          <h5 class="mt-0">Commenter Name</h5>
-          Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+      <?php foreach($_SESSION["comments"] as $comment): ?>
+        <div class="media my-5">
+          <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+          <div class="media-body">
+            <h5 class="mt-0"><?= User::getUsernameById(intval($comment->user_id)) ?></h5>
+            <?= $comment->text ?>
+          </div>
+          <?= $comment->date ?>
         </div>
-      </div>
+      <?php endforeach; ?>
 
       <!-- Comment with nested comments -->
-      <div class="media mb-4">
+      <!-- <div class="media mb-4">
         <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
         <div class="media-body">
           <h5 class="mt-0">Commenter Name</h5>
@@ -135,8 +139,8 @@
           </div>
 
         </div>
-      </div>
-
+      </div> -->
+      <!-- Fin nested comments -->
     </div>
 
     <!-- Sidebar Widgets Column -->

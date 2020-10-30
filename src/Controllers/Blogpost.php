@@ -43,9 +43,12 @@ class Blogpost extends Controller
             if(!empty($user))
             {
                 $view = Models\BlogPostModel::viewConInvisibles(intval($params[2]));
+
                 //? Si existe el post
                 if(!empty($view))
                 {
+                    $comments = Models\BlogPostModel::getComments(intval($view->id));
+
                     //? Si el post encontrado es invisible (privado)
                     if(!$view->visible)
                     {
@@ -58,6 +61,7 @@ class Blogpost extends Controller
                                 ,"css" => array("post.css")
                                 ,"blogPost" => json_encode($view)
                                 ,"autor" => User::getUsernameById(intval($view->user_id))
+                                ,"comments" => $comments
                                 ,"page" => __DIR__ . '/../Views/BlogPost/View.php'
                             ]);
                         }
@@ -73,11 +77,14 @@ class Blogpost extends Controller
                     //? Si el post encontrado es visible (publico)
                     else
                     {
+                        $comments = Models\BlogPostModel::getComments(intval($view->id));
+
                         parent::sendToView([
                             "titulo" => "POST"
                             ,"css" => array("post.css")
                             ,"blogPost" => json_encode($view)
                             ,"autor" => User::getUsernameById(intval($view->user_id))
+                            ,"comments" => $comments
                             ,"page" => __DIR__ . '/../Views/BlogPost/View.php'
                         ]);
                     }
@@ -98,11 +105,14 @@ class Blogpost extends Controller
                 $view = Models\BlogPostModel::view(intval($params[2]));
                 if(!empty($view))
                 {
+                    $comments = Models\BlogPostModel::getComments(intval($view->id));
+
                     parent::sendToView([
                         "titulo" => "POST"
                         ,"css" => array("post.css")
                         ,"blogPost" => json_encode($view)
                         ,"autor" => User::getUsernameById(intval($view->user_id))
+                        ,"comments" => $comments
                         ,"page" => __DIR__ . '/../Views/BlogPost/View.php'
                     ]);
                 }
@@ -114,8 +124,6 @@ class Blogpost extends Controller
                     ]);
                 }
             }
-
-            
         }   
     }
 
@@ -145,16 +153,16 @@ class Blogpost extends Controller
                     ,"list" => $list
                     ,"error" => "No has publicado ningun post todavia."
                     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
-                ]); 
+                ]);
             }
         }
         //? Usuario no logueado
         else
         {
-            Helpers::sendToController("/login/index"
-            ,[
+            Helpers::sendToController("/login/index",
+            [
                 "error" => "Para ver tus posts debes estar registrado."
-             ]);
+            ]);
         }  
     }
 

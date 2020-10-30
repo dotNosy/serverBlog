@@ -491,7 +491,9 @@ class BlogPostModel
         
         //? Usuario no logueado
         $pdo_conn = NULL; 
-    } 
+    }
+
+
 
     public static function addComment(int $post_id, int $user_id,string $text)
     {
@@ -528,6 +530,36 @@ class BlogPostModel
          }
          
          //? Usuario no logueado
+         $pdo_conn = NULL; 
+    }
+
+    public static function getComments(int $post_id)
+    {
+         $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+         $pdo_conn = $connObj->getConnection();
+ 
+         try 
+         {
+            $query = $pdo_conn->prepare("SELECT * FROM comment WHERE post_id = :post_id ORDER BY date DESC;");
+
+            $query->bindValue("post_id", $post_id);
+
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $list = $query->fetchAll(PDO::FETCH_OBJ);
+                return $list;
+            }
+            else {
+                return false;
+            }  
+         } 
+         catch (\Throwable $th) {
+             echo $th;
+             return false;
+         }
+         
          $pdo_conn = NULL; 
     }
 }
