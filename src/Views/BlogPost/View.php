@@ -105,13 +105,42 @@
 
       <!-- Single Comment -->
       <?php foreach($_SESSION["comments"] as $comment): ?>
-        <div class="media my-5">
-          <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-          <div class="media-body">
-            <h5 class="mt-0"><?= User::getUsernameById(intval($comment->user_id)) ?></h5>
-            <?= $comment->text ?>
+        <div class="card my-4">
+          <h5 class="card-header"><?=  User::getUsernameById(intval($comment->user_id))?></h5>
+          <div class="card-body">
+            <p><?= $comment->text ?></p>
           </div>
-          <?= $comment->date ?>
+          <blockquote class="blockquote text-right">
+            <footer class="blockquote-footer mr-3"><?= $comment->date ?></footer>
+          </blockquote>
+          <hr>
+          <!-- Responder -->
+          <form class="form-inline col-12" action="/post/addComment/" method="POST">
+            <input type="hidden" name="id" <?= (!empty($post->id) ? "value='$post->id'" : '') ?> >
+            <input type="hidden" name="id_padre" <?= (!empty($comment->id) ? "value='$comment->id'" : '') ?> >
+
+              <label class="sr-only" for="inlineFormInputGroupUsername2">Username</label>
+              <div class="input-group mb-2 mr-sm-2">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">Responde a <?=  User::getUsernameById(intval($comment->user_id))?></div>
+                </div>
+                <textarea name="text" id="" cols="40" rows="1"></textarea>
+              </div>
+              <button type="submit" name="comment" class="btn btn-primary mb-2">Go!</button>
+          </form>
+
+          <!-- Listar Respuestas -->
+          <?php foreach(BlogPostModel::getAnswer(intval($comment->id)) as $answer): ?>
+            <div class="card ml-5 my-4">
+              <h5 class="card-header"><?=  User::getUsernameById(intval($answer->user_id))?></h5>
+              <div class="card-body">
+                <p><?= $answer->text ?></p>
+              </div>
+              <blockquote class="blockquote text-right">
+                <footer class="blockquote-footer mr-3"><?= $answer->date ?></footer>
+              </blockquote>
+            </div>
+          <?php endforeach; ?>
         </div>
       <?php endforeach; ?>
 

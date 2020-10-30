@@ -540,9 +540,113 @@ class BlogPostModel
  
          try 
          {
-            $query = $pdo_conn->prepare("SELECT * FROM comment WHERE post_id = :post_id ORDER BY date DESC;");
+            $query = $pdo_conn->prepare("SELECT * FROM comment WHERE post_id = :post_id AND comment_id IS NULL ORDER BY date DESC;");
 
             $query->bindValue("post_id", $post_id);
+
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $list = $query->fetchAll(PDO::FETCH_OBJ);
+                return $list;
+            }
+            else {
+                return false;
+            }  
+         } 
+         catch (\Throwable $th) {
+             echo $th;
+             return false;
+         }
+         
+         $pdo_conn = NULL; 
+    }
+
+    public static function getCommentParent(int $id)
+    {
+         $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+         $pdo_conn = $connObj->getConnection();
+ 
+         try 
+         {
+            $query = $pdo_conn->prepare("SELECT * FROM comment WHERE id = :id AND comment_id IS NULL ORDER BY date DESC;");
+
+            $query->bindValue("id", $id);
+
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $list = $query->fetch(PDO::FETCH_OBJ);
+                if (!empty($list)) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                return false;
+            }  
+         } 
+         catch (\Throwable $th) {
+             echo $th;
+             return false;
+         }
+         
+         $pdo_conn = NULL; 
+    }
+
+    public static function addAnswer(int $post_id, int $padre_id ,int $user_id,string $text)
+    {
+         $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+ 
+         $pdo_conn = $connObj->getConnection();
+ 
+         $pdo_conn->beginTransaction();
+ 
+         try 
+         {
+            $query = $pdo_conn->prepare("INSERT INTO comment (post_id, comment_id, user_id, text, date) VALUES (:post_id, :comment_id, :user_id, :text, NOW())");
+
+            $query->bindValue("post_id", $post_id);
+            $query->bindValue("comment_id", $padre_id);
+            $query->bindValue("user_id", $user_id);
+            $query->bindValue("text", $text);
+
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $pdo_conn->commit();
+                return true;
+            }
+            else {
+                $pdo_conn->rollback();
+                return false;
+            }  
+         } 
+         catch (\Throwable $th) {
+             echo $th;
+             $pdo_conn->rollback();
+             return false;
+         }
+         
+         //? Usuario no logueado
+         $pdo_conn = NULL; 
+    }
+
+    public static function getAnswer(int $comment_id)
+    {
+         $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+         $pdo_conn = $connObj->getConnection();
+ 
+         try 
+         {
+            $query = $pdo_conn->prepare("SELECT * FROM comment WHERE comment_id = :comment_id ORDER BY date DESC;");
+
+            $query->bindValue("comment_id", $comment_id);
 
             //* Si la query funciona se hacen un commit
             if($query->execute())

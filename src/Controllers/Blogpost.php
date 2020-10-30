@@ -209,6 +209,27 @@ class Blogpost extends Controller
                 $tituloPost = Helpers::cleanInput($_POST['titulo']);
                 $mensajePost = Helpers::cleanInput($_POST['mensaje']);
                 $radioPost = Helpers::cleanInput($_POST['visibleRadio']);
+
+                // echo $_FILES['imagen']['name'] . "<br>";
+                // echo strripos($_FILES['imagen']['name'], "."). "<br>";
+                // echo strlen($_FILES['imagen']['name']). "<br>";
+                // echo substr($_FILES['imagen']['name'], strripos($_FILES['imagen']['name'], ".")-strlen($_FILES['imagen']['name']));
+                // die();
+                var_dump($_FILES);
+
+                $extension = substr($_FILES['imagen']['name'], strripos($_FILES['imagen']['name'], ".")-strlen($_FILES['imagen']['name']));
+
+                //? Comprueba que la extension del archivo sea o PNG o JPG o GIF
+                if ($extension == ".jpg" || $extension == ".png" || $extension == ".gif") {
+                   
+                    echo "extension BUENA= " . $extension;
+                    die();
+                }
+                else
+                {
+                    echo "extension MALA= " . $extension;
+                    die();
+                }
     
                 //? Si el radibutton no devulve 0 o 1
                 if($radioPost!=0 && $radioPost!=1){
@@ -378,30 +399,68 @@ class Blogpost extends Controller
                 $comment = "";
 
                 //? hay un id post
-                if (!empty(trim($_POST['id']))) 
+                if (!empty($_POST['id'])) 
                 {
                     $post = Models\BlogPostModel::view(intval($id));
 
                     //? El post existe y esta visible
                     if (!empty($post))
                     {
-                        if (!empty(trim($_POST['text'])))
+                        if (!empty($_POST['text']))
                         {
                             $comment = Helpers::cleanInput($_POST['text']);
 
-                           if (Models\BlogPostModel::addComment(intval($id), intval($user->id), $comment)) {
-                                Helpers::sendToController("/post/view/$id",
-                                [
-                                    "msg_comment" => "El comentario se añadio con exito"
-                                ]);
-                           }
-                           else
-                           {
-                                Helpers::sendToController("/post/view/$id",
-                                [
-                                    "error" => "El comentario no se pudo añadir :("
-                                ]);
-                           }
+                            //* COMENTARIO
+                            if (empty($_POST['id_padre']))
+                            {
+                                if (Models\BlogPostModel::addComment(intval($id), intval($user->id), $comment)) {
+                                    Helpers::sendToController("/post/view/$id",
+                                    [
+                                        "msg_comment" => "El comentario se añadio con exito"
+                                    ]);
+                                }
+                                else
+                                {
+                                    Helpers::sendToController("/post/view/$id",
+                                    [
+                                        "error" => "El comentario no se pudo añadir :("
+                                    ]);
+                                }
+                            }
+                            //* RESPUESTA
+                            else
+                            {
+                                $id_padre = Helpers::cleanInput($_POST['id_padre']);
+
+                                //? Comprobar que el comentario padre existe
+                                if (Models\BlogPostModel::getCommentParent(intval($id_padre)))
+                                {
+                                    //? Try insert
+                                    if (Models\BlogPostModel::addAnswer(intval($id), intval($id_padre) ,intval($user->id), $comment))
+                                    {
+                                        Helpers::sendToController("/post/view/$id",
+                                        [
+                                            "msg_comment" => "La respuesta se añadio con exito."
+                                        ]);
+                                    }
+                                    //? No se pudo añadir
+                                    else
+                                    {
+                                        Helpers::sendToController("/post/view/$id",
+                                        [
+                                            "error" => "La respuesta no se pudo añadir :("
+                                        ]);
+                                    }
+                                }
+                                //? El comentario padre no existe
+                                else
+                                {
+                                    Helpers::sendToController("/post/view/$id",
+                                    [
+                                        "error" => "El comentario al que intentas responder no existe :("
+                                    ]);
+                                }
+                            }
                         }
                         //? Comentario vacio
                         else
