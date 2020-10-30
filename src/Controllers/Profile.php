@@ -14,24 +14,32 @@ class Profile extends Controller
     {
         parent::__construct($params);
     }
-
+    
     protected function index(array $params = null) 
     {
+
         if (!empty($_SESSION['user']))
         {
+            $user = Models\User::getUser();
+            //* El profile se crea 
+            $profile = Models\Profile::getProfile(intval($user->id));
             parent::sendToView([
                 "titulo" => "TEST CONTROLLER"
+                ,"profile" => json_encode($profile)
                 ,"page" =>  __DIR__ . '/../Views/Profile.php'
             ]);
         }
         else
         {
-            //TODO: Crear pagina de sesion expired
-            echo "sesion no encontrada";
+            //* No es un post tuyo
+            Services\Helpers::sendToController("/login",
+            [
+                "error" => "Para ver tu perfil debes estar logeado."
+            ]); 
         }
     }
 
-    public function updateProfile($params = null)
+    public function edit($params = null)
     {
         $user = Models\User::getUser();
         //echo $user->id;
@@ -47,48 +55,51 @@ class Profile extends Controller
             $birthdate = Services\Helpers::cleanInput($_POST['date']);
 
             //updateProfile($user->id, $name, $surname, $email, $birthdate);
-            if(Models\Profile::prueba()){
-                echo "makina";
+            if(Models\Profile::edit($user->id, $name, $surname, $email, $birthdate)){
+                echo "Se han modificado los datos";
             }
             else
             {
-                echo "nope";
+                echo "Los datos no se han modificado";
             }
-
-
-            /*if (empty($name)) {   
-                $nameReturn = selectName($user->id);
-                $this->addName($nameReturn);
-            }
-
-            if(!empty($surname)){
-                $surnameReturn = selectSurname($user->id);
-                $this->addSurname($surnameReturn);
-            }
-
-            if(!empty($email)){
-                $emailReturn = selectEmail($user->id);
-                $this->addName($emailReturn);
-            }
-
-            if(!empty($birthdate)){
-                $birthdateReturn = selectBirthdate($user->id);
-                $this->addName($birthdateReturn);
-            }
-            //? DO LOGIN
-            else
-            {
-                $this->addName($name);
-                $this->addSurname($surname);
-                $this->addEmail($email);
-                $this->addBirthdate($birthdate);
-                echo "los datos se han insertado correctamente";
-            }*/
         }
         else {
             Services\Helpers::sendTo404();
         }
     }
+
+    public function editPassword($params = null)
+    {
+        $user = Models\User::getUser();
+        //echo $user->id;
+        //die();
+        if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['cambiarContraseña']))
+        {
+            
+            //? Error credenciales vacias
+            $password = Services\Helpers::cleanInput($_POST['password']);
+            $repeatPassword = Services\Helpers::cleanInput($_POST['repeatPassword']);
+
+            //updateProfile($user->id, $name, $surname, $email, $birthdate);
+            if($password == $repeatPassword){
+                if(Models\Profile::changePassword($user->id, $password)){
+                    echo "Se han modificado los datos";
+                    
+                }
+                else
+                {
+                    echo "Los datos no se han modificado";
+                }
+            }else{
+                echo "Las contraseñas no son iguales";
+            }
+        }
+        else {
+            Services\Helpers::sendTo404();
+        }
+    }
+
+
 }
 
     
