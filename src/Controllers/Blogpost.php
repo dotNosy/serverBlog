@@ -25,34 +25,97 @@ class Blogpost extends Controller
     protected function view(array $params)
     {
         //? La posicion 2 es el id del post
-        if(!empty($params[2]) && is_int($params[2]))
+        //? Si la posicion 2 esta vacia o no es un numero
+        if(empty($params[2]) || !is_int(intval($params[2])))
         {
-
+            //* Redireccion a all con mensaje "No existe este post"
             Helpers::sendToController("/post/all",
             [
                 "error" => "No existe este post."
             ]);
         }
+        //? Si la posicion 2 no esta vacia y es un numero
         else
         {
-            $view = Models\BlogPostModel::view(intval($params[2]));
-            if(!empty($view))
+            $user = User::getUser();
+
+            //? Si el usuario existe
+            if(!empty($user))
             {
-                parent::sendToView([
-                    "titulo" => "POST"
-                    ,"css" => array("post.css")
-                    ,"blogPost" => json_encode($view)
-                    ,"autor" => User::getUsernameById(intval($view->user_id))
-                    ,"page" => __DIR__ . '/../Views/BlogPost/View.php'
-                ]);
+                $view = Models\BlogPostModel::viewConInvisibles(intval($params[2]));
+                //? Si existe el post
+                if(!empty($view))
+                {
+                    //? Si el post encontrado es invisible (privado)
+                    if(!$view->visible)
+                    {
+                        //? Si el id logeado es el creador del post
+                        if($view->user_id==$user->id)
+                        {
+                            //* Te enseña el post
+                            parent::sendToView([
+                                "titulo" => "POST"
+                                ,"css" => array("post.css")
+                                ,"blogPost" => json_encode($view)
+                                ,"autor" => User::getUsernameById(intval($view->user_id))
+                                ,"page" => __DIR__ . '/../Views/BlogPost/View.php'
+                            ]);
+                        }
+                        //? Si el id logeado NO es el creador del post
+                        else
+                        {
+                            Helpers::sendToController("/post/all",
+                                [
+                                "error" => "No existe este post."
+                            ]);
+                        }
+                    }
+                    //? Si el post encontrado es visible (publico)
+                    else
+                    {
+                        parent::sendToView([
+                            "titulo" => "POST"
+                            ,"css" => array("post.css")
+                            ,"blogPost" => json_encode($view)
+                            ,"autor" => User::getUsernameById(intval($view->user_id))
+                            ,"page" => __DIR__ . '/../Views/BlogPost/View.php'
+                        ]);
+                    }
+                }
+                //? Si el post no ha sido encontrado
+                else
+                {
+                    Helpers::sendToController("/post/all",
+                    [
+                        "error" => "No existe este post."
+                    ]);
+                }          
             }
+            //? Si el usuario no esta logeado
             else
             {
-                Helpers::sendToController("/post/all",
-                [
-                    "error" => "No existe este post."
-                ]);
+                //* Coger solo visibles
+                $view = Models\BlogPostModel::view(intval($params[2]));
+                if(!empty($view))
+                {
+                    parent::sendToView([
+                        "titulo" => "POST"
+                        ,"css" => array("post.css")
+                        ,"blogPost" => json_encode($view)
+                        ,"autor" => User::getUsernameById(intval($view->user_id))
+                        ,"page" => __DIR__ . '/../Views/BlogPost/View.php'
+                    ]);
+                }
+                else
+                {
+                    Helpers::sendToController("/post/all",
+                    [
+                        "error" => "No existe este post."
+                    ]);
+                }
             }
+
+            
         }   
     }
 
@@ -283,7 +346,6 @@ class Blogpost extends Controller
                         "error" => "No existe este post."
                     ]);
                 }
-                
             } 
         }
         //? Usuario no logueado
@@ -304,9 +366,63 @@ class Blogpost extends Controller
         {
             if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['comment']))
             {
-                echo "post";
-                die();
+                $id = Helpers::cleanInput($_POST['id']);
+                $comment = "";
+
+                //? hay un id post
+                if (!empty(trim($_POST['id']))) 
+                {
+                    $post = Models\BlogPostModel::view(intval($id));
+
+                    //? El post existe y esta visible
+                    if (!empty($post))
+                    {
+                        if (!empty(trim($_POST['text'])))
+                        {
+                            $comment = Helpers::cleanInput($_POST['text']);
+
+                           if (Models\BlogPostModel::addComment(intval($id), intval($user->id), $comment)) {
+                                Helpers::sendToController("/post/view/$id",
+                                [
+                                    "msg_comment" => "El comentario se añadio con exito"
+                                ]);
+                           }
+                           else
+                           {
+                                Helpers::sendToController("/post/view/$id",
+                                [
+                                    "error" => "El comentario no se pudo añadir :("
+                                ]);
+                           }
+                        }
+                        //? Comentario vacio
+                        else
+                        {
+                            Helpers::sendToController("/post/view/$id",
+                            [
+                                "error" => "El comentario no puede estar vacio."
+                            ]);
+                        }
+                    }
+                    //? el post a comentar no existe
+                    else 
+                    {
+                        Helpers::sendToController("/post/all",
+                        [
+                            "error" => "El post no se pudo encontrar"
+                        ]);
+                    }
+                }
+                //? ID no enviado en formulario
+                else 
+                {
+                    Helpers::sendToController("/post/all",
+                    [
+                        "error" => "El post no se pudo encontrar"
+                    ]);
+                }
             }
+            //? No vienes por POST
             else {
                 Helpers::sendTo404();
             }
@@ -316,7 +432,7 @@ class Blogpost extends Controller
         {
             Helpers::sendToController("/login/index"
             ,[
-                "error" => "Para crear un post debes estar logeado."
+                "error" => "Para comentar debes estar logeado."
              ]);
         }
     }

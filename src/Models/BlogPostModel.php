@@ -53,7 +53,8 @@ class BlogPostModel
         //* Se recogen todos los posts de la base de datos
         $query = $pdo_conn->prepare("SELECT p.id, p.user_id,u.username, p.title, p.text, p.date 
                                     FROM post p
-                                    INNER JOIN user u on u.id = p.user_id 
+                                    INNER JOIN user u on u.id = p.user_id
+                                    WHERE p.visible = 1
                                     ORDER BY date DESC");
         
         if ($query->execute())
@@ -477,7 +478,6 @@ class BlogPostModel
             }
             else
             {
-                
                 $pdo_conn->rollback();
                 return false;
             }  
@@ -493,8 +493,41 @@ class BlogPostModel
         $pdo_conn = NULL; 
     } 
 
-    public static function addComment()
+    public static function addComment(int $post_id, int $user_id,string $text)
     {
-        
+         $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+ 
+         $pdo_conn = $connObj->getConnection();
+ 
+         $pdo_conn->beginTransaction();
+ 
+         try 
+         {
+            $query = $pdo_conn->prepare("INSERT INTO comment (post_id, user_id, text, date) VALUES (:post_id, :user_id, :text, NOW())");
+
+            $query->bindValue("post_id", $post_id);
+            $query->bindValue("user_id", $user_id);
+            $query->bindValue("text", $text);
+
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $pdo_conn->commit();
+                return true;
+            }
+            else {
+                $pdo_conn->rollback();
+                return false;
+            }  
+         } 
+         catch (\Throwable $th) {
+             echo $th;
+             $pdo_conn->rollback();
+             return false;
+         }
+         
+         //? Usuario no logueado
+         $pdo_conn = NULL; 
     }
 }
