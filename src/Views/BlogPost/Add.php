@@ -5,7 +5,7 @@
           <form class="form-horizontal" action="/post/add" method="POST" enctype="multipart/form-data">
             <fieldset>
               <legend class="text-center">Nuevo post</legend>
-      
+
               <!-- titulo input-->
               <div class="form-group">
                 <label class="col-md-3 control-label" for="titulo">Título</label>
@@ -13,7 +13,7 @@
                   <input id="titulo" name="titulo" type="text" placeholder="Título" class="form-control">
                 </div>
               </div>
-      
+
               <!-- Message body -->
               <div class="form-group">
                 <label class="col-md-3 control-label" for="mensaje">Tu mensaje</label>
@@ -23,7 +23,7 @@
               </div>
 
               <div class="form-group">
-                <div class="col-md-9"> 
+                <div class="col-md-9">
                   <div class="custom-control custom-radio">
                       <input type="radio" id="visible" name="visibleRadio" class="custom-control-input" checked="checked" value=1>
                       <label class="custom-control-label" for="visible">Público</label>
@@ -37,12 +37,12 @@
               <!-- Imagen -->
               <div class="form-group">
                 <label class="col-md-4 control-label">Insertar imagen</label>
-                <div class="col-md-9"> 
+                <div class="col-md-9">
                 <input type="hidden" name="MAX_FILE_SIZE" value="30000" />
-                  <input name="imagen" id="imagen" type="file" class="form-control-file">
+                  <input name="imagen" type="file" class="form-control-file">
                 </div>
               </div>
-      
+
               <!-- Form actions -->
               <div class="form-group">
                 <div class="col-md-12 text-right">

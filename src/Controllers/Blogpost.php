@@ -215,13 +215,19 @@ class Blogpost extends Controller
                 // echo strlen($_FILES['imagen']['name']). "<br>";
                 // echo substr($_FILES['imagen']['name'], strripos($_FILES['imagen']['name'], ".")-strlen($_FILES['imagen']['name']));
                 // die();
-                var_dump($_FILES);
+                // var_dump($_FILES);
 
-                $extension = substr($_FILES['imagen']['name'], strripos($_FILES['imagen']['name'], ".")-strlen($_FILES['imagen']['name']));
+                // $dir_to_search = $_FILES['imagen']['name'];
+                // echo $dir_to_search;
+
+                echo $path = "C:\Users\ik_2dw3\Desktop\JavaScript\Anderrekin\5. ariketak - Mikel\assets\gatete1.jpg" . "<br>";
+                echo $type = pathinfo($path, PATHINFO_EXTENSION);
+                echo $data = file_get_contents($path);
+                // var_dump($data);
+                // die();
 
                 //? Comprueba que la extension del archivo sea o PNG o JPG o GIF
-                if ($extension == ".jpg" || $extension == ".png" || $extension == ".gif") {
-                   
+                if ($type == "jpg" || $type == "png" || $type == "gif") {
                     echo "extension BUENA= " . $extension;
                     die();
                 }
