@@ -83,7 +83,10 @@ class Profile extends Controller
             //updateProfile($user->id, $name, $surname, $email, $birthdate);
             if($password == $repeatPassword){
                 if(Models\Profile::changePassword($user->id, $password)){
-                    echo "Se han modificado los datos";
+                    Services\Helpers::sendToController("/login/logout",
+                    [
+                    "error" => "Para ver tu perfil debes estar logeado."
+                    ]);
                     
                 }
                 else
