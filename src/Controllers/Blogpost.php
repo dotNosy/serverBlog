@@ -401,12 +401,11 @@ class Blogpost extends Controller
         {
             if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['comment']))
             {
-                $id = Helpers::cleanInput($_POST['id']);
                 $comment = "";
-
                 //? hay un id post
                 if (!empty($_POST['id'])) 
                 {
+                    $id = Helpers::cleanInput($_POST['id']);
                     $post = Models\BlogPostModel::view(intval($id));
 
                     //? El post existe y esta visible
@@ -507,6 +506,80 @@ class Blogpost extends Controller
             ,[
                 "error" => "Para comentar debes estar logeado."
              ]);
+        }
+    }
+
+    protected function deleteComment()
+    {
+        if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['comment']) && !empty($_POST['id']))
+        {
+            $user = User::getUser();
+            if(!empty($user))
+            {
+                $id = Helpers::cleanInput($_POST['id']);
+
+                $comment = Models\BlogPostModel::getCommentbyId(intval($id));
+
+                //? El comment existe
+                if (!empty($comment))
+                {
+                    $view = Models\BlogPostModel::view(intval($id));
+                    //? La vista existe y esta visible
+                    if(!empty($view))
+                    {
+                        //? El usuario es el propietario del comentario o del post
+                        if ($user->id == $comment->user_id || $user->id == $view->user_id) 
+                        {
+                            if (Models\BlogPostModel::deleteComment(intval($id))) {
+                                Helpers::sendToController("/post/view/$comment->post_id",
+                                [
+                                    "msg_comment" => "El comentario se borro con exito"
+                                ]);
+                            }
+                            //? Error eliminar
+                            else {
+                                Helpers::sendToController("/post/view/$comment->post_id",
+                                [
+                                    "error" => "No se pudo eliminar el comentario :("
+                                ]);
+                            }
+                        }
+                        else {
+                            Helpers::sendToController("/post/view/$comment->post_id",
+                            [
+                                "error" => "No estas autorizado para borrar este post :("
+                            ]);
+                        }
+                    }
+                    //? El post no existe o no esta visible
+                    else {
+                        Helpers::sendToController("/post/all",
+                        [
+                            "error" => "Ese post no esta disponible."
+                        ]);
+                    }
+                }
+                //? el comentario no existe
+                else 
+                {
+                    Helpers::sendToController("/post/all",
+                    [
+                        "error" => "El comentario no se pudo borrar"
+                    ]);
+                }
+            }
+            //? Usuario no logueado
+            else
+            {
+                Helpers::sendToController("/login/index",
+                [
+                    "error" => "Para comentar debes estar logeado."
+                ]);
+            }
+        }
+        //? No vienes por POST
+        else {
+            Helpers::sendTo404();
         }
     }
 

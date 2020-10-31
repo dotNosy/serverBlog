@@ -74,10 +74,12 @@
 
       <!-- Comments Form -->
       <div class="card my-4">
-        <h5 class="card-header">Leave a Comment:</h5>
+        <div class="card-header">
+          <h5 >Leave a Comment:</h5>
+        </div>
         <div class="card-body">
         <?php if (!empty($_SESSION["error"])):?>
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">   
               <?=  $_SESSION["error"] ?>
               <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                 <span aria-hidden="true">&times;</span>
@@ -106,7 +108,24 @@
       <!-- Single Comment -->
       <?php foreach($_SESSION["comments"] as $comment): ?>
         <div class="card my-4">
-          <h5 class="card-header"><?=  User::getUsernameById(intval($comment->user_id))?></h5>
+          <div class="card-header">
+            <h5><?=  User::getUsernameById(intval($comment->user_id))?></h5>
+            <!-- ELIMINAR -->
+            <?php if(!empty($user) && ($user->id == $comment->user_id || $user->id == $post->user_id)):?>
+              <form action="/post/deleteComment" method="POST">
+                <input type="hidden" name="id" <?= "value='$comment->id'"?>>
+                <button
+                  name="comment"
+                  type="submit" 
+                  class="btn btn-outline-danger btn-sm float-right"
+                  data-toggle="tooltip" 
+                  data-placement="top"
+                  title="Eliminar">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </form>
+            <?php endif; ?>
+          </div>
           <div class="card-body">
             <p><?= $comment->text ?></p>
           </div>
@@ -132,7 +151,24 @@
           <!-- Listar Respuestas -->
           <?php foreach(BlogPostModel::getAnswer(intval($comment->id)) as $answer): ?>
             <div class="card ml-5 my-4">
-              <h5 class="card-header"><?=  User::getUsernameById(intval($answer->user_id))?></h5>
+              <div class="card-header">
+                <h5><?=  User::getUsernameById(intval($answer->user_id))?></h5>
+                <!-- ELIMINAR -->
+                <?php if(!empty($user) && ($user->id == $comment->user_id || $user->id == $post->user_id)):?>
+                  <form action="/post/deleteComment" method="POST">
+                    <input type="hidden" name="id" <?= "value='$comment->id'"?>>
+                    <button
+                      name="comment"
+                      type="submit" 
+                      class="btn btn-outline-danger btn-sm float-right"
+                      data-toggle="tooltip" 
+                      data-placement="top"
+                      title="Eliminar">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </form>
+                <?php endif; ?>
+              </div>
               <div class="card-body">
                 <p><?= $answer->text ?></p>
               </div>
@@ -143,33 +179,6 @@
           <?php endforeach; ?>
         </div>
       <?php endforeach; ?>
-
-      <!-- Comment with nested comments -->
-      <!-- <div class="media mb-4">
-        <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-        <div class="media-body">
-          <h5 class="mt-0">Commenter Name</h5>
-          Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-
-          <div class="media mt-4">
-            <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-            <div class="media-body">
-              <h5 class="mt-0">Commenter Name</h5>
-              Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-            </div>
-          </div>
-
-          <div class="media mt-4">
-            <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-            <div class="media-body">
-              <h5 class="mt-0">Commenter Name</h5>
-              Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-            </div>
-          </div>
-
-        </div>
-      </div> -->
-      <!-- Fin nested comments -->
     </div>
 
     <!-- Sidebar Widgets Column -->

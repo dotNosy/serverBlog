@@ -70,7 +70,7 @@ class Login extends Controller
     {
         Models\User::logout();
 
-        Services\Helpers::sendToController("/home");
+        Services\Helpers::sendToController("/login");
     }
 
     protected function register($params = null) 

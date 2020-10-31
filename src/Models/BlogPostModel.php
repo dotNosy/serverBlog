@@ -445,7 +445,6 @@ class BlogPostModel
             return false;
         }
         
-        //? Usuario no logueado
         $pdo_conn = NULL; 
     } 
 
@@ -489,11 +488,8 @@ class BlogPostModel
             return false;
         }
         
-        //? Usuario no logueado
         $pdo_conn = NULL; 
     }
-
-
 
     public static function addComment(int $post_id, int $user_id,string $text)
     {
@@ -529,7 +525,6 @@ class BlogPostModel
              return false;
          }
          
-         //? Usuario no logueado
          $pdo_conn = NULL; 
     }
 
@@ -596,6 +591,77 @@ class BlogPostModel
          }
          
          $pdo_conn = NULL; 
+    }
+
+    public static function getCommentbyId(int $id)
+    {
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+         $pdo_conn = $connObj->getConnection();
+ 
+         try 
+         {
+            $query = $pdo_conn->prepare("SELECT * FROM comment WHERE id = :id;");
+
+            $query->bindValue("id", $id);
+
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $comment = $query->fetch(PDO::FETCH_OBJ);
+
+                if (!empty($comment)) {
+                    return $comment;
+                }
+                else {
+                    return false;
+                }
+            }
+            else {
+                return false;
+            }  
+         } 
+         catch (\Throwable $th) {
+             echo $th;
+             return false;
+         }
+         
+         $pdo_conn = NULL; 
+    }
+
+    public static function deleteComment(int $id)
+    {
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+
+        $pdo_conn = $connObj->getConnection();
+
+        $pdo_conn->beginTransaction();
+
+        try 
+        {
+        $query = $pdo_conn->prepare("DELETE FROM comment WHERE id=:id;");
+
+        $query->bindValue("id", $id);
+
+        //* Si la query funciona se hacen un commit
+        if($query->execute())
+        {
+            //* Se coge el id del post insertado para abrirlo al crearlo
+            $pdo_conn->commit();
+            return true;
+        }
+        else {
+            $pdo_conn->rollback();
+            return false;
+        }  
+        } 
+        catch (\Throwable $th) {
+            echo $th;
+            $pdo_conn->rollback();
+            return false;
+        }
+        
+        $pdo_conn = NULL; 
     }
 
     public static function addAnswer(int $post_id, int $padre_id ,int $user_id,string $text)
