@@ -523,7 +523,7 @@ class Blogpost extends Controller
                 //? El comment existe
                 if (!empty($comment))
                 {
-                    $view = Models\BlogPostModel::view(intval($id));
+                    $view = Models\BlogPostModel::view(intval($comment->post_id));
                     //? La vista existe y esta visible
                     if(!empty($view))
                     {

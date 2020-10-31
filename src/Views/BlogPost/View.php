@@ -154,9 +154,9 @@
               <div class="card-header">
                 <h5><?=  User::getUsernameById(intval($answer->user_id))?></h5>
                 <!-- ELIMINAR -->
-                <?php if(!empty($user) && ($user->id == $comment->user_id || $user->id == $post->user_id)):?>
+                <?php if(!empty($user) && ($user->id == $answer->user_id || $user->id == $post->user_id)):?>
                   <form action="/post/deleteComment" method="POST">
-                    <input type="hidden" name="id" <?= "value='$comment->id'"?>>
+                    <input type="hidden" name="id" <?= "value='$answer->id'"?>>
                     <button
                       name="comment"
                       type="submit" 
