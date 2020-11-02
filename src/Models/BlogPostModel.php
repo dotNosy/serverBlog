@@ -425,22 +425,20 @@ class BlogPostModel
             {
                 //* Se coge el id del post insertado para abrirlo al crearlo
 
-                
-
                 $id_post = $pdo_conn->lastInsertId();
 
                 $pdo_conn->commit();
 
-                
-
                 $pdo_conn->beginTransaction();
 
+                //? Si la imagen no está vacia
                 if(!empty($nombreImagen))
                 {
                     $query = $pdo_conn->prepare("INSERT INTO multimedia (post_id, path) VALUES (:id_post, :path)");
                     $query->bindValue("id_post",$id_post);
                     $query->bindValue("path",$nombreImagen);
 
+                    //? Se mete la imagen en la BBDD
                     if($query->execute())
                     {
                         $pdo_conn->commit();
@@ -450,12 +448,10 @@ class BlogPostModel
                         $pdo_conn->rollback();
                     }
                 }
-                
                 return $id_post;
             }
             else
             {
-                
                 $pdo_conn->rollback();
                 return false;
             }  
@@ -465,7 +461,6 @@ class BlogPostModel
             $pdo_conn->rollback();
             return false;
         }
-        
         $pdo_conn = NULL; 
     } 
 
@@ -497,14 +492,12 @@ class BlogPostModel
 
                 if(!empty($nombreimagen))
                 {
-                    
                     $query = $pdo_conn->prepare("UPDATE multimedia SET path=:path WHERE post_id=:id_post");
                     $query->bindValue("path",$nombreimagen);
                     $query->bindValue("id_post",$id);
                     
                     if($query->execute())
                     {
-                        
                         $pdo_conn->commit();
                     }
                     else
@@ -514,7 +507,6 @@ class BlogPostModel
                     }
                     
                 }
-
                 return true;
             }
             else

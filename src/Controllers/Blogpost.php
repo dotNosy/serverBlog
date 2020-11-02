@@ -209,41 +209,39 @@ class Blogpost extends Controller
                 $tituloPost = Helpers::cleanInput($_POST['titulo']);
                 $mensajePost = Helpers::cleanInput($_POST['mensaje']);
                 $radioPost = Helpers::cleanInput($_POST['visibleRadio']);
-
-                // echo $_FILES['imagen']['name'] . "<br>";
-                // echo strripos($_FILES['imagen']['name'], "."). "<br>";
-                // echo strlen($_FILES['imagen']['name']). "<br>";
-                // echo substr($_FILES['imagen']['name'], strripos($_FILES['imagen']['name'], ".")-strlen($_FILES['imagen']['name']));
                 
-
+                //TODO: Cambiar este directorio por uno del servidor
                 $uploaddir = "C:/xampp/htdocs/serverBlog/assets/";
+
+                //* Nombre de la foto
                 $uploadfile = $uploaddir . basename($_FILES['imagen']['name']);
-                $type = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
+
+                //* Se coge la extension en minusculas
+                $type = strtolower(pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION));
 
                 // //? Comprueba que la extension del archivo sea o PNG o JPG o GIF
                 if ($type == "jpg" || $type == "png" || $type == "gif") 
                 {
-                    echo basename($_FILES['imagen']['name']) . "<br><br>";
-                    echo $_FILES['imagen']['tmp_name'] . "<br><br>";
-
-                    // $dir_to_search = $_FILES['imagen']['name'];
-                    // echo $dir_to_search;
-                    if (move_uploaded_file($_FILES['imagen']['tmp_name'], $uploadfile)) {
-
+                    //? Si se ha hecho la subida
+                    if (move_uploaded_file($_FILES['imagen']['tmp_name'], $uploadfile))
+                    {
                         //* Se ha subido la foto
                         //* Se guarda el path en la BD
 
                         $nombreArchivo = $_FILES['imagen']['name'];
-
-                    } else {
+                    } 
+                    //? Si la subida ha dado un error
+                    else
+                    {
+                        //* Se pone a vacio si no hay archivo, ni se creara ni se editara la foto
                         $nombreArchivo="";
-                        echo "Possible file upload attack!\n";
+                        echo "No se ha podido subir el archivo";
                     }
-
                 }
                 else
                 {
                     $nombreArchivo="";
+                    echo "No hay foto o es de una extension no aceptada";
                 }
                 //? Si el radibutton no devulve 0 o 1
                 if($radioPost!=0 && $radioPost!=1)
@@ -315,7 +313,7 @@ class Blogpost extends Controller
                     { 
                         $uploaddir = "C:/xampp/htdocs/serverBlog/assets/";
                         $uploadfile = $uploaddir . basename($_FILES['imagen']['name']);
-                        $type = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
+                        $type = strtolower(pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION));         
 
                         // //? Comprueba que la extension del archivo sea o PNG o JPG o GIF
                         if ($type == "jpg" || $type == "png" || $type == "gif") 
@@ -338,6 +336,7 @@ class Blogpost extends Controller
                         }
                         else
                         {
+                            
                             $nombreArchivo="";
                         }
 
