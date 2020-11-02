@@ -524,6 +524,55 @@ class BlogPostModel
         $pdo_conn = NULL; 
     }
 
+    public static function author(string $username)
+    {
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+
+        $pdo_conn = $connObj->getConnection();
+
+        //* Se hacen dos querys 
+        $query = $pdo_conn->prepare("SELECT p.id, p.user_id, u.username , date, title , text FROM post p INNER JOIN user u on u.id = p.user_id WHERE u.username = :username AND p.visible=1 ORDER BY date DESC");
+        $query->bindValue("username", $username);
+
+        if ($query->execute())
+        {
+            //* Mete todos los datos en un array
+            $author = $query->fetchAll();
+
+            //* Si esta vacia te devuelve NULL y sino te devuelve un array con todos los posts del usuario logeado
+            return $author;
+        }
+        else {
+            return null;
+        }
+
+        $pdo_conn = NULL;
+    }
+
+    public static function authorConInvisibles(string $username)
+    {
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+
+        $pdo_conn = $connObj->getConnection();
+
+        //* Se hacen dos querys 
+        $query = $pdo_conn->prepare("SELECT p.id, p.user_id, u.username , date, title , text FROM post p INNER JOIN user u on u.id = p.user_id WHERE u.username = :username ORDER BY date DESC");
+        $query->bindValue("username", $username);
+
+        if ($query->execute())
+        {
+            //* Mete todos los datos en un array
+            $author = $query->fetchAll();
+
+            //* Si esta vacia te devuelve NULL y sino te devuelve un array con todos los posts del usuario logeado
+            return $author;
+        }
+        else {
+            return null;
+        }
+        $pdo_conn = NULL;
+    }
+
     public static function addComment(int $post_id, int $user_id,string $text)
     {
          $connObj = new Services\Connection(Services\Helpers::getEnviroment());

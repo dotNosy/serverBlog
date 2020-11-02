@@ -191,10 +191,84 @@ class Blogpost extends Controller
         }
     }
 
-    //! Todos los posts de X autor(user)
     protected function author(array $params)
     {
-        
+        if(!empty($params[2]) && is_int(intval($params[2])))
+        {  
+            $user = User::getUser();
+
+            //* Me devuelve de la BD todos los registros del usuario del id
+            $author = Models\BlogPostModel::author($params[2]);
+
+            if(!empty($user)){
+
+                if($user->username == $params[2])
+                {
+                    $author = Models\BlogPostModel::authorConInvisibles($params[2]);
+                    if(!empty($author))
+                    {
+                        
+                        parent::sendToView([
+                            "titulo" => "ADD POST"
+                            ,"list" => $author
+                            ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+                        ]);
+                    }
+                    else
+                    {
+                        Helpers::sendToController("/post/all"
+                        ,[
+                            "error" => "No existe este usuario."
+                        ]);
+                    }       
+                }
+                else
+                {
+                    if(!empty($author))
+                    {
+                        parent::sendToView([
+                            "titulo" => "ADD POST"
+                            ,"list" => $author
+                            ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+                        ]);
+                    }
+                    else
+                    {
+                        parent::sendToView([
+                            "titulo" => "ADD POST"
+                            ,"list" => $author
+                            ,"error" => "Este autor no tiene posts."
+                            ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+                        ]);
+                    }
+                    
+                }
+
+            }
+            else
+            {
+                if(!empty($author))
+                {
+                    
+                    parent::sendToView([
+                        "titulo" => "ADD POST"
+                        ,"list" => $author
+                        ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+                    ]);
+                }
+                else
+                {
+                    Helpers::sendToController("/post/all"
+                    ,[
+                        "error" => "No existe este usuario."
+                    ]);
+                }
+            }
+        }
+        else
+        {
+            Helpers::sendToController("/post/all");
+        }
     }
 
     protected function add(array $params = null)
