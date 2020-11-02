@@ -104,7 +104,7 @@ class BlogPostModel
         $pdo_conn = $connObj->getConnection();
 
         //* Se recogen los posts de la persona logeada actualmente
-        $query = $pdo_conn->prepare("SELECT id, user_id, title, text, date, visible FROM post WHERE id = :post_id");
+        $query = $pdo_conn->prepare("SELECT p.id, user_id, title, text, date, visible, m.path FROM post p LEFT JOIN multimedia m ON m.post_id=p.id WHERE p.id = :post_id");
         $query->bindValue("post_id", $id);
 
         if ($query->execute())
@@ -399,7 +399,7 @@ class BlogPostModel
         $pdo_conn = NULL;
     }
 
-    public static function add(int $id, string $titulo, string $mensaje, int $visible)
+    public static function add(int $id, string $titulo, string $mensaje, int $visible, string $nombreImagen)
     {
         // //* Se recoge el id del usuario en la sesion actual
 
@@ -415,21 +415,42 @@ class BlogPostModel
             //* Se hace un insert con los datos del post a crear
             $query = $pdo_conn->prepare("INSERT INTO post (user_id, title, text, date, visible) VALUES (:user_id, :titulo, :mensaje, NOW(), :visible)");
             $query->bindValue("user_id", $id);
-            echo $id . "<br>";
             $query->bindValue("titulo", $titulo);
-            echo $titulo . "<br>";
             $query->bindValue("mensaje", $mensaje);
-            echo $mensaje . "<br>";
             $query->bindValue("visible", $visible, PDO::PARAM_INT);
-            echo $visible . "<br>";
 
+            
             //* Si la query funciona se hacen un commit
             if($query->execute())
             {
                 //* Se coge el id del post insertado para abrirlo al crearlo
-                $id_post = $pdo_conn->lastInsertId();
+
                 
+
+                $id_post = $pdo_conn->lastInsertId();
+
                 $pdo_conn->commit();
+
+                
+
+                $pdo_conn->beginTransaction();
+
+                if(!empty($nombreImagen))
+                {
+                    $query = $pdo_conn->prepare("INSERT INTO multimedia (post_id, path) VALUES (:id_post, :path)");
+                    $query->bindValue("id_post",$id_post);
+                    $query->bindValue("path",$nombreImagen);
+
+                    if($query->execute())
+                    {
+                        $pdo_conn->commit();
+                    }
+                    else
+                    {
+                        $pdo_conn->rollback();
+                    }
+                }
+                
                 return $id_post;
             }
             else
@@ -448,7 +469,7 @@ class BlogPostModel
         $pdo_conn = NULL; 
     } 
 
-    public static function edit(int $id, string $titulo, string $mensaje, int $visible)
+    public static function edit(int $id, string $titulo, string $mensaje, int $visible, string $nombreimagen)
     {
 
         $connObj = new Services\Connection(Services\Helpers::getEnviroment());
@@ -470,9 +491,30 @@ class BlogPostModel
             //* Si la query funciona se hacen un commit
             if($query->execute())
             {
-                //* Se coge el id del post insertado para abrirlo al crearlo
-                
-                $pdo_conn->commit();
+
+                $pdo_conn->commit();     
+                $pdo_conn->beginTransaction();   
+
+                if(!empty($nombreimagen))
+                {
+                    
+                    $query = $pdo_conn->prepare("UPDATE multimedia SET path=:path WHERE post_id=:id_post");
+                    $query->bindValue("path",$nombreimagen);
+                    $query->bindValue("id_post",$id);
+                    
+                    if($query->execute())
+                    {
+                        
+                        $pdo_conn->commit();
+                    }
+                    else
+                    {
+                        echo "error";
+                        $pdo_conn->rollback();
+                    }
+                    
+                }
+
                 return true;
             }
             else
@@ -487,7 +529,6 @@ class BlogPostModel
             $pdo_conn->rollback();
             return false;
         }
-        
         $pdo_conn = NULL; 
     }
 

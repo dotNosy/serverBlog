@@ -38,8 +38,8 @@
               <div class="form-group">
                 <label class="col-md-4 control-label">Insertar imagen</label>
                 <div class="col-md-9">
-                <input type="hidden" name="MAX_FILE_SIZE" value="30000" />
-                  <input name="imagen" type="file" class="form-control-file">
+                <!-- <input type="hidden" name="MAX_FILE_SIZE" value="30000" /> -->
+                  <input name="imagen" type="file" class="form-control-file" accept=".png, .jpg, .gif">
                 </div>
               </div>
 

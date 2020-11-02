@@ -214,31 +214,40 @@ class Blogpost extends Controller
                 // echo strripos($_FILES['imagen']['name'], "."). "<br>";
                 // echo strlen($_FILES['imagen']['name']). "<br>";
                 // echo substr($_FILES['imagen']['name'], strripos($_FILES['imagen']['name'], ".")-strlen($_FILES['imagen']['name']));
-                // die();
-                // var_dump($_FILES);
+                
 
-                // $dir_to_search = $_FILES['imagen']['name'];
-                // echo $dir_to_search;
+                $uploaddir = "C:/xampp/htdocs/serverBlog/assets/";
+                $uploadfile = $uploaddir . basename($_FILES['imagen']['name']);
+                $type = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
 
-                echo $path = "C:\Users\ik_2dw3\Desktop\JavaScript\Anderrekin\5. ariketak - Mikel\assets\gatete1.jpg" . "<br>";
-                echo $type = pathinfo($path, PATHINFO_EXTENSION);
-                echo $data = file_get_contents($path);
-                // var_dump($data);
-                // die();
+                // //? Comprueba que la extension del archivo sea o PNG o JPG o GIF
+                if ($type == "jpg" || $type == "png" || $type == "gif") 
+                {
+                    echo basename($_FILES['imagen']['name']) . "<br><br>";
+                    echo $_FILES['imagen']['tmp_name'] . "<br><br>";
 
-                //? Comprueba que la extension del archivo sea o PNG o JPG o GIF
-                if ($type == "jpg" || $type == "png" || $type == "gif") {
-                    echo "extension BUENA= " . $extension;
-                    die();
+                    // $dir_to_search = $_FILES['imagen']['name'];
+                    // echo $dir_to_search;
+                    if (move_uploaded_file($_FILES['imagen']['tmp_name'], $uploadfile)) {
+
+                        //* Se ha subido la foto
+                        //* Se guarda el path en la BD
+
+                        $nombreArchivo = $_FILES['imagen']['name'];
+
+                    } else {
+                        $nombreArchivo="";
+                        echo "Possible file upload attack!\n";
+                    }
+
                 }
                 else
                 {
-                    echo "extension MALA= " . $extension;
-                    die();
+                    $nombreArchivo="";
                 }
-    
                 //? Si el radibutton no devulve 0 o 1
-                if($radioPost!=0 && $radioPost!=1){
+                if($radioPost!=0 && $radioPost!=1)
+                {
                     //TODO: Poner datos incorrectos en rojo
                 }
                 //? Error titulo o mensaje vacio
@@ -250,7 +259,7 @@ class Blogpost extends Controller
                 else
                 {
                     //* Va al model para intentar crear el post
-                    $id_post = Models\BlogPostModel::add($user->id,$tituloPost,$mensajePost,intval($radioPost));
+                    $id_post = Models\BlogPostModel::add($user->id,$tituloPost,$mensajePost,intval($radioPost),$nombreArchivo);
                     
                     //* Si ha devuelto un id es que se ha creado, y por lo tanto te devuelve el view del post creado
                     if(!empty($id_post))
@@ -304,6 +313,34 @@ class Blogpost extends Controller
                     //? Está aqui para no dejar que harcodeen la URL para editar el de los demas
                     if($user->id == $view->user_id)
                     { 
+                        $uploaddir = "C:/xampp/htdocs/serverBlog/assets/";
+                        $uploadfile = $uploaddir . basename($_FILES['imagen']['name']);
+                        $type = pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION);
+
+                        // //? Comprueba que la extension del archivo sea o PNG o JPG o GIF
+                        if ($type == "jpg" || $type == "png" || $type == "gif") 
+                        {
+
+                            // $dir_to_search = $_FILES['imagen']['name'];
+                            // echo $dir_to_search;
+                            if (move_uploaded_file($_FILES['imagen']['tmp_name'], $uploadfile)) {
+
+                                //* Se ha subido la foto
+                                //* Se guarda el path en la BD
+
+                                $nombreArchivo = $_FILES['imagen']['name'];
+
+                            } else {
+                                $nombreArchivo="";
+                                echo "Possible file upload attack!\n";
+                            }
+
+                        }
+                        else
+                        {
+                            $nombreArchivo="";
+                        }
+
                         //* Se recogen las variables sin caracteres especiales
                         $id = Helpers::cleanInput($_POST['id']);
                         $titulo = Helpers::cleanInput($_POST['titulo']);
@@ -311,7 +348,7 @@ class Blogpost extends Controller
                         $visibleRadio = Helpers::cleanInput($_POST['visibleRadio']);
 
                         //? Se ha updateado correctamente
-                        if(Models\BlogPostModel::edit(intval($view->id),$titulo,$mensaje,intval($visibleRadio)))
+                        if(Models\BlogPostModel::edit(intval($view->id),$titulo,$mensaje,intval($visibleRadio),$nombreArchivo))
                         {
                            //* La llamada a la vista
                             Helpers::sendToController("/post/view/$view->id"); 
@@ -321,6 +358,7 @@ class Blogpost extends Controller
                         {
 
                             //TODO: Error "LA SENTENCIA SQL HA FALLADO"
+                            echo "fallo";
 
                         }
                     }

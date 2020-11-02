@@ -63,7 +63,12 @@
       <hr>
 
       <!-- Preview Image -->
-      <img class="img-fluid rounded" src="http://placehold.it/900x300" alt="">
+      <?php
+      
+      if(!empty($post->path)){
+        echo "<img src='http://localhost/serverBlog/assets/$post->path' class='img-fluid rounded'/>";
+      }
+      ?>
 
       <hr>
 
