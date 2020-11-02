@@ -56,7 +56,12 @@ class Profile extends Controller
 
             //updateProfile($user->id, $name, $surname, $email, $birthdate);
             if(Models\Profile::edit($user->id, $name, $surname, $email, $birthdate)){
-                echo "Se han modificado los datos";
+                $profile = Models\Profile::getProfile(intval($user->id));
+                parent::sendToView([
+                "titulo" => "TEST CONTROLLER"
+                ,"profile" => json_encode($profile)
+                ,"page" =>  __DIR__ . '/../Views/Profile.php'
+            ]);
             }
             else
             {
@@ -81,23 +86,50 @@ class Profile extends Controller
             $repeatPassword = Services\Helpers::cleanInput($_POST['repeatPassword']);
 
             //updateProfile($user->id, $name, $surname, $email, $birthdate);
-            if($password == $repeatPassword){
-                if(Models\Profile::changePassword($user->id, $password)){
-                    Services\Helpers::sendToController("/login/logout",
-                    [
-                    "error" => "Para ver tu perfil debes estar logeado."
-                    ]);
-                    
+            if(!empty($password) && !empty($repeatPassword))
+            {
+                if($password == $repeatPassword)
+                {
+                    if(Models\Profile::changePassword($user->id, $password))
+                    {
+                        Services\Helpers::sendToController("/login/logout",
+                        [
+                        "error" => "Para ver tu perfil debes estar logeado."
+                        ]);
+                        
+                    }
+                    else
+                    //,"error" => "Uno o mas campos estan vacios"
+                    {
+                        echo "Los datos no se han modificado";
+                        
+                        
+                    }
                 }
                 else
                 {
-                    echo "Los datos no se han modificado";
+                    $profile = Models\Profile::getProfile(intval($user->id));
+                        parent::sendToView([
+                        "titulo" => "TEST CONTROLLER"
+                        ,"profile" => json_encode($profile)
+                        ,"errorContraseña" => "Las contraseñas debes ser iguales"
+                        ,"page" =>  __DIR__ . '/../Views/Profile.php'
+                    ]);
                 }
-            }else{
-                echo "Las contraseñas no son iguales";
             }
+            else{
+                $profile = Models\Profile::getProfile(intval($user->id));
+                        parent::sendToView([
+                        "titulo" => "TEST CONTROLLER"
+                        ,"profile" => json_encode($profile)
+                        ,"errorContraseña" => "Para cambiar la contraseña rellena los campos"
+                        ,"page" =>  __DIR__ . '/../Views/Profile.php'
+                    ]);
+            }
+            
         }
-        else {
+        else 
+        {
             Services\Helpers::sendTo404();
         }
     }

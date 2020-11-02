@@ -64,6 +64,13 @@
           />
         </div>
         <div class="form-group">
+                <label class="">Insertar imagen</label>
+                <div class=">
+                <input type="hidden" name="MAX_FILE_SIZE" value="30000" />
+                  <input name="imagen" type="file" class="form-control-file">
+                </div>
+              </div>
+        <div class="form-group">
           <button type="submit" name="update" class="btn btn-primary btn-block">
             Modificar datos
           </button>
@@ -105,6 +112,9 @@
             Resetear Contraseña
           </button>
         </div>
+        <?php if (!empty($_SESSION["errorContraseña"])):?>
+                                    <?= '<div class="col-12 alert-danger text-center my-3">'. $_SESSION["errorContraseña"] .'</div>' ?>
+        <?php endif;?>
       </form>
         
         <!-- form-group end.// -->
