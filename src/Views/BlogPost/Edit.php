@@ -1,7 +1,21 @@
 <?php if(!empty($_SESSION["blogPost"]))
 { 
     $post=json_decode($_SESSION["blogPost"]);
-} ?>
+}
+if(!empty($_SESSION["categorias"]))
+{
+  $categorias=json_decode($_SESSION["categorias"]);
+}
+if(!empty($_SESSION["categoriasPost"]))
+{
+  $categoriasPost=json_decode($_SESSION["categoriasPost"]);
+  $categoriasAnteriores=array();
+
+  foreach ($categoriasPost as $key => $value) {
+    array_push($categoriasAnteriores,intval($categoriasPost[$key]->category_id));
+  }
+}
+?>
 <div class="container">
 	<div class="row">
       <div class="col-md-6 col-md-offset-3">
@@ -35,6 +49,29 @@
                     <input type="radio" id="noVisible" name="visibleRadio" class="custom-control-input" <?= (!$post->visible) ? "checked=checked" : "" ?> value=0>
                     <label class="custom-control-label" for="noVisible">Privado</label>
                 </div>
+            </div>
+            
+            <!-- Selector categoria multiple -->
+            <div class="form-group">
+              <label for="categorias">Categoria:</label>
+              <select name="categorias[]" multiple class="form-control" id="categorias">
+                <?php
+                  if(!empty($categorias))
+                  {
+                    
+                    foreach ($categorias as $key => $value) {
+                      $nombreCategoria = $categorias[$key]->name;
+                      $idCategoria = $categorias[$key]->id;
+                      echo "<option value='$idCategoria'";
+                      if(in_array(intval($categorias[$key]->id), $categoriasAnteriores))
+                      {
+                        echo " selected";
+                      }
+                      echo ">$nombreCategoria</option>";
+                    }
+                  }
+                ?>
+              </select>
             </div>
 
             <!-- Imagen -->

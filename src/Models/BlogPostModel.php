@@ -487,6 +487,8 @@ class BlogPostModel
             if($query->execute())
             {
 
+
+
                 $pdo_conn->commit();     
                 $pdo_conn->beginTransaction();   
 
@@ -521,6 +523,96 @@ class BlogPostModel
             $pdo_conn->rollback();
             return false;
         }
+        $pdo_conn = NULL; 
+    }
+
+    public static function editCategorias(int $post_id, array $categoriasViejas, array $categoriasNuevas)
+    {
+        //* Se ordena la array de categorias nuevas MERAMENTE VISUAL, NO ES NECESARIO
+        sort($categoriasNuevas, SORT_NUMERIC);
+
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+
+        $pdo_conn = $connObj->getConnection();
+
+        $pdo_conn->beginTransaction();
+
+        //* Se crean dos arrays, una con los ids de las categorias a insertar y de las categorias a deletear
+        $Insertar=array_diff($categoriasNuevas,$categoriasViejas);
+        $Deletear=array_diff($categoriasViejas,$categoriasNuevas);
+
+        try {
+
+            $sqlCategorias="";
+
+            //? Si hay categorias a borrar
+            if(!empty($Deletear)){
+                
+                //* Se crea la sentencia SQL:
+                foreach ($Deletear as $value) {
+                    //? Si es la primera iteracion se debe hacer ligeramente distinto
+                    if($sqlCategorias==""){
+                        //* Se pone la consulta de manera que cada :categoria_X tenga un bindValue que le meta el valor. (PARA EVITAR INJECCIONES SQL)
+                        $sqlCategorias.= ":categoria_$value";
+                    }else{
+                        $sqlCategorias.=" OR category_id=:categoria_$value";
+                    }
+                }
+
+                //* Se hace el delete
+                $query = $pdo_conn->prepare("DELETE FROM category_post WHERE (category_id=$sqlCategorias) AND post_id=:post_id;");
+               
+                foreach ($Deletear as $value) {
+                    $query->bindValue("categoria_$value", $value);
+                }
+                $query->bindValue("post_id", $post_id);
+
+                $query->execute();
+
+            }
+        } 
+        catch (\Throwable $th)
+        {
+            echo $th;
+            die();
+            $pdo_conn->rollback();
+            return false;
+        }
+
+        try {
+
+            $sqlCategorias="";
+
+            if(!empty($Insertar)){
+
+                foreach ($Insertar as $value) {
+                    if($sqlCategorias==""){
+                        $sqlCategorias.="(:categoria_$value,:post_id)";
+                    }else{
+                        $sqlCategorias.=", (:categoria_$value,:post_id)";
+                    }
+                }
+
+                $query = $pdo_conn->prepare("INSERT INTO category_post (category_id, post_id) VALUES $sqlCategorias;");
+                foreach ($Insertar as $value) {
+                    $query->bindValue("categoria_$value", $value);
+                }
+                $query->bindValue("post_id", $post_id);
+
+                $query->execute();
+            }
+        } 
+        catch (\Throwable $th)
+        {
+            echo $th;
+            die();
+            $pdo_conn->rollback();
+            return false;
+        }
+
+        $pdo_conn->commit();
+        return true;
+
         $pdo_conn = NULL; 
     }
 
@@ -813,5 +905,61 @@ class BlogPostModel
          }
          
          $pdo_conn = NULL; 
+    }
+
+    public static function getCategorias()
+    {
+
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+        $pdo_conn = $connObj->getConnection();
+
+        try 
+        {
+            $query = $pdo_conn->prepare("SELECT id, name FROM category ORDER BY name ASC;");
+
+            
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $categorias = $query->fetchAll(PDO::FETCH_OBJ);
+                return $categorias;
+            }
+            else {
+                return false;
+            }  
+        } catch (\Throwable $th) {
+            return false;
+        }
+
+    }
+
+    public static function getCategoriasByPostID(int $post_id)
+    {
+
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+        $pdo_conn = $connObj->getConnection();
+
+        try 
+        {
+            $query = $pdo_conn->prepare("SELECT category_id FROM category_post WHERE post_id=:post_id;");
+            $query->bindValue("post_id", $post_id);
+            
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $categorias = $query->fetchAll(PDO::FETCH_OBJ);
+                return $categorias;
+            }
+            else {
+                return false;
+            }  
+        } catch (\Throwable $th) {
+            return false;
+        }
+
     }
 }

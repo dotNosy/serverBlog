@@ -279,7 +279,6 @@ class Blogpost extends Controller
         {
             if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['add']))
             {
-                
                 $tituloPost = Helpers::cleanInput($_POST['titulo']);
                 $mensajePost = Helpers::cleanInput($_POST['mensaje']);
                 $radioPost = Helpers::cleanInput($_POST['visibleRadio']);
@@ -343,15 +342,15 @@ class Blogpost extends Controller
                         //TODO: si no se ha podido crear el post
                     }
                     
-    
                     //TODO: Enviar a la funcion view que te devuelve el post que se acaba de crear
                 }
             }
-            //? Si no se ha enviado el formulario de creacion de post te devuelve la vista para crearlo
+            //? VISTA GET
             else 
             {
                 parent::sendToView([
                     "titulo" => "ADD POST"
+                    ,"js" => array("addPost.js")
                     ,"page" => __DIR__ . '/../Views/BlogPost/Add.php'
                 ]);
             }
@@ -370,6 +369,7 @@ class Blogpost extends Controller
     {
         //* Se recoge el usuario
         $user = User::getUser();
+
         if(!empty($user))
         {
             //? Si se envia el formulario (CON POST)
@@ -385,6 +385,7 @@ class Blogpost extends Controller
                     //? Está aqui para no dejar que harcodeen la URL para editar el de los demas
                     if($user->id == $view->user_id)
                     { 
+                        
                         $uploaddir = "C:/xampp/htdocs/serverBlog/assets/";
                         $uploadfile = $uploaddir . basename($_FILES['imagen']['name']);
                         $type = strtolower(pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION));         
@@ -413,15 +414,28 @@ class Blogpost extends Controller
                             
                             $nombreArchivo="";
                         }
-
+                        
                         //* Se recogen las variables sin caracteres especiales
-                        $id = Helpers::cleanInput($_POST['id']);
-                        $titulo = Helpers::cleanInput($_POST['titulo']);
+                        $id = intval(Helpers::cleanInput($_POST['id']));
+                        $titulo = Helpers::cleanInput($_POST['titulo']);  
                         $mensaje = Helpers::cleanInput($_POST['mensaje']);
                         $visibleRadio = Helpers::cleanInput($_POST['visibleRadio']);
 
+                        $categoriasNuevas=array();
+                        $categoriasViejas=array();
+                        
+                        foreach ($_POST['categorias'] as $id) {
+                            array_push($categoriasNuevas,intval(Helpers::cleanInput($id)));
+                        }
+                        
+                        $categoriasElegidas=Models\BlogPostModel::getCategoriasByPostID(intval($view->id));
+
+                        foreach ($categoriasElegidas as $key => $value) {
+                            array_push($categoriasViejas,intval($categoriasElegidas[$key]->category_id));
+                          }
+
                         //? Se ha updateado correctamente
-                        if(Models\BlogPostModel::edit(intval($view->id),$titulo,$mensaje,intval($visibleRadio),$nombreArchivo))
+                        if(Models\BlogPostModel::edit(intval($view->id),$titulo,$mensaje,intval($visibleRadio),$nombreArchivo) && Models\BlogPostModel::editCategorias(intval($view->id), $categoriasViejas, $categoriasNuevas))
                         {
                            //* La llamada a la vista
                             Helpers::sendToController("/post/view/$view->id"); 
@@ -429,9 +443,10 @@ class Blogpost extends Controller
                         //? Ha fallado el update
                         else
                         {
-
-                            //TODO: Error "LA SENTENCIA SQL HA FALLADO"
-                            echo "fallo";
+                            Helpers::sendToController("/post/view/$view->id",
+                    [
+                            "error" => "No se ha podido cambiar uno o más campos."
+                    ]);
 
                         }
                     }
@@ -465,12 +480,17 @@ class Blogpost extends Controller
                         //? El post pertenece al usuario
                         //? Está aqui para no dejar que harcodeen la URL para editar el de los demas
                         if($user->id == $view->user_id)
-                        { 
+                        {
+                            
+                            $categoriasElegidas=Models\BlogPostModel::getCategoriasByPostID(intval($view->id));
+                            $categorias=Models\BlogPostModel::getCategorias();
                             //* Se llama a la vista del edit
                             parent::sendToView([
                                 "titulo" => "EDIT POST"
                                 ,"css" => array("post.css")
                                 ,"blogPost" => json_encode($view)
+                                ,"categorias" => json_encode($categorias)
+                                ,"categoriasPost" =>json_encode($categoriasElegidas)
                                 ,"autor" => User::getUsernameById(intval($view->user_id))
                                 ,"page" => __DIR__ . '/../Views/BlogPost/Edit.php'
                                 ]);
