@@ -66,14 +66,6 @@
                       <span class="menu-collapsed">Login</span>
                   </div>
                 </a>     
-              <?php else: ?>
-                <!-- LOGOUT -->
-                <a href="/login/logout" class="bg-dark list-group-item list-group-item-action">
-                  <div class="d-flex w-100 justify-content-start align-items-center">
-                      <span class="fa fa-user-slash fa-fw mr-3"></span>
-                      <span class="menu-collapsed">Logout</span>
-                  </div>
-                </a>     
               <?php endif; ?>
               <?php if(!empty($user)): ?>
                 <!-- PROFILE -->
@@ -131,6 +123,15 @@
               <!-- Separator without title -->
               <li class="list-group-item sidebar-separator menu-collapsed"></li>            
               <!-- /END Separator -->
+              <?php if (!empty($user)): ?>
+                <!-- LOGOUT -->
+                <a href="/login/logout" class="bg-dark list-group-item list-group-item-action">
+                  <div class="d-flex w-100 justify-content-start align-items-center">
+                      <span class="fa fa-user-slash fa-fw mr-3"></span>
+                      <span class="menu-collapsed">Logout</span>
+                  </div>
+                </a>     
+              <?php endif; ?>
               <a href="#" data-toggle="sidebar-colapse" class="bg-dark list-group-item list-group-item-action d-flex align-items-center">
                   <div class="d-flex w-100 justify-content-start align-items-center">
                       <span id="collapse-icon" class="fa fa-2x mr-3"></span>
