@@ -1,15 +1,15 @@
 <div class="container">
 	<div class="row">
-      <div class="col-md-6 col-md-offset-3">
+      <div class="col-12">
         <div class="well well-sm">
           <form class="form-horizontal" action="/post/add" method="POST" enctype="multipart/form-data">
             <fieldset>
-              <legend class="text-center">Nuevo post</legend>
+              <legend class="text-center my-4">Nuevo post</legend>
 
               <!-- titulo input-->
               <div class="form-group">
                 <label class="col-md-3 control-label" for="titulo">Título</label>
-                <div class="col-md-9">
+                <div class="col-md-6">
                   <input id="titulo" name="titulo" type="text" placeholder="Título" class="form-control">
                 </div>
               </div>
@@ -34,18 +34,21 @@
                   </div>
                 </div>
               </div>
+
               <!-- Imagen -->
               <div class="form-group">
                 <label class="col-md-4 control-label">Insertar imagen</label>
                 <div class="col-md-9">
                 <!-- <input type="hidden" name="MAX_FILE_SIZE" value="30000" /> -->
-                  <input name="imagen" type="file" class="form-control-file" accept=".png, .jpg, .gif">
+                  <input name="imagen" type="file" class="form-control-file" accept=".png, .jpg, .gif" multiple>
+                  <div id="listImgs" class="my-3">
+                  </div>
                 </div>
               </div>
 
               <!-- Form actions -->
               <div class="form-group">
-                <div class="col-md-12 text-right">
+                <div class="col-md-12 text-center">
                   <button type="submit" name="add" class="btn btn-primary btn-lg">Crear post</button>
                 </div>
               </div>
