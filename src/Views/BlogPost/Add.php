@@ -40,7 +40,7 @@
                 <label class="col-md-4 control-label">Insertar imagen</label>
                 <div class="col-md-9">
                 <!-- <input type="hidden" name="MAX_FILE_SIZE" value="30000" /> -->
-                  <input name="imagen" type="file" class="form-control-file" accept=".png, .jpg, .gif" multiple>
+                  <input name="imagenes[]" type="file" class="form-control-file" accept=".png, .jpg, .gif" multiple>
                   <div id="listImgs" class="my-3">
                   </div>
                 </div>
