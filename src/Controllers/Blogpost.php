@@ -796,12 +796,21 @@ class Blogpost extends Controller
             }
             //* Se coge la URL (Nombre de la categoria)
             $categoria = Models\BlogPostModel::categoria(strtolower($params[2]));
+            $categorias = array();
+
+            foreach ($categoria as $post) {
+                $categoriasPorID = Models\BlogPostModel::getCategoriasByPostID(intval($post["id"]));
+                if(!empty($categoriasPorID)){
+                    array_push($categorias,$categoriasPorID);
+                }          
+            }
             
             if(!empty($categoria))
             {
                 parent::sendToView([
                     "titulo" => $params[2]
                     ,"list" => $categoria
+                    ,"categorias" => $categorias
                     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                 ]); 
             }
