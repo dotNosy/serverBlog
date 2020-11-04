@@ -162,8 +162,17 @@ class Login extends Controller
     {
         //*Logear al user y enviar al perfil
         $user = Models\User::login($username, $password);
-
-        if (empty($user)) 
+        //! USUARIO CORRECTO
+        if (!empty($user) && $user instanceof Models\User) 
+        {
+            $_SESSION['user'] = json_encode([
+                'id' => $user->getId(),
+                'username' => $user->getUsername()
+                ]);
+    
+            Services\Helpers::sendToController("/post/feed");
+        }
+        else if (empty($user)) 
         {
             parent::sendToView([
                 "titulo" => "SIGNING UP"
@@ -189,16 +198,6 @@ class Login extends Controller
                 ,"error" => "Las credenciales son incorrectas."
                 ,"page" => $error_page
              ]);
-        }
-        //? USUARIO CORRECTO
-        else if (!empty($user) && $user instanceof Models\User) 
-        {
-            $_SESSION['user'] = json_encode([
-                'id' => $user->getId(),
-                'username' => $user->getUsername()
-                ]);
-    
-            Services\Helpers::sendToController("/home");
         }
         else 
         {
