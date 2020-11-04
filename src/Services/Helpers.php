@@ -30,6 +30,6 @@ class Helpers
 
     public static function getEnviroment()
     {
-        return "nosy";
+        return "dev";
     }
 }
