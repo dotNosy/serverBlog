@@ -48,6 +48,9 @@ class Blogpost extends Controller
                 if(!empty($view))
                 {
                     $comments = Models\BlogPostModel::getComments(intval($view->id));
+                    $categorias=Models\BlogPostModel::getCategoriasByPostID(intval($view->id));
+
+                    $nombreCategorias=Models\BlogPostModel::getNombreCategoriasByCategoriaID($categorias);
 
                     //? Si el post encontrado es invisible (privado)
                     if(!$view->visible)
@@ -62,6 +65,7 @@ class Blogpost extends Controller
                                 ,"blogPost" => json_encode($view)
                                 ,"autor" => User::getUsernameById(intval($view->user_id))
                                 ,"comments" => $comments
+                                ,"categorias" => json_encode($nombreCategorias)
                                 ,"page" => __DIR__ . '/../Views/BlogPost/View.php'
                             ]);
                         }
@@ -85,6 +89,7 @@ class Blogpost extends Controller
                             ,"blogPost" => json_encode($view)
                             ,"autor" => User::getUsernameById(intval($view->user_id))
                             ,"comments" => $comments
+                            ,"categorias" => json_encode($nombreCategorias)
                             ,"page" => __DIR__ . '/../Views/BlogPost/View.php'
                         ]);
                     }
@@ -113,6 +118,7 @@ class Blogpost extends Controller
                         ,"blogPost" => json_encode($view)
                         ,"autor" => User::getUsernameById(intval($view->user_id))
                         ,"comments" => $comments
+                        ,"categorias" => json_encode($nombreCategorias)
                         ,"page" => __DIR__ . '/../Views/BlogPost/View.php'
                     ]);
                 }
