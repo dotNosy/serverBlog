@@ -25,6 +25,15 @@
               <p class="card-text">
                 <?= substr($post['text'], 0, (strlen($post['text']) > 100) ? 100 : strlen($post['text'])) ?>
               </p>
+              
+              <!-- CATEGORIAS -->
+              <?php foreach($_SESSION["categorias"] as $key => $categorias): ?>
+                  <?php foreach($categorias as $categoriasPost): ?>
+                  <?php if(!empty($categoriasPost) && $categoriasPost->post_id  == $post["id"]): ?>
+                    <a href="/post/categoria/<?=strtolower($categoriasPost->name)?>" class="badge badge-dark"><?= $categoriasPost->name ?></a>
+                  <?php endif;?>
+                <?php endforeach;?>
+              <?php endforeach;?>
 
               <!-- AUTHOR -->
               <?php if(!empty($post['user_id'])): ?>

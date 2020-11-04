@@ -579,7 +579,6 @@ class BlogPostModel
         catch (\Throwable $th)
         {
             echo $th;
-            die();
             $pdo_conn->rollback();
             return false;
         }
@@ -610,7 +609,6 @@ class BlogPostModel
         catch (\Throwable $th)
         {
             echo $th;
-            die();
             $pdo_conn->rollback();
             return false;
         }
@@ -974,11 +972,10 @@ class BlogPostModel
 
         try 
         {
-            $query = $pdo_conn->prepare("SELECT category_id, name 
+            $query = $pdo_conn->prepare("SELECT category_id, name, post_id
                                         FROM category_post cp
                                         INNER JOIN category c2 on c2.id = cp.category_id 
-                                        WHERE post_id=:post_id;");
-                                        
+                                        WHERE post_id=:post_id;");                        
             $query->bindValue("post_id", $post_id);
             
             //* Si la query funciona se hacen un commit
@@ -987,6 +984,72 @@ class BlogPostModel
                 //* Se coge el id del post insertado para abrirlo al crearlo
                 $categorias = $query->fetchAll(PDO::FETCH_OBJ);
                 return $categorias;
+            }
+            else {
+                return false;
+            }  
+        } catch (\Throwable $th) {
+            return false;
+        }
+
+        $pdo_conn = NULL; 
+    }
+
+    public static function categoria(string $nombreCategoria)
+    {
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+        $pdo_conn = $connObj->getConnection();
+
+        try 
+        {
+            //* Recoge los posts que sean visibles de la categoria elegida
+            $query = $pdo_conn->prepare("SELECT p.id, p.user_id, u.username , date, title , text, cp.category_id, c.name
+                                        FROM post p
+                                        INNER JOIN user u ON u.id = p.user_id
+                                        INNER JOIN category_post cp ON cp.post_id = p.id
+                                        INNER JOIN category c ON c.id=cp.category_id
+                                        WHERE c.name=:nombre_categoria AND p.visible=1 ORDER BY date DESC");                    
+            $query->bindValue("nombre_categoria", $nombreCategoria);
+            
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $categoria = $query->fetchAll();
+                return $categoria;
+            }
+            else {
+                return false;
+            }  
+        } catch (\Throwable $th) {
+            return false;
+        }
+
+        $pdo_conn = NULL; 
+    }
+
+    public static function categoriaConInvisibles(string $nombreCategoria)
+    {
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+        $pdo_conn = $connObj->getConnection();
+
+        try 
+        {
+            //* Recoge los posts que sean visibles de la categoria elegida
+            $query = $pdo_conn->prepare("SELECT p.id, p.user_id, u.username , date, title , text, cp.category_id, c.name
+                                        FROM post p
+                                        INNER JOIN user u ON u.id = p.user_id
+                                        INNER JOIN category_post cp ON cp.post_id = p.id
+                                        INNER JOIN category c ON c.id=cp.category_id
+                                        WHERE c.name=:nombre_categoria ORDER BY date DESC");                    
+            $query->bindValue("nombre_categoria", $nombreCategoria);
+            
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $categoria = $query->fetchAll();
+                return $categoria;
             }
             else {
                 return false;

@@ -178,12 +178,23 @@ class Blogpost extends Controller
     {
         //* Todos los posts, los nuevos primero
         $list = Models\BlogPostModel::all();
+
+        //* Se cogen las categorias
+        $categorias = array();
+
+        foreach ($list as $post) {
+            $categoriasPorID = Models\BlogPostModel::getCategoriasByPostID(intval($post["id"]));
+            if(!empty($categoriasPorID)){
+                array_push($categorias,$categoriasPorID);
+            }          
+        }
         
         if(!empty($list))
         {
             parent::sendToView([
                 "titulo" => "LIST"
                 ,"list" => $list
+                ,"categorias" => $categorias
                 ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
             ]); 
         }
@@ -810,6 +821,42 @@ class Blogpost extends Controller
                 "error" => "Tienes que estar logueado para ver tus psots favoritos."
             ]);
         }  
+    }
+
+    protected function categoria($params = null) 
+    {
+        if(!empty($params[2]))
+        {  
+            $user = User::getUser();
+
+            if(!empty($user))
+            {
+                //TODO: Hacer que para los mios salgan tambien invisibles
+            }
+            //* Se coge la URL (Nombre de la categoria)
+            $categoria = Models\BlogPostModel::categoria(strtolower($params[2]));
+            
+            if(!empty($categoria))
+            {
+                parent::sendToView([
+                    "titulo" => $params[2]
+                    ,"list" => $categoria
+                    ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
+                ]); 
+            }
+            else
+            {
+                Helpers::sendToController("/post/all",
+                [
+                    "error" => "No se encontro esa categoria o no existen posts de ella."
+                ]);
+            }
+
+        }
+        else
+        {
+            Helpers::sendToController("/post/all");
+        }
     }
 
     protected function addFavoritesOrFeed($params = null)
