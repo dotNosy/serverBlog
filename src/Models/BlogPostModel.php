@@ -974,7 +974,11 @@ class BlogPostModel
 
         try 
         {
-            $query = $pdo_conn->prepare("SELECT category_id FROM category_post WHERE post_id=:post_id;");
+            $query = $pdo_conn->prepare("SELECT category_id, name 
+                                        FROM category_post cp
+                                        INNER JOIN category c2 on c2.id = cp.category_id 
+                                        WHERE post_id=:post_id;");
+                                        
             $query->bindValue("post_id", $post_id);
             
             //* Si la query funciona se hacen un commit
@@ -993,49 +997,4 @@ class BlogPostModel
 
         $pdo_conn = NULL; 
     }
-
-    public static function getNombreCategoriasByCategoriaID(array $categorias)
-    {
-
-        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
-        $pdo_conn = $connObj->getConnection();
-
-        $sqlCategorias="";
-        foreach ($categorias as $key => $value) {
-
-            $id=$categorias[$key]->category_id;
-            
-            if($sqlCategorias==""){
-                $sqlCategorias.= "categoria_$id";
-            }else{
-                $sqlCategorias.=" OR id=:categoria_$id";
-            }
-
-        }
-
-        try 
-        {
-            $query = $pdo_conn->prepare("SELECT name FROM category WHERE id=:$sqlCategorias;");
-            foreach ($categorias as $key => $value) {
-                $id=$categorias[$key]->category_id;
-                $query->bindValue("categoria_$id", $id);
-            }
-            
-            //* Si la query funciona se hacen un commit
-            if($query->execute())
-            {
-
-                //* Se coge el id del post insertado para abrirlo al crearlo
-                $categorias = $query->fetchAll(PDO::FETCH_OBJ);
-                return $categorias;
-            }
-            else {
-                return false;
-            }  
-        } catch (\Throwable $th) {
-            return false;
-        }
-
-    }
-
 }

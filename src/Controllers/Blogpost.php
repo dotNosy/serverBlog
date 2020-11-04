@@ -48,9 +48,8 @@ class Blogpost extends Controller
                 if(!empty($view))
                 {
                     $comments = Models\BlogPostModel::getComments(intval($view->id));
+                    
                     $categorias=Models\BlogPostModel::getCategoriasByPostID(intval($view->id));
-
-                    $nombreCategorias=Models\BlogPostModel::getNombreCategoriasByCategoriaID($categorias);
 
                     $imgs = Models\BlogPostModel::getImgsByPostId(intval($view->id));
 
@@ -67,7 +66,7 @@ class Blogpost extends Controller
                                 ,"blogPost" => json_encode($view)
                                 ,"autor" => User::getUsernameById(intval($view->user_id))
                                 ,"comments" => $comments
-                                ,"categorias" => json_encode($nombreCategorias)
+                                ,"categorias" => $categorias
                                 ,"imgs" => $imgs
                                 ,"page" => __DIR__ . '/../Views/BlogPost/View.php'
                             ]);
@@ -90,7 +89,7 @@ class Blogpost extends Controller
                             ,"blogPost" => json_encode($view)
                             ,"autor" => User::getUsernameById(intval($view->user_id))
                             ,"comments" => $comments
-                            ,"categorias" => json_encode($nombreCategorias)
+                            ,"categorias" => $categorias
                             ,"imgs" => $imgs
                             ,"page" => __DIR__ . '/../Views/BlogPost/View.php'
                         ]);
@@ -324,7 +323,7 @@ class Blogpost extends Controller
 
                             //Get content of file in binary
                             array_push($imgsContent, ["name" => basename($key['name']) , "content" => file_get_contents($uploadfile)]);
-                            
+
                             //Delete img from server
                             unlink($uploadfile);
                         }

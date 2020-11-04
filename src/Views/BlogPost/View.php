@@ -61,19 +61,9 @@
       <p>Posted on <?= $post->date ?></p>
 
       <!-- Categorias -->
-      <?php
-
-        if(!empty($_SESSION["categorias"]))
-        { 
-            $categorias=json_decode($_SESSION["categorias"]);
-
-            foreach ($categorias as $categoria)
-            {
-              echo "<span class='badge badge-dark'>$categoria->name</span>";
-            }
-        } 
-
-      ?>
+      <?php foreach($_SESSION["categorias"] as $categoria): ?>
+        <span class='badge badge-dark'> <?= $categoria->name ?></span>
+      <?php endforeach;?>
 
       <hr>
 
