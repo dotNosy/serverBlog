@@ -35,6 +35,32 @@ class Helpers
         return $filesList;
     }
 
+    public static function getFilesContent(array $files, array $allowedExtensions)
+    {
+        $imgsContent = array();
+        $cleanList = self::filesToArray($files);
+
+        foreach ($cleanList as $index => $key) 
+        {
+            $extension = strtolower(pathinfo($key['name'], PATHINFO_EXTENSION));
+
+            if (in_array($extension, $allowedExtensions)) 
+            {
+                //* directorio = /var/www/dominio/assets/img.name
+                $uploadfile = __DIR__."/../../../assets/".basename($key['name']);   
+                move_uploaded_file($key['tmp_name'], $uploadfile);
+
+                //Get content of file in binary
+                array_push($imgsContent, ["name" => basename($key['name']) , "content" => file_get_contents($uploadfile)]);
+            }
+
+            //Delete img from server
+            unlink($uploadfile);
+        }
+
+        return $imgsContent;
+    }
+
     public static function cleanInput($input)
     {
         return htmlspecialchars(trim($input));
@@ -42,6 +68,6 @@ class Helpers
 
     public static function getEnviroment()
     {
-        return "dev";
+        return "nosy";
     }
 }

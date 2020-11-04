@@ -1,24 +1,25 @@
-<?php if(!empty($_SESSION["blogPost"]))
-{ 
-  $post=json_decode($_SESSION["blogPost"]);
-}
-if(!empty($_SESSION["categorias"]))
-{
-  $categorias=json_decode($_SESSION["categorias"]);
-}
-if(!empty($_SESSION["categoriasPost"]))
-{
-  $categoriasPost=json_decode($_SESSION["categoriasPost"]);
-  $categoriasAnteriores=array();
-
-  foreach ($categoriasPost as $key => $value) {
-    array_push($categoriasAnteriores,intval($categoriasPost[$key]->category_id));
+<?php 
+  if(!empty($_SESSION["blogPost"]))
+  { 
+    $post=json_decode($_SESSION["blogPost"]);
   }
-}
+  if(!empty($_SESSION["categorias"]))
+  {
+    $categorias=json_decode($_SESSION["categorias"]);
+  }
+  if(!empty($_SESSION["categoriasPost"]))
+  {
+    $categoriasPost=json_decode($_SESSION["categoriasPost"]);
+    $categoriasAnteriores=array();
+
+    foreach ($categoriasPost as $key => $value) {
+      array_push($categoriasAnteriores,intval($categoriasPost[$key]->category_id));
+    }
+  }
 ?>
 <div class="container">
 	<div class="row">
-      <div class="col-md-6 col-md-offset-3">
+      <div class="col-md-6">
           <form class="form-horizontal" action="/post/edit" method="POST" enctype="multipart/form-data">
           <fieldset>
             <legend class="text-center">Nuevo post</legend>
@@ -58,7 +59,6 @@ if(!empty($_SESSION["categoriasPost"]))
                 <?php
                   if(!empty($categorias))
                   {
-                    
                     foreach ($categorias as $key => $value) {
                       $nombreCategoria = $categorias[$key]->name;
                       $idCategoria = $categorias[$key]->id;
@@ -79,7 +79,7 @@ if(!empty($_SESSION["categoriasPost"]))
                 <label class="col-md-4 control-label">Insertar imagen</label>
                 <div class="col-md-9">
                 <!-- <input type="hidden" name="MAX_FILE_SIZE" value="30000" /> -->
-                <input name="imagen" type="file" class="form-control-file" accept=".png, .jpg, .gif">
+                <input name="imagenes[]" type="file" class="form-control-file" accept=".png, .jpg, .gif" multiple> 
                 </div>
               </div>
     
@@ -91,6 +91,23 @@ if(!empty($_SESSION["categoriasPost"]))
             </div>
           </fieldset>
           </form>
+      </div>
+      <div class="col-md-6">
+        <!-- Preview Image -->
+        <?php foreach($_SESSION["imgs"] as $img): ?>
+          <form class="form-horizontal" action="/post/deleteImg" method="POST">
+            <img class="img-thumbnail" width="200px" height="200px" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($img->img); ?>" />
+            <button
+              name="deleteImg"
+              type="submit" 
+              class="btn btn-danger btn-sm"
+              data-toggle="tooltip" 
+              data-placement="top"
+              title="Eliminar">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </form>
+        <?php endforeach;?>
       </div>
 	</div>
 </div>

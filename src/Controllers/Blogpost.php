@@ -307,26 +307,7 @@ class Blogpost extends Controller
                     if (!empty($_FILES['imagenes']))
                     {
                         $allowedExtensions = array('jpg','png','gif');
-
-                        $fileList = Helpers::filesToArray($_FILES['imagenes']);
-
-                        foreach ($fileList as $index => $key) 
-                        {
-                            $extension = strtolower(pathinfo($key['name'], PATHINFO_EXTENSION));
-
-                            if (in_array($extension, $allowedExtensions)) 
-                            {
-                                //* directorio = /var/www/dominio/assets/img.name
-                                $uploadfile = __DIR__."/../../../assets/".basename($key['name']);   
-                                move_uploaded_file($key['tmp_name'], $uploadfile);
-                            }
-
-                            //Get content of file in binary
-                            array_push($imgsContent, ["name" => basename($key['name']) , "content" => file_get_contents($uploadfile)]);
-
-                            //Delete img from server
-                            unlink($uploadfile);
-                        }
+                        $imgsContent = Helpers::getFilesContent($_FILES['imagenes'], $allowedExtensions);
                     }
 
                     //* Va al model para intentar crear el post
@@ -382,34 +363,13 @@ class Blogpost extends Controller
                     //? Está aqui para no dejar que harcodeen la URL para editar el de los demas
                     if($user->id == $view->user_id)
                     { 
-                        
-                        $uploaddir = "C:/xampp/htdocs/serverBlog/assets/";
-                        $uploadfile = $uploaddir . basename($_FILES['imagen']['name']);
-                        $type = strtolower(pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION));         
+                        $imgsContent = array();
 
-                        // //? Comprueba que la extension del archivo sea o PNG o JPG o GIF
-                        if ($type == "jpg" || $type == "png" || $type == "gif") 
+                         //! ADD IMAGENES
+                        if (!empty($_FILES['imagenes']))
                         {
-
-                            // $dir_to_search = $_FILES['imagen']['name'];
-                            // echo $dir_to_search;
-                            if (move_uploaded_file($_FILES['imagen']['tmp_name'], $uploadfile)) {
-
-                                //* Se ha subido la foto
-                                //* Se guarda el path en la BD
-
-                                $nombreArchivo = $_FILES['imagen']['name'];
-
-                            } else {
-                                $nombreArchivo="";
-                                echo "Possible file upload attack!\n";
-                            }
-
-                        }
-                        else
-                        {
-                            
-                            $nombreArchivo="";
+                            $allowedExtensions = array('jpg','png','gif');
+                            $imgsContent = Helpers::getFilesContent($_FILES['imagenes'], $allowedExtensions);
                         }
                         
                         //* Se recogen las variables sin caracteres especiales
@@ -417,22 +377,23 @@ class Blogpost extends Controller
                         $titulo = Helpers::cleanInput($_POST['titulo']);  
                         $mensaje = Helpers::cleanInput($_POST['mensaje']);
                         $visibleRadio = Helpers::cleanInput($_POST['visibleRadio']);
+                        $categorias = !empty($_POST['categorias']) ? $_POST['categorias'] : array();
 
                         $categoriasNuevas=array();
                         $categoriasViejas=array();
                         
-                        foreach ($_POST['categorias'] as $id) {
+                        foreach ($categorias as $id) {
                             array_push($categoriasNuevas,intval(Helpers::cleanInput($id)));
                         }
                         
-                        $categoriasElegidas=Models\BlogPostModel::getCategoriasByPostID(intval($view->id));
+                        $categoriasElegidas = Models\BlogPostModel::getCategoriasByPostID(intval($view->id));
 
                         foreach ($categoriasElegidas as $key => $value) {
                             array_push($categoriasViejas,intval($categoriasElegidas[$key]->category_id));
-                          }
+                        }
 
                         //? Se ha updateado correctamente
-                        if(Models\BlogPostModel::edit(intval($view->id),$titulo,$mensaje,intval($visibleRadio),$nombreArchivo) && Models\BlogPostModel::editCategorias(intval($view->id), $categoriasViejas, $categoriasNuevas))
+                        if(Models\BlogPostModel::edit(intval($view->id),$titulo,$mensaje,intval($visibleRadio),$imgsContent) && Models\BlogPostModel::editCategorias(intval($view->id), $categoriasViejas, $categoriasNuevas))
                         {
                            //* La llamada a la vista
                             Helpers::sendToController("/post/view/$view->id"); 
@@ -442,9 +403,8 @@ class Blogpost extends Controller
                         {
                             Helpers::sendToController("/post/view/$view->id",
                             [
-                                    "error" => "No se ha podido cambiar uno o más campos."
+                                "error" => "No se ha podido cambiar uno o más campos."
                             ]);
-
                         }
                     }
                     else
@@ -478,19 +438,20 @@ class Blogpost extends Controller
                         //? Está aqui para no dejar que harcodeen la URL para editar el de los demas
                         if($user->id == $view->user_id)
                         {
-                            
-                            $categoriasElegidas=Models\BlogPostModel::getCategoriasByPostID(intval($view->id));
-                            $categorias=Models\BlogPostModel::getCategorias();
+                            $categoriasElegidas = Models\BlogPostModel::getCategoriasByPostID(intval($view->id));
+                            $categorias = Models\BlogPostModel::getCategorias();
+                            $imgs = Models\BlogPostModel::getImgsByPostId(intval($view->id));
+
                             //* Se llama a la vista del edit
                             parent::sendToView([
                                 "titulo" => "EDIT POST"
-                                ,"css" => array("post.css")
                                 ,"blogPost" => json_encode($view)
                                 ,"categorias" => json_encode($categorias)
                                 ,"categoriasPost" =>json_encode($categoriasElegidas)
+                                ,"imgs" => $imgs
                                 ,"autor" => User::getUsernameById(intval($view->user_id))
                                 ,"page" => __DIR__ . '/../Views/BlogPost/Edit.php'
-                                ]);
+                            ]);
                         }
                         else
                         {

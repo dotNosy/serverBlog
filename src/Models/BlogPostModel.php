@@ -429,30 +429,10 @@ class BlogPostModel
 
                 $pdo_conn->commit();
 
-                //! SUBIR IMAGENES
-                //? Si la imagen no está vacia
-                if(!empty($imgsContent))
-                {
-                    foreach ($imgsContent as $img) 
-                    {
-                        $pdo_conn->beginTransaction();
-
-                        $query = $pdo_conn->prepare("INSERT INTO multimedia (post_id, path, img) VALUES (:id_post, :path, :img)");
-                        $query->bindValue("id_post",$id_post);
-                        $query->bindValue("path", $img['name']);
-                        $query->bindValue("img", $img['content']);
-
-                        //? Se mete la imagen en la BBDD
-                        if($query->execute())
-                        {
-                            $pdo_conn->commit();
-                        }
-                        else
-                        {
-                            $pdo_conn->rollback();
-                        }
-                    }
+                if (!empty($imgsContent)) {
+                    self::addImgs($imgsContent, intval($id_post));
                 }
+
                 return $id_post;
             }
             else
@@ -467,11 +447,45 @@ class BlogPostModel
             return false;
         }
         $pdo_conn = NULL; 
-    } 
+    }
 
-    public static function edit(int $id, string $titulo, string $mensaje, int $visible, string $nombreimagen)
+    public static function addImgs(array $imgsContent, int $id_post)
     {
+        //? Si la imagen no está vacia
+        if(!empty($imgsContent))
+        {
+            try 
+            {
+                $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+                $pdo_conn = $connObj->getConnection();
 
+                foreach ($imgsContent as $img) 
+                {
+                    $pdo_conn->beginTransaction();
+                    $query = $pdo_conn->prepare("INSERT INTO multimedia (post_id, path, img) VALUES (:id_post, :path, :img)");
+                    $query->bindValue("id_post",$id_post);
+                    $query->bindValue("path", $img['name']);
+                    $query->bindValue("img", $img['content']);
+
+                    //? Se mete la imagen en la BBDD
+                    if($query->execute()) {
+                        $pdo_conn->commit();
+                    }
+                    else {
+                        $pdo_conn->rollback();
+                    }
+                }
+            }
+            catch (\Throwable $th) {
+                $pdo_conn->rollback();
+            }
+
+            $pdo_conn = NULL;
+        } 
+    }
+
+    public static function edit(int $id, string $titulo, string $mensaje, int $visible, array $imgsContent)
+    {
         $connObj = new Services\Connection(Services\Helpers::getEnviroment());
 
         $pdo_conn = $connObj->getConnection();
@@ -480,40 +494,21 @@ class BlogPostModel
 
         try {
             //* Se hace un update del post a cambiar
-            $query = $pdo_conn->prepare("UPDATE post SET title=:titulo,text=:mensaje,date=NOW(),visible=:visible WHERE id=:id_post");
-            $query->bindValue("id_post", $id);
+            $query = $pdo_conn->prepare("UPDATE post SET title=:titulo,text=:mensaje,date=NOW(),visible=:visible WHERE id=:post_id");
+            $query->bindValue("post_id", $id);
             $query->bindValue("titulo", $titulo);
             $query->bindValue("mensaje", $mensaje);
             $query->bindValue("visible", $visible, PDO::PARAM_INT);
 
-
-
             //* Si la query funciona se hacen un commit
             if($query->execute())
             {
+                $pdo_conn->commit();
 
-
-
-                $pdo_conn->commit();     
-                $pdo_conn->beginTransaction();   
-
-                if(!empty($nombreimagen))
-                {
-                    $query = $pdo_conn->prepare("UPDATE multimedia SET path=:path WHERE post_id=:id_post");
-                    $query->bindValue("path",$nombreimagen);
-                    $query->bindValue("id_post",$id);
-                    
-                    if($query->execute())
-                    {
-                        $pdo_conn->commit();
-                    }
-                    else
-                    {
-                        echo "error";
-                        $pdo_conn->rollback();
-                    }
-                    
+                if (!empty($imgsContent)) {
+                    self::addImgs($imgsContent, $id);
                 }
+                
                 return true;
             }
             else
