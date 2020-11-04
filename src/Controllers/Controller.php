@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ServerBlog\Controllers;
 
 use ServerBlog\Services as Services;
+use ServerBlog\Models\User;
 
 class Controller
 {
@@ -33,26 +34,24 @@ class Controller
         }
     }
 
-
     //! Esta funcion solo se puede usar para redirigir a una vista de un mismo controllador
     //* Los parametros del controlador son para vistas del mismo controlador o funcion
     //* Los parametros de url se obtienen de una llamada desde otro controlador u otra funcion del mismo usando Helpers::sendToController()
     protected function sendToView(array $controllerParams) :void
     {   
+        //! VARIABLES NECESARIAS PARA UNA SESION AQUI
+        $user = User::getUser();
+
+        //! BORRAR RESTOS DE SESION
+        unset($_SESSION); 
+
         //* CONTROLLER PARAMS
-
-        //Limpiar restos de vistas hijas
-        unset($_SESSION["css"]); 
-        unset($_SESSION["error"]);
-
-        foreach ($controllerParams as $name => $value) 
-        {
+        foreach ($controllerParams as $name => $value) {
             //! Añadir la informacion para recogerla en las plantillas
             $_SESSION[$name] = $value;
         }
 
-        //* URL PARAMS
-       
+        //? URL PARAMS
         if (!empty($_SESSION["URL_PARAMS"]))
         {
             foreach ($_SESSION["URL_PARAMS"] as $name => $value) 
@@ -62,6 +61,12 @@ class Controller
             }
             
             unset($_SESSION['URL_PARAMS']);
+        }
+
+        //*Login user
+        if (!empty($user))
+        {
+            $_SESSION['user'] = json_encode($user);
         }
 
         require_once __PARENT_TEMPLATE__;

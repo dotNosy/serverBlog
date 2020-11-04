@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="/css/sidebar.css">
 
     <!-- CSS backend -->
-    <?php if (isset($_SESSION['css'])): ?>
+    <?php if (!empty($_SESSION['css'])): ?>
       <?php foreach ($_SESSION['css'] as $css): ?>
         <?= '<link rel="stylesheet" href="/css/'. $css .'">' ?>
       <?php endforeach; ?>
@@ -169,11 +169,10 @@
       })
     </script>
 
-    <?php if (isset($_SESSION['js'])): ?>
+    <?php if (!empty($_SESSION['js'])): ?>
       <?php foreach ($_SESSION['js'] as $js): ?>
-        <?= '<link rel="stylesheet" href="/css/'. $css .'">' ?>
+        <?= "<script src='/js/$js'></script>" ?>
       <?php endforeach; ?>
-      <?= "<script src='/js/$js'></script>" ?>
     <?php endif; ?>
   </body>
 </html>
