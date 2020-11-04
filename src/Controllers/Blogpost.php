@@ -441,9 +441,9 @@ class Blogpost extends Controller
                         else
                         {
                             Helpers::sendToController("/post/view/$view->id",
-                    [
-                            "error" => "No se ha podido cambiar uno o más campos."
-                    ]);
+                            [
+                                    "error" => "No se ha podido cambiar uno o más campos."
+                            ]);
 
                         }
                     }
