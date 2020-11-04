@@ -1,6 +1,6 @@
 <?php if(!empty($_SESSION["blogPost"]))
 { 
-    $post=json_decode($_SESSION["blogPost"]);
+  $post=json_decode($_SESSION["blogPost"]);
 }
 if(!empty($_SESSION["categorias"]))
 {

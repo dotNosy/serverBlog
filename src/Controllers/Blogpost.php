@@ -49,6 +49,8 @@ class Blogpost extends Controller
                 {
                     $comments = Models\BlogPostModel::getComments(intval($view->id));
 
+                    $imgs = Models\BlogPostModel::getImgsByPostId(intval($view->id));
+
                     //? Si el post encontrado es invisible (privado)
                     if(!$view->visible)
                     {
@@ -62,6 +64,7 @@ class Blogpost extends Controller
                                 ,"blogPost" => json_encode($view)
                                 ,"autor" => User::getUsernameById(intval($view->user_id))
                                 ,"comments" => $comments
+                                ,"imgs" => $imgs
                                 ,"page" => __DIR__ . '/../Views/BlogPost/View.php'
                             ]);
                         }
@@ -77,14 +80,13 @@ class Blogpost extends Controller
                     //? Si el post encontrado es visible (publico)
                     else
                     {
-                        $comments = Models\BlogPostModel::getComments(intval($view->id));
-
                         parent::sendToView([
                             "titulo" => "POST"
                             ,"css" => array("post.css")
                             ,"blogPost" => json_encode($view)
                             ,"autor" => User::getUsernameById(intval($view->user_id))
                             ,"comments" => $comments
+                            ,"imgs" => $imgs
                             ,"page" => __DIR__ . '/../Views/BlogPost/View.php'
                         ]);
                     }
@@ -294,60 +296,36 @@ class Blogpost extends Controller
                 //? Creacion del post
                 else
                 {
-                    //Imagenes
+                    $imgsContent = array();
+
+                    //! ADD IMAGENES
                     if (!empty($_FILES['imagenes']))
                     {
-                        $allowTypes = array('jpg','png','gif'); 
-                        $imagesContent = array();
+                        $allowedExtensions = array('jpg','png','gif');
 
-                        foreach ($_FILES['imagenes']['name'] as $key => $value) 
+                        $fileList = Helpers::filesToArray($_FILES['imagenes']);
+
+                        foreach ($fileList as $index => $key) 
                         {
-                            // Path a subir
-                            $fileName = basename($value); 
-                            $targetFilePath = $targetDir . $fileName; 
-                            $fileType = pathinfo($targetFilePath, PATHINFO_EXTENSION);
+                            $extension = strtolower(pathinfo($key['name'], PATHINFO_EXTENSION));
 
-                            //?extension valida
-                            if (in_array($fileType, $allowTypes)) {
-                                //array_push($imagesContent ,addslashes(file_get_contents($_FILES['imagenes']['tmp_name'][0])));
+                            if (in_array($extension, $allowedExtensions)) 
+                            {
+                                //* directorio = /var/www/dominio/assets/img.name
+                                $uploadfile = __DIR__."/../../../assets/".basename($key['name']);   
+                                move_uploaded_file($key['tmp_name'], $uploadfile);
                             }
+
+                            //Get content of file in binary
+                            array_push($imgsContent, ["name" => basename($key['name']) , "content" => file_get_contents($uploadfile)]);
+                            
+                            //Delete img from server
+                            unlink($uploadfile);
                         }
-                        var_dump($_FILES['imagenes']['tmp_name']);
-                    }
-                    die();
-                    //* Nombre de la foto
-                    $uploadfile = $uploaddir . basename($_FILES['imagen']['name']);
-
-                    //* Se coge la extension en minusculas
-                    $type = strtolower(pathinfo($_FILES['imagen']['name'], PATHINFO_EXTENSION));
-
-                    // //? Comprueba que la extension del archivo sea o PNG o JPG o GIF
-                    if ($type == "jpg" || $type == "png" || $type == "gif") 
-                    {
-                        //? Si se ha hecho la subida
-                        if (move_uploaded_file($_FILES['imagen']['tmp_name'], $uploadfile))
-                        {
-                            //* Se ha subido la foto
-                            //* Se guarda el path en la BD
-
-                            $nombreArchivo = $_FILES['imagen']['name'];
-                        } 
-                        //? Si la subida ha dado un error
-                        else
-                        {
-                            //* Se pone a vacio si no hay archivo, ni se creara ni se editara la foto
-                            $nombreArchivo = NULL;
-                            echo "No se ha podido subir el archivo";
-                        }
-                    }
-                    else
-                    {
-                        $nombreArchivo= NULL;
-                        echo "No hay foto o es de una extension no aceptada";
                     }
 
                     //* Va al model para intentar crear el post
-                    $id_post = Models\BlogPostModel::add($user->id,$tituloPost,$mensajePost,intval($radioPost),$nombreArchivo);
+                    $id_post = Models\BlogPostModel::add($user->id,$tituloPost,$mensajePost,intval($radioPost),$imgsContent);
                     
                     //* Si ha devuelto un id es que se ha creado, y por lo tanto te devuelve el view del post creado
                     if(!empty($id_post))
