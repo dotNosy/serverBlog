@@ -23,6 +23,18 @@ class Helpers
         die();
     }
 
+    public static function filesToArray($files) :array
+    {
+        $filesList = array();
+        foreach ($files as $property => $array) {
+            foreach ($array as $index => $value) {
+                $filesList[$index][$property] = $value;
+            }
+        }
+        
+        return $filesList;
+    }
+
     public static function cleanInput($input)
     {
         return htmlspecialchars(trim($input));

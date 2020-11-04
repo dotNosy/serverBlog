@@ -78,12 +78,9 @@
       <hr>
 
       <!-- Preview Image -->
-      <?php
-      
-      if(!empty($post->path)){
-        echo "<img src='http://localhost/serverBlog/assets/$post->path' class='img-fluid rounded'/>";
-      }
-      ?>
+      <?php foreach($_SESSION["imgs"] as $img): ?>
+        <img class="img-thumbnail" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($img->img); ?>" /> 
+      <?php endforeach;?>
 
       <hr>
 

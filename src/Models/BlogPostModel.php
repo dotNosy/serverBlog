@@ -104,7 +104,7 @@ class BlogPostModel
         $pdo_conn = $connObj->getConnection();
 
         //* Se recogen los posts de la persona logeada actualmente
-        $query = $pdo_conn->prepare("SELECT p.id, user_id, title, text, date, visible, m.path FROM post p LEFT JOIN multimedia m ON m.post_id=p.id WHERE p.id = :post_id");
+        $query = $pdo_conn->prepare("SELECT p.id, user_id, title, text, date, visible FROM post p WHERE p.id = :post_id");
         $query->bindValue("post_id", $id);
 
         if ($query->execute())
@@ -399,7 +399,7 @@ class BlogPostModel
         $pdo_conn = NULL;
     }
 
-    public static function add(int $id, string $titulo, string $mensaje, int $visible, string $nombreImagen)
+    public static function add(int $id, string $titulo, string $mensaje, int $visible, array $imgsContent)
     {
         // //* Se recoge el id del usuario en la sesion actual
 
@@ -429,23 +429,28 @@ class BlogPostModel
 
                 $pdo_conn->commit();
 
-                $pdo_conn->beginTransaction();
-
+                //! SUBIR IMAGENES
                 //? Si la imagen no está vacia
-                if(!empty($nombreImagen))
+                if(!empty($imgsContent))
                 {
-                    $query = $pdo_conn->prepare("INSERT INTO multimedia (post_id, path) VALUES (:id_post, :path)");
-                    $query->bindValue("id_post",$id_post);
-                    $query->bindValue("path",$nombreImagen);
+                    foreach ($imgsContent as $img) 
+                    {
+                        $pdo_conn->beginTransaction();
 
-                    //? Se mete la imagen en la BBDD
-                    if($query->execute())
-                    {
-                        $pdo_conn->commit();
-                    }
-                    else
-                    {
-                        $pdo_conn->rollback();
+                        $query = $pdo_conn->prepare("INSERT INTO multimedia (post_id, path, img) VALUES (:id_post, :path, :img)");
+                        $query->bindValue("id_post",$id_post);
+                        $query->bindValue("path", $img['name']);
+                        $query->bindValue("img", $img['content']);
+
+                        //? Se mete la imagen en la BBDD
+                        if($query->execute())
+                        {
+                            $pdo_conn->commit();
+                        }
+                        else
+                        {
+                            $pdo_conn->rollback();
+                        }
                     }
                 }
                 return $id_post;
@@ -907,21 +912,47 @@ class BlogPostModel
          $pdo_conn = NULL; 
     }
 
+    public static function getImgsByPostId(int $post_id)
+    {
+        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+        $pdo_conn = $connObj->getConnection();
+
+        try 
+        {
+            $query = $pdo_conn->prepare("SELECT * FROM multimedia WHERE post_id = :post_id;");
+
+            $query->bindValue("post_id", $post_id);
+
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $imgs = $query->fetchAll(PDO::FETCH_OBJ);
+
+                return $imgs;
+            }
+            else {
+                return false;
+            }  
+        } catch (\Throwable $th) {
+            return false;
+        }
+
+        $pdo_conn = NULL; 
+    }
+
     public static function getCategorias()
     {
-
         $connObj = new Services\Connection(Services\Helpers::getEnviroment());
         $pdo_conn = $connObj->getConnection();
 
         try 
         {
             $query = $pdo_conn->prepare("SELECT id, name FROM category ORDER BY name ASC;");
-
             
             //* Si la query funciona se hacen un commit
             if($query->execute())
             {
-
                 //* Se coge el id del post insertado para abrirlo al crearlo
                 $categorias = $query->fetchAll(PDO::FETCH_OBJ);
                 return $categorias;
@@ -933,11 +964,11 @@ class BlogPostModel
             return false;
         }
 
+        $pdo_conn = NULL; 
     }
 
     public static function getCategoriasByPostID(int $post_id)
     {
-
         $connObj = new Services\Connection(Services\Helpers::getEnviroment());
         $pdo_conn = $connObj->getConnection();
 
@@ -949,7 +980,6 @@ class BlogPostModel
             //* Si la query funciona se hacen un commit
             if($query->execute())
             {
-
                 //* Se coge el id del post insertado para abrirlo al crearlo
                 $categorias = $query->fetchAll(PDO::FETCH_OBJ);
                 return $categorias;
@@ -961,6 +991,7 @@ class BlogPostModel
             return false;
         }
 
+        $pdo_conn = NULL; 
     }
 
     public static function getNombreCategoriasByCategoriaID(array $categorias)
