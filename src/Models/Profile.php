@@ -38,50 +38,56 @@ class Profile
         {
             //! Si no funciona la query se hace un rollback tanto de perfil como de usuario
             echo "Connection failed: " . $e->getMessage();
-            die();
             $PDOconnection->rollback();
             throw $e;
         }
+        finally{
+            $pdo_conn = NULL; 
+        }
     }
 
-    public static function getProfile(int $id){
-        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+    public static function getProfile(int $id)
+    {
+        try{
+            $connObj = new Services\Connection(Services\Helpers::getEnviroment());
 
-        $pdo_conn = $connObj->getConnection();
-
-        //* Se hace un update del post a cambiar
-        $query = $pdo_conn->prepare("SELECT name, surname, birth_date, email FROM profile WHERE user_id=:user_id");
-        //El :name guarda el contenido de $name
-        $query->bindValue("user_id", $id);
-        
-        //* Si la query funciona se hacen un commit
-        if($query->execute())
-        {
+            $pdo_conn = $connObj->getConnection();
+    
+            //* Se hace un update del post a cambiar
+            $query = $pdo_conn->prepare("SELECT name, surname, birth_date, email FROM profile WHERE user_id=:user_id");
+            //El :name guarda el contenido de $name
+            $query->bindValue("user_id", $id);
             
-            //Crea el objeto con la linea de la base de datos
-            $profile = $query->fetch(PDO::FETCH_OBJ);
-            return $profile;
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                
+                //Crea el objeto con la linea de la base de datos
+                $profile = $query->fetch(PDO::FETCH_OBJ);
+                return $profile;
+            }
+            else
+            {   
+                return false;
+            }
         }
-        else
-        {   
-            
+        catch(Exception $e){
+            echo $e;
             return false;
         }
-        
-        //? Usuario no logueado
-        $pdo_conn = NULL;
+        finally{
+            $pdo_conn = NULL;
+        }
     }
 
     public static function edit(int $id, string $name, string $surname, string $email,string $birthdate)
     {
-        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
-
-        $pdo_conn = $connObj->getConnection();
-
-        $pdo_conn->beginTransaction();
-
         try 
         {
+            $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+            $pdo_conn = $connObj->getConnection();
+            $pdo_conn->beginTransaction();
+
             //* Se hace un update del post a cambiar
             $stm = "";
             //name=:name, surname=:surname, email=:email, birth_date=:birth_date
@@ -151,29 +157,25 @@ class Profile
                 return false;
             }
         } 
-        catch (\Throwable $th)
+        catch (Exception $e)
         {
-            echo $th;
+            echo $e;
             $pdo_conn->rollback();
             return false;
         }
-
-
-        
-        //? Usuario no logueado
-        $pdo_conn = NULL;
+        finally{
+            $pdo_conn = NULL;
+        }
     }
 
     public static function changePassword(int $id, string $password)
     {
-        $connObj = new Services\Connection(Services\Helpers::getEnviroment());
-
-        $pdo_conn = $connObj->getConnection();
-
-        $pdo_conn->beginTransaction();
-
         try 
         {
+            $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+            $pdo_conn = $connObj->getConnection();
+            $pdo_conn->beginTransaction();
+
             $query = $pdo_conn->prepare("UPDATE user SET password=:password WHERE id=:user_id");
             //El :name guarda el contenido de $name
             $query->bindValue("user_id", $id);
@@ -195,15 +197,13 @@ class Profile
             }
             
         } 
-        catch (\Throwable $th)
+        catch (Exception $e)
         {
-            echo $th;
+            echo $e;
             $pdo_conn->rollback();
             return false;
+        }finally{
+            $pdo_conn = NULL;
         }
-
-        //? Usuario no logueado
-        $pdo_conn = NULL;
     }
-    
 }
