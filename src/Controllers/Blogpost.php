@@ -218,17 +218,39 @@ class Blogpost extends Controller
             //* Me devuelve de la BD todos los registros del usuario del id
             $author = Models\BlogPostModel::author($params[2]);
 
+            //* Se cogen las categorias
+            $categorias = array();
+
+            foreach ($author as $post) {
+                $categoriasPorID = Models\BlogPostModel::getCategoriasByPostID(intval($post["id"]));
+                if(!empty($categoriasPorID)){
+                    array_push($categorias,$categoriasPorID);
+                }          
+            }
+
             if(!empty($user)){
 
                 if($user->username == $params[2])
                 {
                     $author = Models\BlogPostModel::authorConInvisibles($params[2]);
+
+                    //* Se cogen las categorias
+                    $categorias = array();
+
+                    foreach ($author as $post) {
+                        $categoriasPorID = Models\BlogPostModel::getCategoriasByPostID(intval($post["id"]));
+                        if(!empty($categoriasPorID)){
+                            array_push($categorias,$categoriasPorID);
+                        }          
+                    }
+
                     if(!empty($author))
                     {
                         
                         parent::sendToView([
                             "titulo" => "ADD POST"
                             ,"list" => $author
+                            ,"categorias" => $categorias
                             ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                         ]);
                     }
@@ -247,6 +269,7 @@ class Blogpost extends Controller
                         parent::sendToView([
                             "titulo" => "ADD POST"
                             ,"list" => $author
+                            ,"categorias" => $categorias
                             ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                         ]);
                     }
@@ -255,6 +278,7 @@ class Blogpost extends Controller
                         parent::sendToView([
                             "titulo" => "ADD POST"
                             ,"list" => $author
+                            ,"categorias" => $categorias
                             ,"error" => "Este autor no tiene posts."
                             ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                         ]);
@@ -271,6 +295,7 @@ class Blogpost extends Controller
                     parent::sendToView([
                         "titulo" => "ADD POST"
                         ,"list" => $author
+                        ,"categorias" => $categorias
                         ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                     ]);
                 }
@@ -692,16 +717,27 @@ class Blogpost extends Controller
             //* Se recoge el id del usuario en la sesion actual
             $user = User::getUser();
 
+            $categorias = array();
+
             if(!empty($user))
             {
                 //* Me devuelve de la BD todos los registros del usuario del id
                 $feed = Models\BlogPostModel::feed($user->username);
+                $categorias = array();
+
+                foreach ($feed as $post) {
+                    $categoriasPorID = Models\BlogPostModel::getCategoriasByPostID(intval($post["id"]));
+                    if(!empty($categoriasPorID)){
+                        array_push($categorias,$categoriasPorID);
+                    }          
+                }
                 
                 if(!empty($feed))
                 {   
                     parent::sendToView([
                         "titulo" => "FEED"
                         ,"list" => $feed
+                        ,"categorias" => $categorias
                         ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                     ]); 
                 }
@@ -710,6 +746,7 @@ class Blogpost extends Controller
                     parent::sendToView([
                         "titulo" => "LIST"
                         ,"error" => "Tu feed está vacio."
+                        ,"categorias" => $categorias
                         ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                     ]); 
                 }
@@ -728,12 +765,20 @@ class Blogpost extends Controller
         {
             //* Me devuelve de la BD todos los registros del usuario del id
             $feed = Models\BlogPostModel::feed($params[2]);
+            $categorias = array();
+            foreach ($feed as $post) {
+                $categoriasPorID = Models\BlogPostModel::getCategoriasByPostID(intval($post["id"]));
+                if(!empty($categoriasPorID)){
+                    array_push($categorias,$categoriasPorID);
+                }          
+            }
                 
             if(!empty($feed))
             {   
                 parent::sendToView([
                     "titulo" => "FEED"
                     ,"list" => $feed
+                    ,"categorias" => $categorias
                     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                 ]); 
             }
@@ -756,12 +801,21 @@ class Blogpost extends Controller
         {
             //* Me devuelve de la BD todos los registros del usuario del id
             $favs = Models\BlogPostModel::favorites(intval($user->id));
+
+            $categorias = array();
+            foreach ($favs as $post) {
+                $categoriasPorID = Models\BlogPostModel::getCategoriasByPostID(intval($post["id"]));
+                if(!empty($categoriasPorID)){
+                    array_push($categorias,$categoriasPorID);
+                }          
+            }
             
             if(!empty($favs))
             {   
                 parent::sendToView([
                     "titulo" => "FEED"
                     ,"list" => $favs
+                    ,"categorias" => $categorias
                     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                 ]); 
             }
@@ -770,6 +824,8 @@ class Blogpost extends Controller
                 parent::sendToView([
                     "titulo" => "LIST"
                     ,"error" => "No tienes ningun post favorito."
+                    ,"list" => array()
+                    ,"categorias" => $categorias
                     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                 ]); 
             }
@@ -779,7 +835,7 @@ class Blogpost extends Controller
         {
             Helpers::sendToController("/login",
             [
-                "error" => "Tienes que estar logueado para ver tus psots favoritos."
+                "error" => "Tienes que estar logueado para ver tus posts favoritos."
             ]);
         }  
     }
