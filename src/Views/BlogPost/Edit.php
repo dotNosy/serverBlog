@@ -1,22 +1,10 @@
 <?php 
   if(!empty($_SESSION["blogPost"]))
   { 
-    $post=json_decode($_SESSION["blogPost"]);
-  }
-  if(!empty($_SESSION["categorias"]))
-  {
-    $categorias=json_decode($_SESSION["categorias"]);
-  }
-  if(!empty($_SESSION["categoriasPost"]))
-  {
-    $categoriasPost=json_decode($_SESSION["categoriasPost"]);
-    $categoriasAnteriores=array();
-
-    foreach ($categoriasPost as $key => $value) {
-      array_push($categoriasAnteriores,intval($categoriasPost[$key]->category_id));
-    }
+    $post = $_SESSION["blogPost"];
   }
 ?>
+
 <div class="container">
 	<div class="row">
       <div class="col-md-6">
@@ -56,21 +44,16 @@
             <div class="form-group">
               <label for="categorias">Categoria:</label>
               <select name="categorias[]" multiple class="form-control" id="categorias">
-                <?php
-                  if(!empty($categorias))
-                  {
-                    foreach ($categorias as $key => $value) {
-                      $nombreCategoria = $categorias[$key]->name;
-                      $idCategoria = $categorias[$key]->id;
-                      echo "<option value='$idCategoria'";
-                      if(in_array(intval($categorias[$key]->id), $categoriasAnteriores))
-                      {
-                        echo " selected";
-                      }
-                      echo ">$nombreCategoria</option>";
-                    }
-                  }
-                ?>
+
+                <?php if(!empty($_SESSION['categorias'])): ?>
+                  <?php foreach($_SESSION['categorias'] as $key => $value): ?>
+                    <?php 
+                      $nombreCategoria = $_SESSION['categorias'][$key]->name;
+                      $idCategoria = $_SESSION['categorias'][$key]->id;
+                    ?>
+                    <option value='<?= $idCategoria ?>' <?= in_array(intval($idCategoria), $_SESSION['categoriasAnteriores']) ? 'selected' : ''?>>  <?= $nombreCategoria ?></option>
+                  <?php endforeach; ?>
+                <?php endif; ?>
               </select>
             </div>
 
@@ -99,7 +82,6 @@
             <img class="img-thumbnail" width="200px" height="200px" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($img->img); ?>" />
             <button
               name="deleteImg"
-              type="submit" 
               class="btn btn-danger btn-sm"
               data-toggle="tooltip" 
               data-placement="top"

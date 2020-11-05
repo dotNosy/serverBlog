@@ -38,12 +38,15 @@ class Controller
     //* Los parametros del controlador son para vistas del mismo controlador o funcion
     //* Los parametros de url se obtienen de una llamada desde otro controlador u otra funcion del mismo usando Helpers::sendToController()
     protected function sendToView(array $controllerParams) :void
-    {   
+    { 
         //! VARIABLES NECESARIAS PARA UNA SESION AQUI
         $user = User::getUser();
+        $URLparams = !empty($_SESSION["URL_PARAMS"]) ?  $_SESSION["URL_PARAMS"] : array();
 
         //! BORRAR RESTOS DE SESION
-        unset($_SESSION); 
+        foreach ($_SESSION as $key => $value) {
+            unset($_SESSION[$key]);
+        }
 
         //* CONTROLLER PARAMS
         foreach ($controllerParams as $name => $value) {
@@ -52,20 +55,15 @@ class Controller
         }
 
         //? URL PARAMS
-        if (!empty($_SESSION["URL_PARAMS"]))
-        {
-            foreach ($_SESSION["URL_PARAMS"] as $name => $value) 
-            {
+        if (!empty($URLparams)) {
+            foreach ($URLparams as $name => $value) {
                 //! Añadir la informacion para recogerla en las plantillas
                 $_SESSION[$name] = $value;
             }
-            
-            unset($_SESSION['URL_PARAMS']);
         }
 
         //*Login user
-        if (!empty($user))
-        {
+        if (!empty($user)) {
             $_SESSION['user'] = json_encode($user);
         }
 

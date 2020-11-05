@@ -55,7 +55,10 @@ class Helpers
             }
 
             //Delete img from server
-            unlink($uploadfile);
+            if(!empty($uploadfile)){
+                unlink($uploadfile);
+            }
+            
         }
 
         return $imgsContent;
@@ -68,6 +71,6 @@ class Helpers
 
     public static function getEnviroment()
     {
-        return "nosy";
+        return "dev";
     }
 }
