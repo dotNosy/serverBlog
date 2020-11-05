@@ -43,7 +43,7 @@ class BlogPostModel
                 return null;
             }
         }
-        catch (Exception $e)
+        catch (Throwable $e)
         {
             throw $e;
             return null;
@@ -79,7 +79,7 @@ class BlogPostModel
                 return null;
             }
         }
-        catch(Exception $e)
+        catch(Throwable $e)
         {
             throw $e;
         }
@@ -111,7 +111,7 @@ class BlogPostModel
                 return null;
             }
         }
-        catch(Exception $e)
+        catch(Throwable $e)
         {
             throw $e;
             return null;
@@ -144,7 +144,7 @@ class BlogPostModel
                 return null;
             }
         }
-        catch(Exception $e)
+        catch(Throwable $e)
         {
             throw $e;
             return null;
@@ -182,7 +182,7 @@ class BlogPostModel
                 return null;
             }
         }
-        catch(Exception $e)
+        catch(Throwable $e)
         {
             throw $e;
             return null;
@@ -218,7 +218,7 @@ class BlogPostModel
                 return false;
             }
         }
-        catch (Exception $e)
+        catch (Throwable $e)
         {
             $pdo_conn->rollback();
             throw $e;
@@ -255,7 +255,7 @@ class BlogPostModel
                 return false;
             }
         }
-        catch (Exception $e)
+        catch (Throwable $e)
         {
             $pdo_conn->rollback();
             throw $e;
@@ -291,7 +291,7 @@ class BlogPostModel
                 }
             }
         }   
-        catch (Exception $e)
+        catch (Throwable $e)
         {
             throw $e;
             return false;
@@ -335,7 +335,7 @@ class BlogPostModel
                 return null;
             }
         }
-        catch(Exception $e)
+        catch(Throwable $e)
         {
             throw $e;
             return null;
@@ -369,7 +369,7 @@ class BlogPostModel
                 return false;
             }
         }
-        catch (Exception $e)
+        catch (Throwable $e)
         {
             throw $e;
             return false;
@@ -405,7 +405,7 @@ class BlogPostModel
                 return false;
             }
         }
-        catch (Exception $e)
+        catch (Throwable $e)
         {
             $pdo_conn->rollback();
             throw $e;
@@ -444,7 +444,7 @@ class BlogPostModel
                 return false;
             }
         }
-        catch(Exception $e)
+        catch(Throwable $e)
         {
             throw $e;
             return null;
@@ -456,7 +456,6 @@ class BlogPostModel
 
     public static function add(int $id, string $titulo, string $mensaje, int $visible, array $imgsContent, array $categorias)
     {
-
         try {
             //* Se recoge el id del usuario en la sesion actual
             $today = date("Y/m/d h:i:s");
@@ -544,6 +543,35 @@ class BlogPostModel
         } 
     }
 
+    public static function deleteImg(int $id)
+    {
+        try 
+        {
+            $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+            $pdo_conn = $connObj->getConnection();
+            $pdo_conn->beginTransaction();
+
+            $query = $pdo_conn->prepare("DELETE FROM multimedia WHERE id=:id");
+            $query->bindValue("id", $id);
+
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                $pdo_conn->commit();
+                return true;
+            }
+            else
+            {
+                $pdo_conn->rollback();
+                return false;
+            }  
+        } 
+        catch (Throwable $th) 
+        {
+            throw $th;
+        }
+    }
+
     public static function edit(int $id, string $titulo, string $mensaje, int $visible, array $imgsContent)
     {
         try {
@@ -575,7 +603,7 @@ class BlogPostModel
                 return false;
             }  
         } 
-        catch (\Throwable $th)
+        catch (Throwable $th)
         {
             echo $th;
             $pdo_conn->rollback();
@@ -623,9 +651,9 @@ class BlogPostModel
                     $query->execute();
                 }
             } 
-            catch (Exception $e)
+            catch (Throwable $e)
             {
-                echo $e;
+                throw $e;
                 return false;
             }
     
@@ -652,7 +680,7 @@ class BlogPostModel
                     $query->execute();
                 }
             } 
-            catch (\Throwable $th)
+            catch (Throwable $th)
             {
                 echo $th;
                 return false;
@@ -660,7 +688,7 @@ class BlogPostModel
             $pdo_conn->commit();
             return true;
         }
-        catch(Exception $e)
+        catch(Throwable $e)
         {
             $pdo_conn->rollback();
             throw $e;
@@ -693,7 +721,7 @@ class BlogPostModel
                 return null;
             }
         }
-        catch(Exception $e)
+        catch(Throwable $e)
         {
             throw $e;
             return null;
@@ -727,7 +755,7 @@ class BlogPostModel
                 return null;
             }
         }
-        catch(Exception $e)
+        catch(Throwable $e)
         {
             throw $e;
             return null;
@@ -763,8 +791,8 @@ class BlogPostModel
                 return false;
             }  
          } 
-         catch (Exception $e) {
-             echo $e;
+         catch (Throwable $e) {
+            throw $e;
              $pdo_conn->rollback();
              return false;
          }
@@ -794,9 +822,9 @@ class BlogPostModel
                 return false;
             }  
          } 
-         catch (Exception $e) {
-             echo $e;
-             return false;
+         catch (Throwable $e) {
+            throw $e;
+            return false;
          }
          finally{
             $pdo_conn = NULL; 
@@ -829,9 +857,9 @@ class BlogPostModel
                 return false;
             }  
          } 
-         catch (Exception $e) {
-             echo $e;
-             return false;
+         catch (Throwable $e) {
+            throw $e;
+            return false;
          }
          finally{
             $pdo_conn = NULL; 
@@ -865,8 +893,8 @@ class BlogPostModel
                 return false;
             }  
          } 
-         catch (Exception $e) {
-             echo $e;
+         catch (Throwable $e) {
+             throw $e;
              return false;
          }
          finally{
@@ -897,8 +925,8 @@ class BlogPostModel
                 return false;
             }  
         } 
-        catch (Exception $e) {
-            echo $e;
+        catch (Throwable $e) {
+            throw $e;
             $pdo_conn->rollback();
             return false;
         }
@@ -933,8 +961,8 @@ class BlogPostModel
                 return false;
             }  
          } 
-         catch (Exception $e) {
-             echo $e;
+         catch (Throwable $e) {
+             throw $e;
              $pdo_conn->rollback();
              return false;
          }
@@ -964,9 +992,9 @@ class BlogPostModel
                 return false;
             }  
         } 
-        catch (Exception $e)
+        catch (Throwable $e)
         {
-             echo $e;
+             throw $e;
              return false;
         }
         finally{
@@ -995,8 +1023,8 @@ class BlogPostModel
             else {
                 return false;
             }  
-        } catch (Exception $e) {
-            echo $e;
+        } catch (Throwable $e) {
+            throw $e;
             return false;
         }
         finally{
@@ -1023,7 +1051,7 @@ class BlogPostModel
             else {
                 return false;
             }  
-        } catch (Exception $th) {
+        } catch (Throwable $th) {
             return false;
         }
         finally{
@@ -1054,8 +1082,8 @@ class BlogPostModel
             else {
                 return false;
             }  
-        } catch (Exception $e) {
-            echo $e;
+        } catch (Throwable $e) {
+            throw $e;
             return false;
         }
         finally{
@@ -1089,8 +1117,8 @@ class BlogPostModel
             else {
                 return false;
             }  
-        } catch (Exception $e) {
-            echo $e;
+        } catch (Throwable $e) {
+            throw $e;
             return false;
         }
         finally{
@@ -1124,8 +1152,8 @@ class BlogPostModel
             else {
                 return false;
             }  
-        } catch (Exception $e) {
-            echo $e;
+        } catch (Throwable $e) {
+            throw $e;
             return false;
         }
         finally{
@@ -1156,8 +1184,8 @@ class BlogPostModel
             else {
                 return false;
             }  
-        } catch (Exception $e) {
-            echo $e;
+        } catch (Throwable $e) {
+            throw $e;
             return false;
         }
         finally{

@@ -508,7 +508,8 @@ class Blogpost extends Controller
 
                             //* Se llama a la vista del edit
                             parent::sendToView([
-                                "titulo" => "EDIT POST"
+                                "js" => array("deleteImg.js")
+                                ,"titulo" => "EDIT POST"
                                 ,"blogPost" => $view
                                 ,"categorias" => $categorias
                                 ,"categoriasPost" => $categoriasElegidas
@@ -544,6 +545,26 @@ class Blogpost extends Controller
             [
                 "error" => "Para editar un post debes estar logeado."
             ]);
+        }
+    }
+
+    protected function deleteImg()
+    {
+        if ($_POST && !empty($_POST['id']))
+        {
+            $response = array("status" => "");
+
+            if (is_int(intval($_POST['id'])))
+            {
+               $deleted = Models\BlogPostModel::deleteImg(intval($_POST['id']));
+
+                $response['status'] = $deleted;
+            }
+            else {
+                $response = array("status" => "error");
+            }
+            
+            echo json_encode($response);
         }
     }
 

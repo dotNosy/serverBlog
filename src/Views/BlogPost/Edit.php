@@ -82,6 +82,7 @@
               <img class="img-thumbnail" width="200px" height="200px" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($img->img); ?>" />
               <div class="col-12 text-center">
                 <button
+                  id="<?=$img->id?>"
                   class="btn btn-danger btn-sm deleteImg my-2"
                   data-toggle="tooltip" 
                   data-placement="top"
