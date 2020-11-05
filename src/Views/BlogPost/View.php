@@ -1,6 +1,6 @@
 <?php if(!empty($_SESSION["blogPost"]))
 { 
-    $post=json_decode($_SESSION["blogPost"]);
+  $post=$_SESSION["blogPost"];
 }?>
 
 <?php 
@@ -62,7 +62,7 @@
 
       <!-- Categorias -->
       <?php foreach($_SESSION["categorias"] as $categoria): ?>
-        <span class='badge badge-dark'> <?= $categoria->name ?></span>
+        <a href="/post/categoria/<?=strtolower($categoria->name)?>" class="badge badge-dark"><?= $categoria->name ?></a>
       <?php endforeach;?>
 
       <hr>
@@ -206,33 +206,21 @@
 
       <!-- Categories Widget -->
       <div class="card my-4">
-        <h5 class="card-header">Categories</h5>
+        <h5 class="card-header">Categorias</h5>
         <div class="card-body">
           <div class="row">
             <div class="col-lg-6">
               <ul class="list-unstyled mb-0">
+              <?php foreach($_SESSION["categoriasTodas"] as $categoria): ?>
                 <li>
-                  <a href="#">Web Design</a>
+                  <a href="/post/categoria/<?=strtolower($categoria->name)?>"><?=$categoria->name?></a>
                 </li>
-                <li>
-                  <a href="#">HTML</a>
-                </li>
-                <li>
-                  <a href="#">Freebies</a>
-                </li>
-              </ul>
-            </div>
-            <div class="col-lg-6">
-              <ul class="list-unstyled mb-0">
-                <li>
-                  <a href="#">JavaScript</a>
-                </li>
-                <li>
-                  <a href="#">CSS</a>
-                </li>
-                <li>
-                  <a href="#">Tutorials</a>
-                </li>
+                <?php if(ceil(count($_SESSION["categoriasTodas"])/2)): ?>
+                  </div>
+                  <div class="col-lg-6">
+                  <ul class="list-unstyled mb-0">
+                <?php endif; ?>
+              <?php endforeach; ?>
               </ul>
             </div>
           </div>

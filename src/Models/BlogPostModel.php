@@ -454,8 +454,9 @@ class BlogPostModel
         }
     }
 
-    public static function add(int $id, string $titulo, string $mensaje, int $visible, array $imgsContent)
+    public static function add(int $id, string $titulo, string $mensaje, int $visible, array $imgsContent, array $categorias)
     {
+
         try {
             //* Se recoge el id del usuario en la sesion actual
             $today = date("Y/m/d h:i:s");
@@ -482,6 +483,11 @@ class BlogPostModel
 
                 if (!empty($imgsContent)) {
                     self::addImgs($imgsContent, intval($id_post));
+                }
+
+                
+                if (!empty($categorias)){
+                    self::editCategorias(intval($id_post), array(), $categorias);
                 }
 
                 return $id_post;

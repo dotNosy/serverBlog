@@ -35,6 +35,23 @@
                 </div>
               </div>
 
+              <!-- Selector categoria multiple -->
+              <div class="form-group">
+                <label for="categorias">Categoria:</label>
+                <select name="categorias[]" multiple class="form-control" id="categorias">
+
+                  <?php if(!empty($_SESSION['categorias'])): ?>
+                    <?php foreach($_SESSION['categorias'] as $key => $value): ?>
+                      <?php 
+                        $nombreCategoria = $_SESSION['categorias'][$key]->name;
+                        $idCategoria = $_SESSION['categorias'][$key]->id;
+                      ?>
+                      <option value='<?= $idCategoria ?>'>  <?= $nombreCategoria ?></option>
+                    <?php endforeach; ?>
+                  <?php endif; ?>
+                </select>
+              </div>
+
               <!-- Imagen -->
               <div class="form-group">
                 <label class="col-md-4 control-label">Insertar imagen</label>
