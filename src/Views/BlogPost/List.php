@@ -73,6 +73,7 @@
                     <i class="far fa-plus-square"></i>
                   </button>
                   <?php endif; ?>
+                  
                 <!-- Edit -->
                 <?php if (!empty($user->id) && $post['user_id'] == $user->id): ?>
                   <a <?="href='/post/edit/".$post["id"]."'"?>  class="btn btn-outline-dark btn-sm mx-2"><i class="far fa-edit"></i></a>
