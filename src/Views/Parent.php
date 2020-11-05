@@ -101,6 +101,13 @@
                   </div>
               </a>
               <?php if(!empty($user)): ?>
+               <!-- REDACTADOS -->
+               <a href="/post/list" class="bg-dark list-group-item list-group-item-action">
+                    <div class="d-flex w-100 justify-content-start align-items-center">
+                        <span class="fas fa-book fa-fw mr-3"></span>
+                        <span class="menu-collapsed">Redactados</span>
+                    </div>
+                </a>
                 <!-- FEED -->
                 <a href="/post/feed" class="bg-dark list-group-item list-group-item-action">
                     <div class="d-flex w-100 justify-content-start align-items-center">

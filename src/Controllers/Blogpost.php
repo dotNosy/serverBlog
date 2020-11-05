@@ -158,9 +158,19 @@ class Blogpost extends Controller
             $list = Models\BlogPostModel::list(intval($user->id));
             
             if(!empty($list))
-            {   
+            {  
+                $categorias = array();
+                foreach ($list as $post) 
+                {
+                    $categoriasPorID = Models\BlogPostModel::getCategoriasByPostID(intval($post["id"]));
+
+                    if(!empty($categoriasPorID)) {
+                        array_push($categorias,$categoriasPorID);
+                    }          
+                }
                 parent::sendToView([
                     "titulo" => "LIST"
+                    ,"categorias" => $categorias
                     ,"list" => $list
                     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                 ]); 
@@ -170,6 +180,7 @@ class Blogpost extends Controller
                 parent::sendToView([
                     "titulo" => "LIST"
                     ,"list" => $list
+                    ,"categorias" => array()
                     ,"error" => "No has publicado ningun post todavia."
                     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                 ]);
