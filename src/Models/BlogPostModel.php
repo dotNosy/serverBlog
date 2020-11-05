@@ -1132,4 +1132,36 @@ class BlogPostModel
             $pdo_conn = NULL; 
         }
     }
+
+    public static function getUserByPostID(int $post_id)
+    {
+        try 
+        {
+            $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+            $pdo_conn = $connObj->getConnection();
+
+            //* Recoge los posts que sean visibles de la categoria elegida
+            $query = $pdo_conn->prepare("SELECT u.id FROM user u
+                                        INNER JOIN post p ON p.user_id = u.id
+                                        WHERE p.id=:$post_id");               
+            $query->bindValue("post_id", $post_id);
+            
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $user_id = $query->fetch();
+                return $user_id;
+            }
+            else {
+                return false;
+            }  
+        } catch (Exception $e) {
+            echo $e;
+            return false;
+        }
+        finally{
+            $pdo_conn = NULL; 
+        }
+    }
 }
