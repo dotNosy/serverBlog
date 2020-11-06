@@ -498,7 +498,7 @@ class BlogPostModel
             }  
         } 
         catch (\Throwable $th) {
-            echo $th;
+             throw $th;
             $pdo_conn->rollback();
             return false;
         }
@@ -572,6 +572,71 @@ class BlogPostModel
         }
     }
 
+    public static function setImgPosInPost(int $id, string $pos)
+    {
+        try 
+        {
+            $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+            $pdo_conn = $connObj->getConnection();
+
+            //? SI ES UNA POSICION UNICA
+            if (in_array($pos, ["starting", "ending", "portada"]))
+            {   
+                //Coger la imagen y sus datos
+                $query = $pdo_conn->prepare("SELECT * FROM multimedia WHERE id=:id");
+                $query->bindValue("id", $id);
+
+                if($query->execute())
+                {
+                    $img = $query->fetch(PDO::FETCH_OBJ);
+
+                    //? existe la imagen
+                    if (!empty($img)) 
+                    {
+                        $pdo_conn->beginTransaction();
+
+                        //* Set pos to null si ya existe una imagen en esa posicion (y en el mismo post)
+                        $query = $pdo_conn->prepare("UPDATE multimedia SET pos=NULL WHERE pos=:pos AND post_id=:post_id;");
+                        $query->bindValue("pos", $pos);
+                        $query->bindValue("post_id", $img->post_id);
+                        $query->execute();
+
+                        //* Set la imagen que elegimos a la pos
+                        $query = $pdo_conn->prepare("UPDATE multimedia SET pos=:pos WHERE id=:id");
+                        $query->bindValue("pos", $pos);
+                        $query->bindValue("id", $id);
+                        $query->execute();
+
+                        $pdo_conn->commit();
+
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                else {
+                    return false;
+                }  
+            }
+            //? POS QUE SE PUEDE REPETIR
+            else
+            {
+                
+                
+            }
+        } 
+        catch (Throwable $th)
+        {
+            $pdo_conn->rollback();
+            throw $th;
+            return false;
+        }
+        finally{
+            $pdo_conn = NULL; 
+        }
+    }
+
     public static function edit(int $id, string $titulo, string $mensaje, int $visible, array $imgsContent)
     {
         try {
@@ -605,7 +670,7 @@ class BlogPostModel
         } 
         catch (Throwable $th)
         {
-            echo $th;
+             throw $th;
             $pdo_conn->rollback();
             return false;
         }
@@ -682,7 +747,7 @@ class BlogPostModel
             } 
             catch (Throwable $th)
             {
-                echo $th;
+                 throw $th;
                 return false;
             }
             $pdo_conn->commit();

@@ -54,14 +54,13 @@ class Profile
             $pdo_conn = $connObj->getConnection();
     
             //* Se hace un update del post a cambiar
-            $query = $pdo_conn->prepare("SELECT name, surname, birth_date, email FROM profile WHERE user_id=:user_id");
+            $query = $pdo_conn->prepare("SELECT name, surname, birth_date, email, avatar FROM profile WHERE user_id=:user_id");
             //El :name guarda el contenido de $name
             $query->bindValue("user_id", $id);
             
             //* Si la query funciona se hacen un commit
             if($query->execute())
             {
-                
                 //Crea el objeto con la linea de la base de datos
                 $profile = $query->fetch(PDO::FETCH_OBJ);
                 return $profile;
@@ -80,7 +79,7 @@ class Profile
         }
     }
 
-    public static function edit(int $id, string $name, string $surname, string $email,string $birthdate)
+    public static function edit(int $id, string $name, string $surname, string $email,string $birthdate, array $imgsContent)
     {
         try 
         {
@@ -122,6 +121,14 @@ class Profile
                 }  
             }
 
+            if(!empty($imgsContent)){
+                if(!empty($stm)){
+                    $stm .= ", avatar=:avatar";
+                }else{
+                    $stm .= "avatar=:avatar";
+                }  
+            }
+
             if(!empty($stm))
             {
                 $query = $pdo_conn->prepare("UPDATE profile SET $stm WHERE user_id=:user_id");
@@ -138,6 +145,9 @@ class Profile
                 }
                 if(!empty($birthdate)){
                     $query->bindValue("birth_date", $birthdate);
+                }
+                if(!empty($imgsContent)){
+                    $query->bindValue("avatar", $imgsContent[0]["content"]);
                 }
 
                 //* Si la query funciona se hacen un commit

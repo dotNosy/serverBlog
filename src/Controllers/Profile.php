@@ -25,9 +25,10 @@ class Profile extends Controller
             $user = Models\User::getUser();
             //* El profile se crea con el id de el usuario
             $profile = Models\Profile::getProfile(intval($user->id));
+
             parent::sendToView([
                 "titulo" => "TEST CONTROLLER"
-                ,"profile" => json_encode($profile)
+                ,"profile" => $profile
                 ,"page" =>  __DIR__ . '/../Views/Profile.php'
             ]);
         }
@@ -57,15 +58,20 @@ class Profile extends Controller
             $email = Services\Helpers::cleanInput($_POST['email']);
             $birthdate = Services\Helpers::cleanInput($_POST['date']);
 
+            $imgsContent="";
+                //! ADD IMAGENES
+                if (!empty($_FILES['avatar']))
+                {
+                    $allowedExtensions = array('jpg','png','gif');
+                    $imgsContent = Services\Helpers::getFilesContent($_FILES['avatar'], $allowedExtensions);      
+                }
+                
             // Llama a la función edit de parametros que la cual hace la sentencia de UPDATE en mysql con los datos recogidos. Esta solo funciona si los datos se recogen correctamente.
-            if(Models\Profile::edit($user->id, $name, $surname, $email, $birthdate)){
+            if(Models\Profile::edit($user->id, $name, $surname, $email, $birthdate, $imgsContent)){
                 // Guarda la id de el usuario
                 $profile = Models\Profile::getProfile(intval($user->id));
-                parent::sendToView([
-                "titulo" => "TEST CONTROLLER"
-                ,"profile" => json_encode($profile)
-                ,"page" =>  __DIR__ . '/../Views/Profile.php'
-            ]);
+
+                Services\Helpers::sendToController("/profile/");
             }
             else
             {

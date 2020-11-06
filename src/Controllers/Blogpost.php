@@ -519,7 +519,7 @@ class Blogpost extends Controller
 
                             //* Se llama a la vista del edit
                             parent::sendToView([
-                                "js" => array("deleteImg.js")
+                                "js" => array("deleteImg.js", "setPosImg.js")
                                 ,"titulo" => "EDIT POST"
                                 ,"blogPost" => $view
                                 ,"categorias" => $categorias
@@ -565,11 +565,34 @@ class Blogpost extends Controller
         {
             $response = array("status" => "");
 
-            if (is_int(intval($_POST['id'])))
+            if (is_int(intval(Helpers::cleanInput($_POST['id']))))
             {
-               $deleted = Models\BlogPostModel::deleteImg(intval($_POST['id']));
+               $deleted = Models\BlogPostModel::deleteImg(intval(Helpers::cleanInput($_POST['id'])));
 
                 $response['status'] = $deleted;
+            }
+            else {
+                $response = array("status" => "error");
+            }
+            
+            echo json_encode($response);
+        }
+    }
+
+    protected function setImgPosInPost()
+    {
+        if ($_POST && !empty($_POST['id'] && !empty($_POST['pos'])))
+        {
+            $response = array("status" => "");
+            $id = Helpers::cleanInput($_POST['id']);
+            $pos = Helpers::cleanInput($_POST['pos']);
+
+            if (in_array($pos, ["starting", "inline", "ending", "side", "portada"]) && is_int(intval($id)))
+            {
+                $updated = Models\BlogPostModel::setImgPosInPost(intval($id), $pos);
+
+                $response['status'] = $updated;
+                $response['pos'] = $pos;
             }
             else {
                 $response = array("status" => "error");

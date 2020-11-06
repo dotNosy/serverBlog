@@ -1,13 +1,80 @@
 <?php if(!empty($_SESSION["profile"]))
 { 
-    $profile=json_decode($_SESSION["profile"]);
+    $profile=$_SESSION["profile"];
 } ?>
-<div class="container">
+
+
+<script>
+//kontadore bat erabiliko dugu kontroladorea funtzionatzeko
+var clicks = 1
+
+//click egitean resize() egingo du baina berriz klik egitean resizeM() egingo du
+  function controlador(){
+    if(clicks==1){
+      resize(4);
+      clicks=0;
+    }
+    else{
+      resizeM(4);
+      clicks=1;
+    }
+  }
+
+// click egitean zoom egiteko
+function resize(direction) {
+  //resize-en tamaina ajustatzeko
+  var size = 93.12 * direction;
+
+  var element = document.getElementById('zoom');
+
+  //avatar-aren posizioa hartuko du
+  var positionInfo = element.getBoundingClientRect();
+
+  element.style.width = positionInfo.width+size+'px';
+  element.style.height = positionInfo.height+size+'px';
+
+  document.body.style.backgroundColor = "#2E2F2F";
+  document.getElementById("container").style.backgroundColor = "#2E2F2F";
+}
+
+//berriz click egitean zoom-a kenduko du
+function resizeM(direction) {
+  //resizeM-n tamaina ajustatzeko
+  var size = 93.12 * direction;
+
+  var element = document.getElementById('zoom');
+  
+  //avatar-aren posizioa hartuko du
+  var positionInfo = element.getBoundingClientRect();
+
+  element.style.width = positionInfo.width-size+'px';
+  element.style.height = positionInfo.height-size+'px';
+
+  document.body.style.backgroundColor = "white";
+  document.getElementById("container").style.backgroundColor = "white";
+}
+</script>
+
+<style type="text/css">
+    .zoomin img { height: 400px; width: 400px;
+    -webkit-transition: all 1s ease;
+    -moz-transition: all 1s ease;
+    -ms-transition: all 1s ease;
+    transition: all 1s ease; }
+    .zoomin img:hover { width: 500px; height: 500px; } 
+  </style>
+  
+<div class="container" id="container">
     <hr>
-  <div class="card bg-light">
-    <article class="card-body mx-auto" style="max-width: 400px">
+  <div class="card bg-light" id="container">
+    <article class="card-body mx-auto" max-width="700px" id="container">
       <h4 class="card-title mt-3 text-center">PERFIL</h4>
-      <form action="/profile/edit" method="POST">
+
+      <!-- <img class="img-thumbnail" id="zoom" onmouseover="zoomin()" onmouseout="zoomout()" width="400px" height="400px" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($profile->avatar); ?>" /> -->
+      <div class="zoomin">
+      <img class="img-thumbnail" id="zoom" onclick="controlador()" width="400px" height="400px" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($profile->avatar); ?>" />
+      </div>
+      <form action="/profile/edit" method="POST" enctype="multipart/form-data">
       <!--  action="/profile" method="POST" -->
         <div class="form-group input-group">
           <div class="input-group-prepend">
@@ -63,11 +130,14 @@
             <?="value='$profile->birth_date'"?>
           />
         </div>
-        <div class="form-group">
-                <label class="">Insertar imagen</label>
-                <div class=">
-                <input type="hidden" name="MAX_FILE_SIZE" value="30000" />
-                  <input name="imagen" type="file" class="form-control-file">
+        <!-- Imagen -->
+        <div class="form-group input-group">
+                <label class="input-group-prepend">Insertar imagen</label>
+                <div class="input-group-text">
+                <!-- <input type="hidden" name="MAX_FILE_SIZE" value="30000" /> -->
+                  <input name="avatar[]" type="file" class="form-control-file" accept=".png, .jpg, .gif" multiple>
+                  <div id="listImgs" class="my-3">
+                  </div>
                 </div>
               </div>
         <div class="form-group">

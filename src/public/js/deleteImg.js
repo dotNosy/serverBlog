@@ -35,7 +35,7 @@ $(function () {
                     });
                 },
                 No: () => {
-                    return false;
+
                 }
             }
         });
