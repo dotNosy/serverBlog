@@ -660,13 +660,13 @@ class Blogpost extends Controller
                                 //? Try insert
                                 if (Models\BlogPostModel::addAnswer(intval($id), intval($id_padre) ,intval($user->id), $comment))
                                 {
-                                    $user_notificado = Models\BlogPostModel::getUserByPostID(intval($id));
+                                    $user_notificado = Models\BlogPostModel::getUserByCommentID(intval($id_padre)); 
 
                                     //? Si el usuario que crea la notificacion no es el mismo que las recibe
-                                    if(intval($user_notificado->id)!=intval($user->id))
+                                    if(intval($user_notificado->user_id)!=intval($user->id))
                                     {
                                         //? El 1 representa el tipo de notificacion, 4=RESPUESTA en la base de datos
-                                        $notificacion = Models\BlogPostModel::crearNotificacion(intval($user_notificado->id),$user->id, intval($id), 4);
+                                        $notificacion = Models\BlogPostModel::crearNotificacion(intval($user_notificado->user_id),$user->id, intval($id), 4);
                                     }
 
                                     Helpers::sendToController("/post/view/$id",
