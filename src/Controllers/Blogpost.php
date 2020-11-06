@@ -626,6 +626,16 @@ class Blogpost extends Controller
                         if (empty($_POST['id_padre']))
                         {
                             if (Models\BlogPostModel::addComment(intval($id), intval($user->id), $comment)) {
+
+                                $user_notificado = Models\BlogPostModel::getUserByPostID(intval($id));
+
+                                //? Si el usuario que crea la notificacion no es el mismo que las recibe
+                                if(intval($user_notificado->id)!=intval($user->id))
+                                {
+                                    //? El 1 representa el tipo de notificacion, 3=COMENTARIO en la base de datos
+                                    $notificacion = Models\BlogPostModel::crearNotificacion(intval($user_notificado->id),$user->id, intval($id), 3);
+                                }
+
                                 Helpers::sendToController("/post/view/$id",
                                 [
                                     "msg_comment" => "El comentario se añadio con exito"
@@ -650,6 +660,15 @@ class Blogpost extends Controller
                                 //? Try insert
                                 if (Models\BlogPostModel::addAnswer(intval($id), intval($id_padre) ,intval($user->id), $comment))
                                 {
+                                    $user_notificado = Models\BlogPostModel::getUserByPostID(intval($id));
+
+                                    //? Si el usuario que crea la notificacion no es el mismo que las recibe
+                                    if(intval($user_notificado->id)!=intval($user->id))
+                                    {
+                                        //? El 1 representa el tipo de notificacion, 4=RESPUESTA en la base de datos
+                                        $notificacion = Models\BlogPostModel::crearNotificacion(intval($user_notificado->id),$user->id, intval($id), 4);
+                                    }
+
                                     Helpers::sendToController("/post/view/$id",
                                     [
                                         "msg_comment" => "La respuesta se añadio con exito."
@@ -998,11 +1017,21 @@ class Blogpost extends Controller
                         else
                         {
                             $added = Models\BlogPostModel::addToFavorites(intval($post_id), $user->id);
-                        
+
                             if ($added)
                             {
+                                $user_notificado = Models\BlogPostModel::getUserByPostID(intval($post_id));
+
+                                //? Si el usuario que crea la notificacion no es el mismo que las recibe
+                                if(intval($user_notificado->id)!=intval($user->id))
+                                {
+                                    //? El 1 representa el tipo de notificacion, 1=LIKE en la base de datos
+                                    $notificacion = Models\BlogPostModel::crearNotificacion(intval($user_notificado->id),$user->id, intval($post_id), 1);
+                                }
+
                                 //TODO: Redirigir a la pagina desde donde se hizo el add to feed
                                 Helpers::sendToController("/post/all");
+
                             }
                             else
                             {
@@ -1035,6 +1064,15 @@ class Blogpost extends Controller
                         {
                             $added = Models\BlogPostModel::addToFeed(intval($post_id), $user->id);
                         
+                            $user_notificado = Models\BlogPostModel::getUserByPostID(intval($post_id));
+
+                            //? Si el usuario que crea la notificacion no es el mismo que las recibe
+                            if(intval($user_notificado->id)!=intval($user->id))
+                            {
+                                //? El 1 representa el tipo de notificacion, 2=RETWEET en la base de datos
+                                $notificacion = Models\BlogPostModel::crearNotificacion(intval($user_notificado->id),$user->id, intval($post_id), 2);
+                            }
+
                             if ($added)
                             {
                                 Helpers::sendToController("/post/all");

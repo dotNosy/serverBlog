@@ -207,9 +207,7 @@ class BlogPostModel
 
             if ($query->execute())
             {
-                //* Mete todos los datos en un array
                 $pdo_conn->commit();
-
                 return true;
             }
             else
@@ -1236,14 +1234,81 @@ class BlogPostModel
             //* Recoge los posts que sean visibles de la categoria elegida
             $query = $pdo_conn->prepare("SELECT u.id FROM user u
                                         INNER JOIN post p ON p.user_id = u.id
-                                        WHERE p.id=:$post_id");               
+                                        WHERE p.id=:post_id");               
             $query->bindValue("post_id", $post_id);
             
             //* Si la query funciona se hacen un commit
             if($query->execute())
             {
                 //* Se coge el id del post insertado para abrirlo al crearlo
-                $user_id = $query->fetch();
+                $user_id = $query->fetch(PDO::FETCH_OBJ);
+                return $user_id;
+            }
+            else {
+                return false;
+            }  
+        } catch (Throwable $e) {
+            throw $e;
+            return false;
+        }
+        finally{
+            $pdo_conn = NULL; 
+        }
+    }
+
+    public static function crearNotificacion(int $user_notificado, int $user_notificador, int $post_id, int $id_tipo)
+    {
+        try 
+        {
+
+            $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+            $pdo_conn = $connObj->getConnection();
+            $pdo_conn->beginTransaction();
+
+            //* Recoge los posts que sean visibles de la categoria elegida
+            $query = $pdo_conn->prepare("INSERT INTO notification (`user_id`, `notification_user_id`, `post_id`, `id_tipo`)
+                                        VALUES (:user_notificado, :user_notificador, :post_id, :id_tipo)");               
+            $query->bindValue("user_notificado", $user_notificado);
+            $query->bindValue("user_notificador", $user_notificador);
+            $query->bindValue("post_id", $post_id);
+            $query->bindValue("id_tipo", $id_tipo);
+            
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                $pdo_conn->commit();
+                return true;
+            }
+            else {
+                $pdo_conn->rollback();
+                return false;
+            }  
+        } catch (Throwable $e) {
+            $pdo_conn->rollback();
+            throw $e;
+            return false;
+        }
+        finally{
+            $pdo_conn = NULL; 
+        }
+    }
+
+    public static function getUserByCommentID(int $comment_id)
+    {
+        try 
+        {
+            $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+            $pdo_conn = $connObj->getConnection();
+
+            //* Recoge los posts que sean visibles de la categoria elegida
+            $query = $pdo_conn->prepare("SELECT `user_id` FROM comment WHERE id=:comment_id;");               
+            $query->bindValue("comment_id", $comment_id);
+            
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $user_id = $query->fetch(PDO::FETCH_OBJ);
                 return $user_id;
             }
             else {
