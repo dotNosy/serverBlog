@@ -79,7 +79,7 @@
         <?php foreach($_SESSION["imgs"] as $img): ?>
           <div class="col-12 my-5 mx-2">
             <div class="row">
-              <div class="col-6 text-center">
+              <div class="col-7 text-center">
               <div class="col-3">
                     <button
                         id="<?=$img->id?>"
@@ -92,38 +92,39 @@
                     <button
                         id="<?=$img->id?>"
                         value="portada"
-                        class="col-12 btn <?= $img->pos == "portada" ? 'btn-success' : 'btn-outline-success'?> btn-sm my-2 float-left btnpos"
+                        class="<?=$img->id?> col-12 btn <?= $img->pos == "portada" ? 'btn-success' : 'btn-outline-success'?> btn-sm my-2 float-left btnpos"
                         data-toggle="tooltip" 
                         data-placement="top"
                         title="Establecer como portada">
                         <i class="far fa-image"></i>
                     </button>
               </div>
-                <img class="img-thumbnail"   style="width:200px;height:175px" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($img->img); ?>" />
+                <img class="img-thumbnail col-9"   style="width:200px;height:175px" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($img->img); ?>" />
               </div>
-              <div class="col-6">
-              <button 
-                class="btnpos btn <?= $img->pos == "side" ? 'btn-primary' : 'btn-outline-primary'?> col-2 float-left float-right h-100 mr-3"
+              <div class="col-5">
+              <button
+                id="<?=$img->id?>"
+                class="<?=$img->id?> btnpos btn <?= $img->pos == "side" ? 'btn-primary' : 'btn-outline-primary'?> col-2 float-left float-right h-100 mr-3"
                 value="side">
               L
-              A
-              D
-              O
+              a
+              d
+              o
               </button>
                 <button 
                   id="<?=$img->id?>"
-                  class="btnpos btn <?= $img->pos == "starting" ? 'btn-success' : 'btn-outline-success'?> col-8"
+                  class="<?=$img->id?> btnpos btn <?= $img->pos == "starting" ? 'btn-success' : 'btn-outline-success'?> col-8"
                   value="starting">
                    Starting
                 </button>
                 <button
                   id="<?=$img->id?>"
-                  class="btnpos offset-md-1 btn <?= $img->pos == "inline" ? 'btn-danger' : 'btn-outline-danger'?> col-6 float-left my-3"
+                  class="<?=$img->id?> btnpos offset-md-1 btn <?= $img->pos == "inline" ? 'btn-danger' : 'btn-outline-danger'?> col-6 float-left my-3"
                   value="inline"> Inline
                 </button>
                 <button 
                   id="<?=$img->id?>"
-                  class="btnpos btn  <?= $img->pos == "ending" ? 'btn-dark' : 'btn-outline-dark'?> col-8 float-left" 
+                  class="<?=$img->id?> btnpos btn  <?= $img->pos == "ending" ? 'btn-dark' : 'btn-outline-dark'?> col-8 float-left" 
                   value="ending"> Ending
                 </button>
               </div>

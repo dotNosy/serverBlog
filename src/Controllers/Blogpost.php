@@ -837,6 +837,7 @@ class Blogpost extends Controller
                 {
                     parent::sendToView([
                         "titulo" => "LIST"
+                        ,"list" => $feed
                         ,"error" => "Tu feed está vacio."
                         ,"categorias" => $categorias
                         ,"page" => __DIR__ . '/../Views/BlogPost/List.php'

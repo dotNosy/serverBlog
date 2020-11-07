@@ -24,29 +24,100 @@ $(function () {
                                 }
                                 else if(response.status === true)
                                 {
-                                    switch (response.pos)
+                                    switch (value)
                                     {
                                         case "starting":
+                                            //Quitar otras pos de esta imagen
+                                            $('.'+id+'[value=inline]').removeClass("btn-danger");
+                                            $('.'+id+'[value=inline]').addClass("btn-outline-danger");
+                                            $('.'+id+'[value=ending]').removeClass("btn-dark");
+                                            $('.'+id+'[value=ending]').addClass("btn-outline-dark");
+                                            $('.'+id+'[value=portada]').removeClass("btn-success");
+                                            $('.'+id+'[value=portada]').addClass("btn-outline-success");
+                                            $('.'+id+'[value=side]').removeClass("btn-primary");
+                                            $('.'+id+'[value=side]').addClass("btn-outline-primary");
+                                            
+                                            //Quitar estilo a otra imagen puesta en esta pos
+                                            $(':button[value='+value+']').removeClass("btn-success");
+                                            $(':button[value='+value+']').addClass("btn-outline-success");
+                                           
+                                            //Poner este boton en la pos
                                             $(myBtn).addClass("btn-success");
                                             $(myBtn).removeClass("btn-outline-success");
                                         break;
 
                                         case "inline":
+                                            //Quitar otras pos de esta imagen
+                                            $('.'+id+'[value=starting]').removeClass("btn-success");
+                                            $('.'+id+'[value=starting]').addClass("btn-outline-success");
+                                            $('.'+id+'[value=ending]').removeClass("btn-dark");
+                                            $('.'+id+'[value=ending]').addClass("btn-outline-dark");
+                                            $('.'+id+'[value=portada]').removeClass("btn-success");
+                                            $('.'+id+'[value=portada]').addClass("btn-outline-success");
+                                            $('.'+id+'[value=side]').removeClass("btn-primary");
+                                            $('.'+id+'[value=side]').addClass("btn-outline-primary");
+
+                                            //Quitar estilo al anterior imagen puesta en esta pos
+                                            $(':button[value='+value+']').removeClass("btn-danger");
+                                            $(':button[value='+value+']').addClass("btn-outline-danger");
+
+                                            //Poner este boton en la pos
                                             $(myBtn).addClass("btn-danger");
                                             $(myBtn).removeClass("btn-outline-danger");
                                         break;
 
                                         case "ending":
+                                            //Quitar otras pos de esta imagen
+                                            $('.'+id+'[value=starting]').removeClass("btn-success");
+                                            $('.'+id+'[value=starting]').addClass("btn-outline-success");
+                                            $('.'+id+'[value=inline]').removeClass("btn-danger");
+                                            $('.'+id+'[value=inline]').addClass("btn-outline-danger");
+                                            $('.'+id+'[value=portada]').removeClass("btn-success");
+                                            $('.'+id+'[value=portada]').addClass("btn-outline-success");
+                                            $('.'+id+'[value=side]').removeClass("btn-primary");
+                                            $('.'+id+'[value=side]').addClass("btn-outline-primary");
+
+                                            //Quitar estilo al anterior imagen puesta en esta pos
+                                            $(':button[value='+value+']').removeClass("btn-dark");
+                                            $(':button[value='+value+']').addClass("btn-outline-dark");
+                                        
+                                            //Poner este boton en la pos
                                             $(myBtn).addClass("btn-dark");
                                             $(myBtn).removeClass("btn-outline-dark");
                                         break;
 
                                         case "side":
+                                            //Quitar otras pos de esta imagen
+                                            $('.'+id+'[value=starting]').removeClass("btn-success");
+                                            $('.'+id+'[value=starting]').addClass("btn-outline-success");
+                                            $('.'+id+'[value=inline]').removeClass("btn-danger");
+                                            $('.'+id+'[value=inline]').addClass("btn-outline-danger");
+                                            $('.'+id+'[value=portada]').removeClass("btn-success");
+                                            $('.'+id+'[value=portada]').addClass("btn-outline-success");
+                                            $('.'+id+'[value=ending]').removeClass("btn-dark");
+                                            $('.'+id+'[value=ending]').addClass("btn-outline-dark");
+
+                                            //Poner este boton en la pos
                                             $(myBtn).addClass("btn-primary");
                                             $(myBtn).removeClass("btn-outline-primary");
                                         break;
 
                                         case "portada":
+                                            //Quitar otras pos de esta imagen
+                                            $('.'+id+'[value=starting]').removeClass("btn-success");
+                                            $('.'+id+'[value=starting]').addClass("btn-outline-success");
+                                            $('.'+id+'[value=inline]').removeClass("btn-danger");
+                                            $('.'+id+'[value=inline]').addClass("btn-outline-danger");
+                                            $('.'+id+'[value=ending]').removeClass("btn-dark");
+                                            $('.'+id+'[value=ending]').addClass("btn-outline-dark");
+                                            $('.'+id+'[value=side]').removeClass("btn-primary");
+                                            $('.'+id+'[value=side]').addClass("btn-outline-primary");
+
+                                            //Quitar estilo al anterior imagen puesta en esta pos
+                                            $(':button[value='+value+']').removeClass("btn-success");
+                                            $(':button[value='+value+']').addClass("btn-outline-success");
+
+                                            //Poner este boton en la pos
                                             $(myBtn).addClass("btn-success");
                                             $(myBtn).removeClass("btn-outline-success");
                                         break;

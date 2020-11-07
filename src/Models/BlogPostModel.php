@@ -578,7 +578,7 @@ class BlogPostModel
             $pdo_conn = $connObj->getConnection();
 
             //? SI ES UNA POSICION UNICA
-            if (in_array($pos, ["starting", "ending", "portada"]))
+            if (in_array($pos, ["starting", "ending", "inline", "portada"]))
             {   
                 //Coger la imagen y sus datos
                 $query = $pdo_conn->prepare("SELECT * FROM multimedia WHERE id=:id");
@@ -603,11 +603,16 @@ class BlogPostModel
                         $query = $pdo_conn->prepare("UPDATE multimedia SET pos=:pos WHERE id=:id");
                         $query->bindValue("pos", $pos);
                         $query->bindValue("id", $id);
-                        $query->execute();
 
-                        $pdo_conn->commit();
-
-                        return true;
+                        if ($query->execute())
+                        {
+                            $pdo_conn->commit();
+                            return true;
+                        }
+                        else {
+                            $pdo_conn->rollback();
+                            return false;
+                        }
                     }
                     else {
                         return false;
@@ -620,8 +625,21 @@ class BlogPostModel
             //? POS QUE SE PUEDE REPETIR
             else
             {
-                
-                
+                $pdo_conn->beginTransaction();
+
+                //* Set la imagen que elegimos a la pos
+                $query = $pdo_conn->prepare("UPDATE multimedia SET pos=:pos WHERE id=:id");
+                $query->bindValue("pos", $pos);
+                $query->bindValue("id", $id);
+
+                if ($query->execute()) {
+                    $pdo_conn->commit();
+                    return true;
+                }
+                else {
+                    $pdo_conn->rollback();
+                    return false;
+                }
             }
         } 
         catch (Throwable $th)
