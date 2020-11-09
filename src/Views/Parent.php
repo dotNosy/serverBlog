@@ -79,12 +79,32 @@
                   </div>
                 </a>
                 <!-- NOTIFICACIONES -->
-                <a href="#" class="bg-dark list-group-item list-group-item-action">
+                <a class="bg-dark list-group-item list-group-item-action showNotifications" data-toggle="modal" data-target="#staticBackdrop">
                     <div class="d-flex w-100 justify-content-start align-items-center">
                         <span class="fa fa-bell fa-fw mr-3"></span>
                         <span class="menu-collapsed">Notificaciones<span class="badge badge-pill badge-primary ml-2">5</span></span>
                     </div>
-                </a>      
+                </a>
+
+                <!-- Modal -->
+                <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Notificaciones</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="false">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body" id="notificaciones-content">
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <button id="borrarTodos" type="button" class="btn btn-danger">Borrar todos</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               <?php endif; ?>
 
               <!-- Separator with title -->
@@ -170,6 +190,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.2/jquery-confirm.min.js"></script>
     <!-- Custom JS -->
     <script src="/js/sidebar.js"></script>
+    <script src="/js/Notifications.js"></script>
     <script>
       $(function () {
         $('[data-toggle="tooltip"]').tooltip()

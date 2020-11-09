@@ -8,6 +8,8 @@ use ServerBlog\Services as Services;
 
 use ServerBlog\Models as Models;
 
+use ServerBlog\Models\User;
+
 class Profile extends Controller
 {
     public function __construct(array $params = null) 
@@ -144,6 +146,152 @@ class Profile extends Controller
         }
     }
 
+    protected function notifications($params = null)
+    {
+
+        $user = User::getUser();
+
+        if(!empty($user))
+        {    
+            $notificaciones = Models\Profile::getNotifications(intval($user->id));
+
+            if(!empty($notificaciones)){
+
+                $response['notificaciones'] = array();
+                $accion = "";
+                $color = "";
+                foreach($notificaciones as $not)
+                {
+                    
+                    switch ($not->type_id) {
+                        case 1:
+                            $accion = "añadido a favoritos tu";
+                            $color = "danger";
+                            break;
+                        case 2:
+                            $accion = "retweeteado tu";
+                            $color = "primary";
+                            break;
+                        case 3:
+                            $accion = "comentado en tu";
+                            $color = "warning";
+                            break;
+                        case 4:
+                            $accion = "respondido a tu comentario en el";
+                            $color = "dark";
+                        break;
+                        
+                        default:
+                            break;
+                    }
+
+                    if($not->Leido == 1){
+                        $color = "light";
+                    }
+
+                    array_push($response['notificaciones'],"
+                    <div class='alert alert-". $color ."' role='alert'>
+                        <button id='$not->id' type='button' class='deleteNotifications close' data-dismiss='alert' aria-label='Close'>
+                            <span class='' aria-hidden='true'>&times;</span>
+                        </button>
+	                    <h4 class='alert-heading'>Well done!</h4>
+                        <p><a style='color:black' href='/post/author/$not->Nombre' class='alert-link'>". $not->Nombre ."</a> 
+                        ha ". $accion ." post '<a style='color:black' href='/post/view/$not->post_id' class='alert-link'>". $not->title ."</a>'.</p>
+                        <hr>
+                        <p class='mb-0'>". $not->date ."</p>
+                    </div>");
+                }
+
+                $marcadasComoLeido = Models\Profile::marcarNotificacionesComoLeido(intval($user->id));
+
+            }
+            else {
+                $response['notificaciones'] = ["<div class='alert alert-danger alert-dismissible fade show' role='alert'>
+                <strong>No tienes notificaciones pendientes.</strong> 
+                <button type='button' class='close' data-dismiss='alert' aria-label='Close'>
+                  <span aria-hidden='true'>&times;</span>
+                </button>
+              </div>"];
+            }
+                
+            echo json_encode($response);
+        }
+        //? No estas logueado
+        else
+        {
+            Services\Helpers::sendToController("/login",
+            [
+                "error" => "Tienes que estar logueado para ver tus notificaciones."
+            ]);
+        }  
+    }
+
+    protected function deleteNotificationsByNotificationID($params = null)
+    {
+
+        $user = User::getUser();
+
+        if(!empty($user))
+        {    
+
+            if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['id']))
+            {
+
+                if(!empty($_POST['id'])){
+                    $response['status'] = Models\Profile::deleteNotificationsByNotificationID(intval($_POST["id"]));
+                }
+                else
+                {
+                    $response['error'] = "Ha ocurrido un error inesperado";
+                }
+
+            }
+            else
+            {
+                $response['error'] = "Ha ocurrido un error inesperado";
+            }
+            echo json_encode($response);
+        }
+        //? No estas logueado
+        else
+        {
+            Services\Helpers::sendToController("/login",
+            [
+                "error" => "Tienes que estar logueado para ver tus notificaciones."
+            ]);
+        }  
+    }
+
+    protected function deleteNotificationsByUserID($params = null)
+    {
+
+        $user = User::getUser();
+
+        if(!empty($user))
+        {    
+
+            if ($_SERVER['REQUEST_METHOD'] == "POST")
+            {
+
+                $response['status'] = Models\Profile::deleteNotificationsByUserID(intval($user->id));
+
+            }
+            else
+            {
+                $response['error'] = "Ha ocurrido un error inesperado";
+            }
+
+            echo json_encode($response);
+        }
+        //? No estas logueado
+        else
+        {
+            Services\Helpers::sendToController("/login",
+            [
+                "error" => "Tienes que estar logueado para ver tus notificaciones."
+            ]);
+        }  
+    }
 
 }
 

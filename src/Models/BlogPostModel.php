@@ -25,10 +25,11 @@ class BlogPostModel
             $pdo_conn = $connObj->getConnection();
 
             //* Se recogen los posts de la persona logeada actualmente
-            $query = $pdo_conn->prepare("SELECT post.id, post.user_id , u.username, title, text, date 
-                                        FROM post
-                                        INNER JOIN user u on u.id = post.user_id 
-                                        WHERE user_id = :user_id");
+            $query = $pdo_conn->prepare("SELECT post.id, post.user_id , u.username, title, CASE WHEN m.pos is null THEN  NULL ELSE m.img END img, text, date 
+                                            FROM post
+                                            INNER JOIN user u on u.id = post.user_id
+                                            LEFT JOIN multimedia m on m.post_id = post.id
+                                            WHERE user_id = :user_id and (m.pos = 'portada' OR m.pos is null)");
             $query->bindValue("user_id", $id);
 
             if ($query->execute())
@@ -889,7 +890,11 @@ class BlogPostModel
             $connObj = new Services\Connection(Services\Helpers::getEnviroment());
             $pdo_conn = $connObj->getConnection();
 
-            $query = $pdo_conn->prepare("SELECT * FROM comment WHERE post_id = :post_id AND comment_id IS NULL ORDER BY date DESC;");
+            $query = $pdo_conn->prepare("SELECT comment.*, p.avatar FROM comment
+                                        INNER JOIN `user` u on u.id = comment.user_id
+                                        INNER JOIN profile p on p.user_id = u.id
+                                        WHERE post_id = :post_id AND comment_id IS NULL ORDER BY date DESC;");
+
             $query->bindValue("post_id", $post_id);
 
             //* Si la query funciona se hacen un commit
@@ -1059,7 +1064,8 @@ class BlogPostModel
             $connObj = new Services\Connection(Services\Helpers::getEnviroment());
             $pdo_conn = $connObj->getConnection();
 
-            $query = $pdo_conn->prepare("SELECT * FROM comment WHERE comment_id = :comment_id ORDER BY date DESC;");
+            $query = $pdo_conn->prepare("SELECT *,p.avatar FROM comment INNER JOIN `user` u on u.id = comment.user_id
+            INNER JOIN profile p on p.user_id = u.id WHERE comment_id = :comment_id ORDER BY date DESC;");
             $query->bindValue("comment_id", $comment_id);
 
             //* Si la query funciona se hacen un commit
@@ -1091,6 +1097,36 @@ class BlogPostModel
             $pdo_conn = $connObj->getConnection();
 
             $query = $pdo_conn->prepare("SELECT * FROM multimedia WHERE post_id = :post_id;");
+            $query->bindValue("post_id", $post_id);
+
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $imgs = $query->fetchAll(PDO::FETCH_OBJ);
+
+                return $imgs;
+            }
+            else {
+                return false;
+            }  
+        } catch (Throwable $e) {
+            throw $e;
+            return false;
+        }
+        finally{
+            $pdo_conn = NULL; 
+        }
+    }
+
+    public static function getPortadaImg(int $post_id)
+    {
+        try 
+        {
+            $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+            $pdo_conn = $connObj->getConnection();
+
+            $query = $pdo_conn->prepare("SELECT * FROM multimedia WHERE post_id = :post_id; AND pos = portada");
             $query->bindValue("post_id", $post_id);
 
             //* Si la query funciona se hacen un commit
@@ -1284,8 +1320,8 @@ class BlogPostModel
             $pdo_conn->beginTransaction();
 
             //* Recoge los posts que sean visibles de la categoria elegida
-            $query = $pdo_conn->prepare("INSERT INTO notification (`user_id`, `notification_user_id`, `post_id`, `id_tipo`)
-                                        VALUES (:user_notificado, :user_notificador, :post_id, :id_tipo)");               
+            $query = $pdo_conn->prepare("INSERT INTO notification (`user_id`, `notification_user_id`, `post_id`, `type_id`,`date`)
+                                        VALUES (:user_notificado, :user_notificador, :post_id, :id_tipo, NOW())");               
             $query->bindValue("user_notificado", $user_notificado);
             $query->bindValue("user_notificador", $user_notificador);
             $query->bindValue("post_id", $post_id);
@@ -1340,4 +1376,37 @@ class BlogPostModel
             $pdo_conn = NULL; 
         }
     }
+
+    public static function getProfileByComentId(int $comment_id)
+    {
+        try 
+        {
+            $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+            $pdo_conn = $connObj->getConnection();
+
+            //* Recoge los posts que sean visibles de la categoria elegida
+            $query = $pdo_conn->prepare("SELECT `user_id` FROM comment WHERE id=:comment_id;");               
+            $query->bindValue("comment_id", $comment_id);
+            
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $user_id = $query->fetch(PDO::FETCH_OBJ);
+                return $user_id;
+            }
+            else {
+                return false;
+            }  
+        } catch (Throwable $e) {
+            throw $e;
+            return false;
+        }
+        finally{
+            $pdo_conn = NULL; 
+        }
+    }
+
+    
+
 }

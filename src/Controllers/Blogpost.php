@@ -55,6 +55,13 @@ class Blogpost extends Controller
 
                     $imgs = Models\BlogPostModel::getImgsByPostId(intval($view->id));
 
+                    $imgs_slider = array();
+                    foreach ($imgs as $img) {
+                        if ($img->pos == "inline" || $img->pos == "ending") {
+                            array_push($imgs_slider, $img);
+                        }
+                    }
+
                     //? Si el post encontrado es invisible (privado)
                     if(!$view->visible)
                     {
@@ -71,6 +78,7 @@ class Blogpost extends Controller
                                 ,"categorias" => $categorias
                                 ,"categoriasTodas" => $categoriasTodas
                                 ,"imgs" => $imgs
+                                ,"imgs_slider" => $imgs_slider
                                 ,"page" => __DIR__ . '/../Views/BlogPost/View.php'
                             ]);
                         }
@@ -95,6 +103,7 @@ class Blogpost extends Controller
                             ,"categorias" => $categorias
                             ,"categoriasTodas" => $categoriasTodas
                             ,"imgs" => $imgs
+                            ,"imgs_slider" => $imgs_slider
                             ,"page" => __DIR__ . '/../Views/BlogPost/View.php'
                         ]);
                     }
@@ -123,6 +132,13 @@ class Blogpost extends Controller
 
                     $imgs = Models\BlogPostModel::getImgsByPostId(intval($view->id));
 
+                    $imgs_slider = array();
+                    foreach ($imgs as $img) {
+                        if ($img->pos == "inline" || $img->pos == "ending") {
+                            array_push($imgs_slider, $img);
+                        }
+                    }
+
                     parent::sendToView([
                         "titulo" => "POST"
                         ,"css" => array("post.css")
@@ -132,6 +148,7 @@ class Blogpost extends Controller
                         ,"categorias" => $categorias
                         ,"categoriasTodas" => $categoriasTodas
                         ,"imgs" => $imgs
+                        ,"imgs_slider" => $imgs_slider
                         ,"page" => __DIR__ . '/../Views/BlogPost/View.php'
                     ]);
                 }
@@ -151,6 +168,7 @@ class Blogpost extends Controller
     {
         //* Se recoge el id del usuario en la sesion actual
         $user = User::getUser();
+        
 
         if(!empty($user))
         {
@@ -348,7 +366,11 @@ class Blogpost extends Controller
                 $tituloPost = Helpers::cleanInput($_POST['titulo']);
                 $mensajePost = Helpers::cleanInput($_POST['mensaje']);
                 $radioPost = Helpers::cleanInput($_POST['visibleRadio']);
-                $categorias = $_POST['categorias'];
+                if(!empty($_POST['categorias'])){
+                    $categorias = $_POST['categorias'];
+                }else{
+                    $categorias = array();
+                }
 
                 //? Si el radibutton no devulve 0 o 1
                 if($radioPost!=0 && $radioPost!=1) {
@@ -1107,4 +1129,5 @@ class Blogpost extends Controller
             }  
         }
     }
+
 }

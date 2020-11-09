@@ -69,16 +69,43 @@
 
       <!-- Preview Image -->
       <?php foreach($_SESSION["imgs"] as $img): ?>
-        <img class="img-thumbnail" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($img->img); ?>" /> 
+        <?php if($img->pos == "starting"): ?>
+          <img class="img-fluid" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($img->img); ?>" /> 
+        <?php endif;?>
       <?php endforeach;?>
 
       <hr>
 
       <!-- Post Content -->
-      <p class="lead"><?= $post->text ?></p>
+      <p class="lead my-5"><?= $post->text ?></p>
 
       <hr>
 
+      <!-- SILDER IMAGENES -->
+      <?php if(!empty($_SESSION["imgs_slider"])): ?>
+        <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+            <ol class="carousel-indicators">
+              <?php for ($i=0; $i < count($_SESSION["imgs_slider"]); $i++): ?>
+                <li data-target="#carouselExampleIndicators" data-slide-to="<?=$i?>" <?= $i == 0 ? "class='active'": ""?>></li>
+              <?php endfor;?>
+            </ol>
+            <div class="carousel-inner">
+              <?php for ($i=0; $i < count($_SESSION["imgs_slider"]); $i++): ?>
+                <div class="carousel-item <?= $i == 0 ? "active": ""?>">
+                  <img class="d-block w-100" style="widht:100%;height:450px;" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($_SESSION["imgs_slider"][$i]->img); ?>">
+                </div>
+              <?php endfor;?>
+            </div>
+              <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+              </a>
+              <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+              </a>
+        </div>
+      <?php endif; ?>
       <!-- Comments Form -->
       <div class="card my-4">
         <div class="card-header">
@@ -116,9 +143,13 @@
       <?php foreach($_SESSION["comments"] as $comment): ?>
         <div class="card my-4">
           <div class="card-header">
-            <h5><?=  User::getUsernameById(intval($comment->user_id))?></h5>
-            <!-- ELIMINAR -->
-            <?php if(!empty($user) && ($user->id == $comment->user_id || $user->id == $post->user_id)):?>
+          <img class="rounded-circle" style="width:70px;heigth:70px;" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($comment->avatar); ?>" /> 
+          <div style="margin-top:-7%; margin-left:12%">
+          <h4 style="text-align:top">
+            <?=  User::getUsernameById(intval($comment->user_id))?>
+          </h4>
+              <!-- ELIMINAR -->
+              <?php if(!empty($user) && ($user->id == $comment->user_id || $user->id == $post->user_id)):?>
               <form action="/post/deleteComment" method="POST">
                 <input type="hidden" name="id" <?= "value='$comment->id'"?>>
                 <button
@@ -132,6 +163,7 @@
                 </button>
               </form>
             <?php endif; ?>
+            </div>
           </div>
           <div class="card-body">
             <p><?= $comment->text ?></p>
@@ -159,9 +191,13 @@
           <?php foreach(BlogPostModel::getAnswer(intval($comment->id)) as $answer): ?>
             <div class="card ml-5 my-4">
               <div class="card-header">
-                <h5><?=  User::getUsernameById(intval($answer->user_id))?></h5>
-                <!-- ELIMINAR -->
-                <?php if(!empty($user) && ($user->id == $answer->user_id || $user->id == $post->user_id)):?>
+              <img class="rounded-circle" style="width:70px;heigth:70px;" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($comment->avatar); ?>" /> 
+              <div style="margin-top:-7%; margin-left:12%">
+                <h4 style="text-align:top;">
+                <?=  User::getUsernameById(intval($answer->user_id))?>
+                </h4>
+                  <!-- ELIMINAR -->
+                  <?php if(!empty($user) && ($user->id == $answer->user_id || $user->id == $post->user_id)):?>
                   <form action="/post/deleteComment" method="POST">
                     <input type="hidden" name="id" <?= "value='$answer->id'"?>>
                     <button
@@ -175,6 +211,7 @@
                     </button>
                   </form>
                 <?php endif; ?>
+                </div>
               </div>
               <div class="card-body">
                 <p><?= $answer->text ?></p>
@@ -227,16 +264,19 @@
         </div>
       </div>
 
-      <!-- Side Widget -->
+      <!-- SIDE IMAGENES-->
       <div class="card my-4">
         <h5 class="card-header">Side Widget</h5>
         <div class="card-body">
-          You can put anything you want inside of these side widgets. They are easy to use, and feature the new Bootstrap 4 card containers!
+          <?php foreach($_SESSION["imgs"] as $img): ?>
+            <?php if($img->pos == "side"): ?>
+              <img class="img-thumbnail my-4" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($img->img); ?>" /> 
+            <?php endif;?>
+          <?php endforeach;?>
         </div>
       </div>
 
     </div>
-
   </div>
   <!-- /.row -->
 

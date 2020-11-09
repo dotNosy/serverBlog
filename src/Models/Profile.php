@@ -216,4 +216,205 @@ class Profile
             $pdo_conn = NULL;
         }
     }
+
+    public static function getNotifications(int $id)
+    {
+        try 
+        {
+            $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+            $pdo_conn = $connObj->getConnection();
+
+            $query = $pdo_conn->prepare("SELECT n.id, n.user_id, u.username as 'Nombre', notification_user_id, n.post_id, p.title, type_id, n.date, nt.name as 'Tipo', Leido
+                                        FROM notification n
+                                        INNER JOIN `user` u
+                                        ON u.id = n.notification_user_id
+                                        INNER JOIN post p 
+                                        ON n.post_id = p.id
+                                        INNER JOIN notification_type nt
+                                        ON n.type_id = nt.id 
+                                        WHERE n.user_id = :user_id
+                                        ORDER BY date DESC;");
+            //El :name guarda el contenido de $name
+            $query->bindValue("user_id", $id);
+            
+
+
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $notificaciones = $query->fetchAll(PDO::FETCH_OBJ);
+                return $notificaciones;
+            }
+            else
+            {   
+                return false;
+            }
+            
+        } 
+        catch (Exception $e)
+        {
+            echo $e;
+            return false;
+        }finally{
+            $pdo_conn = NULL;
+        }
+    }
+
+    public static function marcarNotificacionesComoLeido(int $id)
+    {
+        try 
+        {
+            $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+            $pdo_conn = $connObj->getConnection();
+            $pdo_conn->beginTransaction();
+
+
+            $query = $pdo_conn->prepare("UPDATE notification
+                                        SET Leido=b'1'
+                                        WHERE user_id = :user_id;");
+            //El :name guarda el contenido de $name
+            $query->bindValue("user_id", $id);
+            
+
+
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $pdo_conn->commit();
+                return true;
+
+            }
+            else
+            {   
+                $pdo_conn->rollback();
+                return false;
+            }
+            
+        } 
+        catch (Exception $e)
+        {
+            echo $e;
+            $pdo_conn->rollback();
+            return false;
+        }finally{
+            $pdo_conn = NULL;
+        }
+    }
+
+    public static function deleteNotificationsByNotificationID(int $id)
+    {
+        try 
+        {
+            $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+            $pdo_conn = $connObj->getConnection();
+            $pdo_conn->beginTransaction();
+
+
+            $query = $pdo_conn->prepare("DELETE FROM notification WHERE id=:notification_id;");
+            //El :name guarda el contenido de $name
+            $query->bindValue("notification_id", $id);
+            
+
+
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $pdo_conn->commit();
+                return true;
+
+            }
+            else
+            {   
+                $pdo_conn->rollback();
+                return false;
+            }
+            
+        } 
+        catch (Exception $e)
+        {
+            echo $e;
+            $pdo_conn->rollback();
+            return false;
+        }finally{
+            $pdo_conn = NULL;
+        }
+    }
+
+    public static function deleteNotificationsByUserID(int $id)
+    {
+        try 
+        {
+            $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+            $pdo_conn = $connObj->getConnection();
+            $pdo_conn->beginTransaction();
+
+
+            $query = $pdo_conn->prepare("DELETE FROM notification WHERE user_id=:user_id;");
+            //El :name guarda el contenido de $name
+            $query->bindValue("user_id", $id);
+            
+
+
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $pdo_conn->commit();
+                return true;
+
+            }
+            else
+            {   
+                $pdo_conn->rollback();
+                return false;
+            }
+            
+        } 
+        catch (Exception $e)
+        {
+            echo $e;
+            $pdo_conn->rollback();
+            return false;
+        }finally{
+            $pdo_conn = NULL;
+        }
+    }
+
+    public static function getProfileImg(int $idProfile)
+    {
+        try{
+            $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+
+            $pdo_conn = $connObj->getConnection();
+    
+            //* Se hace un update del post a cambiar
+            $query = $pdo_conn->prepare("SELECT avatar FROM profile WHERE id=:profile_id");
+            //El :name guarda el contenido de $name
+            $query->bindValue("profile_id", $idProfile);
+            
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //Crea el objeto con la linea de la base de datos
+                $profile = $query->fetch(PDO::FETCH_OBJ);
+                return $profile;
+            }
+            else
+            {   
+                return false;
+            }
+        }
+        catch(Exception $e){
+            echo $e;
+            return false;
+        }
+        finally{
+            $pdo_conn = NULL;
+        }
+    }
+
+    
 }
