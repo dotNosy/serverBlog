@@ -14,13 +14,14 @@
 
       <?php foreach($_SESSION['list'] as $post): ?>
         <div class="col-lg-4 my-4">
-          <?php //var_dump($post) ?>
           <div class="card">
+          
             <?php if(!empty($post['img'])): ?>
               <img src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($post['img']); ?>" class="card-img-top">
             <?php else: ?>
               <img src="https://images.unsplash.com/photo-1477862096227-3a1bb3b08330?ixlib=rb-1.2.1&auto=format&fit=crop&w=700&q=60" alt="" class="card-img-top">
             <?php endif; ?>
+
             <div class="card-body">
               <!-- TITULO -->
               <h5 class="card-title"><?= $post['title'] ?></h5>

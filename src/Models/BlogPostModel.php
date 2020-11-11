@@ -62,10 +62,11 @@ class BlogPostModel
             $pdo_conn = $connObj->getConnection();
 
             //* Se recogen todos los posts de la base de datos
-            $query = $pdo_conn->prepare("SELECT p.id, p.user_id,u.username, p.title, p.text, p.date 
+            $query = $pdo_conn->prepare("SELECT p.id, p.user_id,u.username, p.title, p.text, p.date, CASE WHEN m.pos is null THEN  NULL ELSE m.img END img
             FROM post p
             INNER JOIN user u on u.id = p.user_id
-            WHERE p.visible = 1
+            LEFT JOIN multimedia m on m.post_id = p.id
+            WHERE p.visible = 1 and (m.pos = 'portada' OR m.pos is null)
             ORDER BY date DESC");
 
             if ($query->execute())
