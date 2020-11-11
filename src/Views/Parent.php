@@ -23,7 +23,6 @@
     <title><?= $_SESSION['titulo'] ?> </title>
   </head>
   <body>
-
   <!-- Bootstrap row -->
   <div class="row" id="body-row">
       <!-- Sidebar -->

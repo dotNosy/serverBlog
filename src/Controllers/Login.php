@@ -81,6 +81,7 @@ class Login extends Controller
         {
             parent::sendToView([
                 "titulo" => "SIGNING UP"
+                ,"js" => array("validateUser.js")
                 ,"css" => array("register.css")
                 ,"page" => __DIR__ . '/../Views/Register.php'
              ]);
@@ -208,5 +209,26 @@ class Login extends Controller
                 ,"page" => $error_page
              ]);
         }
+    }
+
+    protected function comprobarUsuario($params = null) 
+    {
+
+        if ($_SERVER['REQUEST_METHOD'] == "POST")
+        {
+            $username = Services\Helpers::cleanInput($_POST['username']);
+            $user = Models\User::userExists($username);
+
+            if(!empty($user)){
+                //? Si el usuario existe = false
+                $response = true;
+                echo json_encode($response);
+            }else{
+                //? Si el usuario no existe = true
+                $response = false;
+                echo json_encode($response);
+            }
+        }
+
     }
 }

@@ -71,6 +71,7 @@ class Blogpost extends Controller
                             //* Te enseña el post
                             parent::sendToView([
                                 "titulo" => "POST"
+                                ,"js" => array("addComment.js")
                                 ,"css" => array("post.css")
                                 ,"blogPost" => $view
                                 ,"autor" => User::getUsernameById(intval($view->user_id))
@@ -96,6 +97,7 @@ class Blogpost extends Controller
                     {
                         parent::sendToView([
                             "titulo" => "POST"
+                            ,"js" => array("addComment.js")
                             ,"css" => array("post.css")
                             ,"blogPost" => $view
                             ,"autor" => User::getUsernameById(intval($view->user_id))
@@ -187,7 +189,8 @@ class Blogpost extends Controller
                     }          
                 }
                 parent::sendToView([
-                    "titulo" => "LIST"
+                    "js" => array("addFavFeed.js")
+                    ,"titulo" => "LIST"
                     ,"categorias" => $categorias
                     ,"list" => $list
                     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
@@ -197,6 +200,7 @@ class Blogpost extends Controller
             {
                 parent::sendToView([
                     "titulo" => "LIST"
+                    ,"js" => array("addFavFeed.js")
                     ,"list" => $list
                     ,"categorias" => array()
                     ,"error" => "No has publicado ningun post todavia."
@@ -234,6 +238,7 @@ class Blogpost extends Controller
         {
             parent::sendToView([
                 "titulo" => "LIST"
+                ,"js" => array("addFavFeed.js")
                 ,"list" => $list
                 ,"categorias" => $categorias
                 ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
@@ -243,6 +248,7 @@ class Blogpost extends Controller
         {
             parent::sendToView([
                 "titulo" => "LIST"
+                ,"js" => array("addFavFeed.js")
                 ,"list" => $list
                 ,"error" => "No se han publicado posts todavia."
                 ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
@@ -287,9 +293,9 @@ class Blogpost extends Controller
 
                     if(!empty($author))
                     {
-                        
                         parent::sendToView([
                             "titulo" => "ADD POST"
+                            ,"js" => array("addFavFeed.js")
                             ,"list" => $author
                             ,"categorias" => $categorias
                             ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
@@ -309,6 +315,7 @@ class Blogpost extends Controller
                     {
                         parent::sendToView([
                             "titulo" => "ADD POST"
+                            ,"js" => array("addFavFeed.js")
                             ,"list" => $author
                             ,"categorias" => $categorias
                             ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
@@ -319,22 +326,21 @@ class Blogpost extends Controller
                         parent::sendToView([
                             "titulo" => "ADD POST"
                             ,"list" => $author
+                            ,"js" => array("addFavFeed.js")
                             ,"categorias" => $categorias
                             ,"error" => "Este autor no tiene posts."
                             ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                         ]);
                     }
-                    
                 }
-
             }
             else
             {
                 if(!empty($author))
                 {
-                    
                     parent::sendToView([
                         "titulo" => "ADD POST"
+                        ,"js" => array("addFavFeed.js")
                         ,"list" => $author
                         ,"categorias" => $categorias
                         ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
@@ -342,15 +348,14 @@ class Blogpost extends Controller
                 }
                 else
                 {
-                    Helpers::sendToController("/post/all"
-                    ,[
+                    Helpers::sendToController("/post/all",
+                    [
                         "error" => "No existe este usuario."
                     ]);
                 }
             }
         }
-        else
-        {
+        else {
             Helpers::sendToController("/post/all");
         }
     }
@@ -630,7 +635,7 @@ class Blogpost extends Controller
 
         if(!empty($user))
         {
-            if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['comment']) && !empty($_POST['id']) && !empty($_POST['text']))
+            if ($_POST && !empty($_POST['id']) && !empty($_POST['text']))
             {
                 $comment = "";
                 //? hay un id post
@@ -646,29 +651,72 @@ class Blogpost extends Controller
 
                         //* COMENTARIO
                         if (empty($_POST['id_padre']))
-                        {
-                            if (Models\BlogPostModel::addComment(intval($id), intval($user->id), $comment)) {
+                        {   
+                            $insertId = Models\BlogPostModel::addComment(intval($id), intval($user->id), $comment);
 
+                            $addedComment = Models\BlogPostModel::getCommentbyId(intval($insertId));
+
+                            if (!empty($addedComment)) 
+                            {
                                 $user_notificado = Models\BlogPostModel::getUserByPostID(intval($id));
 
                                 //? Si el usuario que crea la notificacion no es el mismo que las recibe
-                                if(intval($user_notificado->id)!=intval($user->id))
+                                if(!empty($user_notificado ) && intval($user_notificado->id)!=intval($user->id))
                                 {
                                     //? El 1 representa el tipo de notificacion, 3=COMENTARIO en la base de datos
                                     $notificacion = Models\BlogPostModel::crearNotificacion(intval($user_notificado->id),$user->id, intval($id), 3);
                                 }
 
-                                Helpers::sendToController("/post/view/$id",
-                                [
-                                    "msg_comment" => "El comentario se añadio con exito"
-                                ]);
+                                $response = [
+                                    "status" => true,
+                                    "comment" => "<div class='card my-4'>
+                                    <div class='card-header'>
+                                    <img class='rounded-circle' style='width:70px;heigth:70px;' src='data:image/jpg;charset=utf8;base64,". base64_encode($addedComment->avatar). "' /> 
+                                    <div style='margin-top:-7%; margin-left:12%'>
+                                    <h4 style='text-align:top'>".  User::getUsernameById(intval($addedComment->user_id))."
+                                    </h4>
+                                        <!-- ELIMINAR -->
+                                        <form action='/post/deleteComment' method='POST'>
+                                          <input type='hidden' name='id' value='".$addedComment->id."'>
+                                          <button
+                                            name='comment'
+                                            type='submit' 
+                                            class='btn btn-outline-danger btn-sm float-right'
+                                            data-toggle='tooltip' 
+                                            data-placement='top'
+                                            title='Eliminar'>
+                                            <i class='fas fa-trash-alt'></i>
+                                          </button>
+                                        </form>
+                                      </div>
+                                    </div>
+                                    <div class='card-body'>
+                                      <p>". $addedComment->text ."</p>
+                                    </div>
+                                    <blockquote class='blockquote text-right'>
+                                      <footer class='blockquote-footer mr-3'>". $addedComment->date ."</footer>
+                                    </blockquote>
+                                    <hr>
+                                    <div id='$addedComment->id-response'>
+                                    <!-- Responder -->
+                                        <div class='col-12'>
+                                            <div class='input-group mb-2'>
+                                            <div class='input-group-prepend'>
+                                                <div class='input-group-text'>Responde a ". User::getUsernameById(intval($addedComment->user_id)) ."</div>
+                                            </div>
+                                                <input type='hidden' name='id' value='$id'>
+                                                <input type='hidden' name='id_padre' value='". $addedComment->id ."'>
+                                                <textarea name='text' id='' cols='40' rows='1'></textarea>
+                                                <button type='submit' name='comment' class='btn btn-primary mb-2 ml-2'>Go!</button>
+                                            </div>
+                                        </div>
+                                    </div>"
+                                ];
+
+                                echo json_encode($response);
                             }
-                            else
-                            {
-                                Helpers::sendToController("/post/view/$id",
-                                [
-                                    "error" => "El comentario no se pudo añadir :("
-                                ]);
+                            else {
+                                echo json_encode(["error" => "El comentario no se pudo añadir :("]);
                             }
                         }
                         //* RESPUESTA
@@ -679,72 +727,84 @@ class Blogpost extends Controller
                             //? Comprobar que el comentario padre existe
                             if (Models\BlogPostModel::getCommentParent(intval($id_padre)))
                             {
+                                $insertId = Models\BlogPostModel::addAnswer(intval($id), intval($id_padre) ,intval($user->id), $comment);
+
+                                $addedComment = Models\BlogPostModel::getCommentbyId(intval($insertId));
+                                
                                 //? Try insert
-                                if (Models\BlogPostModel::addAnswer(intval($id), intval($id_padre) ,intval($user->id), $comment))
+                                if (!empty($addedComment))
                                 {
                                     $user_notificado = Models\BlogPostModel::getUserByCommentID(intval($id_padre)); 
 
                                     //? Si el usuario que crea la notificacion no es el mismo que las recibe
-                                    if(intval($user_notificado->user_id)!=intval($user->id))
+                                    if(!empty($user_notificado ) && intval($user_notificado->user_id) != intval($user->id))
                                     {
                                         //? El 1 representa el tipo de notificacion, 4=RESPUESTA en la base de datos
                                         $notificacion = Models\BlogPostModel::crearNotificacion(intval($user_notificado->user_id),$user->id, intval($id), 4);
                                     }
 
-                                    Helpers::sendToController("/post/view/$id",
-                                    [
-                                        "msg_comment" => "La respuesta se añadio con exito."
-                                    ]);
+                                    $response = [
+                                        "status" => true,
+                                        "answer" => "
+                                            <div class='card ml-5 my-4'>
+                                            <div class='card-header'>
+                                            <img class='rounded-circle' style='width:70px;heigth:70px;' src='data:image/jpg;charset=utf8;base64,". base64_encode($addedComment->avatar) ."'/> 
+                                            <div style='margin-top:-7%; margin-left:12%'>
+                                            <h4 style='text-align:top;'>". User::getUsernameById(intval($addedComment->user_id)) ."
+                                            </h4>
+                                                <!-- ELIMINAR -->
+                                                <form action='/post/deleteComment' method='POST'>
+                                                <input type='hidden' name='id' 'value='$addedComment->id'>
+                                                <button
+                                                    name='comment'
+                                                    type='submit' 
+                                                    class='btn btn-outline-danger btn-sm float-right'
+                                                    data-toggle='tooltip' 
+                                                    data-placement='top'
+                                                    title='Eliminar'>
+                                                    <i class='fas fa-trash-alt'></i>
+                                                </button>
+                                                </form>
+                                            </div>
+                                            </div>
+                                            <div class='card-body'>
+                                            <p>$addedComment->text</p>
+                                            </div>
+                                            <blockquote class='blockquote text-right'>
+                                            <footer class='blockquote-footer mr-3'>$addedComment->date</footer>
+                                            </blockquote>
+                                        </div>"
+                                    ];
+                                    echo json_encode($response);
                                 }
                                 //? No se pudo añadir
-                                else
-                                {
-                                    Helpers::sendToController("/post/view/$id",
-                                    [
-                                        "error" => "La respuesta no se pudo añadir :("
-                                    ]);
+                                else {
+                                    echo json_encode(["error" => "No se pudo responder al comentario. Intenalo de nuevo."]);
                                 }
                             }
                             //? El comentario padre no existe
-                            else
-                            {
-                                Helpers::sendToController("/post/view/$id",
-                                [
-                                    "error" => "El comentario al que intentas responder no existe :("
-                                ]);
+                            else {
+                                echo json_encode(["error" => "El comentario al que intentas responder no existe :("]);
                             }
                         }
                     }
                     //? el post a comentar no existe
-                    else 
-                    {
-                        Helpers::sendToController("/post/all",
-                        [
-                            "error" => "El post no se pudo encontrar"
-                        ]);
+                    else {
+                        echo json_encode(["error" => "El post no se pudo encontrar"]);
                     }
                 }
                 //? ID no enviado en formulario
-                else 
-                {
-                    Helpers::sendToController("/post/all",
-                    [
-                        "error" => "El post no se pudo encontrar"
-                    ]);
+                else {
+                    echo json_encode(["error" => "El post no se pudo encontrar"]);
                 }
             }
-            //? No vienes por POST
             else {
-                Helpers::sendTo404();
+                echo json_encode(["error" => "Uno o mas datos estan vacios"]);
             }
         }
         //? Usuario no logueado
-        else
-        {
-            Helpers::sendToController("/login/index"
-            ,[
-                "error" => "Para comentar debes estar logeado."
-             ]);
+        else {
+            echo json_encode(["error" => "Tienes que estar logueado para comentar un post"]);
         }
     }
 
@@ -850,6 +910,7 @@ class Blogpost extends Controller
                 {   
                     parent::sendToView([
                         "titulo" => "FEED"
+                        ,"js" => array("addFavFeed.js")
                         ,"list" => $feed
                         ,"categorias" => $categorias
                         ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
@@ -860,6 +921,7 @@ class Blogpost extends Controller
                     parent::sendToView([
                         "titulo" => "LIST"
                         ,"list" => $feed
+                        ,"js" => array("addFavFeed.js")
                         ,"error" => "Tu feed está vacio."
                         ,"categorias" => $categorias
                         ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
@@ -893,6 +955,7 @@ class Blogpost extends Controller
                 parent::sendToView([
                     "titulo" => "FEED"
                     ,"list" => $feed
+                    ,"js" => array("addFavFeed.js")
                     ,"categorias" => $categorias
                     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                 ]); 
@@ -929,6 +992,7 @@ class Blogpost extends Controller
             {   
                 parent::sendToView([
                     "titulo" => "FEED"
+                    ,"js" => array("addFavFeed.js")
                     ,"list" => $favs
                     ,"categorias" => $categorias
                     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
@@ -981,6 +1045,7 @@ class Blogpost extends Controller
                 parent::sendToView([
                     "titulo" => $params[2]
                     ,"list" => $categoria
+                    ,"js" => array("addFavFeed.js")
                     ,"categorias" => $categorias
                     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                 ]); 
@@ -1004,12 +1069,14 @@ class Blogpost extends Controller
 
     protected function addFavoritesOrFeed($params = null)
     {
-        if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['type']))
+        if ($_POST && !empty($_POST['type']) && !empty($_POST['id']))
         {
             $user = User::getUser();
 
             if(!empty($user))
             {
+                $response = array();
+
                 $post_id = Helpers::cleanInput($_POST['id']);
 
                 $post = Models\BlogPostModel::view(intval($post_id));
@@ -1025,16 +1092,7 @@ class Blogpost extends Controller
                         {
                             $deleted = Models\BlogPostModel::deleteFromFavorites(intval($post_id), intval($user->id));
 
-                            if ($deleted) {
-                                //TODO: Redirigir a la pagina desde donde se hizo el like
-                                Helpers::sendToController("/post/all");
-                            }
-                            else {
-                                Helpers::sendToController("/post/all",
-                                [
-                                    "error" => "no se pudo eliminar de favoritos :("
-                                ]);
-                            }
+                            echo json_encode(["status" => $deleted]);
                         }
                         //? AÑADIR A FAVORITOS
                         else
@@ -1046,22 +1104,16 @@ class Blogpost extends Controller
                                 $user_notificado = Models\BlogPostModel::getUserByPostID(intval($post_id));
 
                                 //? Si el usuario que crea la notificacion no es el mismo que las recibe
-                                if(intval($user_notificado->id)!=intval($user->id))
+                                if(!empty($user_notificado ) && intval($user_notificado->id)!=intval($user->id))
                                 {
                                     //? El 1 representa el tipo de notificacion, 1=LIKE en la base de datos
                                     $notificacion = Models\BlogPostModel::crearNotificacion(intval($user_notificado->id),$user->id, intval($post_id), 1);
                                 }
 
-                                //TODO: Redirigir a la pagina desde donde se hizo el add to feed
-                                Helpers::sendToController("/post/all");
-
+                                echo json_encode(["status" => true]);
                             }
-                            else
-                            {
-                                Helpers::sendToController("/post/all",
-                                [
-                                    "error" => "no se pudo añadir a favoritos :("
-                                ]);
+                            else {
+                                echo json_encode(["error" => "No se pudo añadir a favoritos"]);
                             }
                         }
                     }
@@ -1072,15 +1124,7 @@ class Blogpost extends Controller
                         {
                             $deleted = Models\BlogPostModel::deleteFromFeed(intval($post_id), intval($user->id));
 
-                            if ($deleted) {
-                                Helpers::sendToController("/post/all");
-                            }
-                            else {
-                                Helpers::sendToController("/post/all",
-                                [
-                                    "error" => "no se pudo eliminar de favoritos :("
-                                ]);
-                            }
+                            echo json_encode(["status" => $deleted]);
                         }
                         //? AÑADIR Al FEED
                         else
@@ -1090,42 +1134,24 @@ class Blogpost extends Controller
                             $user_notificado = Models\BlogPostModel::getUserByPostID(intval($post_id));
 
                             //? Si el usuario que crea la notificacion no es el mismo que las recibe
-                            if(intval($user_notificado->id)!=intval($user->id))
+                            if(!empty($user_notificado ) && intval($user_notificado->id)!=intval($user->id))
                             {
                                 //? El 1 representa el tipo de notificacion, 2=RETWEET en la base de datos
                                 $notificacion = Models\BlogPostModel::crearNotificacion(intval($user_notificado->id),$user->id, intval($post_id), 2);
                             }
 
-                            if ($added)
-                            {
-                                Helpers::sendToController("/post/all");
-                            }
-                            else
-                            {
-                                Helpers::sendToController("/post/all",
-                                [
-                                    "error" => "no se pudo añadir a favoritos :("
-                                ]);
-                            }
+                            echo json_encode(["status" => $added]);
                         }
                     }
                 }
                 //? No hay post
-                else
-                {
-                    Helpers::sendToController("/post/all",
-                    [
-                        "error" => "El post que intentas añadir no existe."
-                    ]);
+                else {
+                    echo json_encode(["error" => "El post que intentas añadir no existe."]);
                 }
             }
             //? No estas logueado
-            else
-            {
-                Helpers::sendToController("/login",
-                [
-                    "error" => "Tienes que estar logueado para ver tu feed."
-                ]);
+            else {
+                echo json_encode(["error" => "Debes estar logueado para añadir a favoritos o a tu feed."]);
             }  
         }
     }

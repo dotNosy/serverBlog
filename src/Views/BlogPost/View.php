@@ -52,7 +52,7 @@
       <!-- Author -->
       <p class="lead">
         by
-        <a href="#"><?= $_SESSION["autor"] ?></a>
+        <a <?= "href='/post/feed/".$_SESSION["autor"] ."'"?>><?= $_SESSION["autor"] ?></a>
       </p>
 
       <hr>
@@ -106,6 +106,14 @@
               </a>
         </div>
       <?php endif; ?>
+      
+      <!-- LOADER -->
+      <div class="text-center mt-5">
+        <div id="spinner" class="spinner-grow text-danger" style="display:none;width: 7rem; height: 7rem;" role="status">
+          <span class="sr-only">Loading...</span>
+        </div>    
+      </div>
+      
       <!-- Comments Form -->
       <div class="card my-4">
         <div class="card-header">
@@ -129,77 +137,28 @@
               </button>
             </div>
           <?php endif;?>
-          <form method = "POST" action="/post/addComment/">
             <div class="form-group">
-            <input type="hidden" name="id" <?= (!empty($post->id) ? "value='$post->id'" : '') ?>>
+              <input type="hidden" name="id" <?= (!empty($post->id) ? "value='$post->id'" : '') ?>>
               <textarea class="form-control" rows="3" name = "text"></textarea>
+              <button type="submit" class="btn btn-primary mt-4" name="comment">Submit</button>
             </div>
-            <button type="submit" class="btn btn-primary" name="comment">Submit</button>
-          </form>
         </div>
       </div>
 
-      <!-- Single Comment -->
-      <?php foreach($_SESSION["comments"] as $comment): ?>
-        <div class="card my-4">
-          <div class="card-header">
-          <img class="rounded-circle" style="width:70px;heigth:70px;" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($comment->avatar); ?>" /> 
-          <div style="margin-top:-7%; margin-left:12%">
-          <h4 style="text-align:top">
-            <?=  User::getUsernameById(intval($comment->user_id))?>
-          </h4>
-              <!-- ELIMINAR -->
-              <?php if(!empty($user) && ($user->id == $comment->user_id || $user->id == $post->user_id)):?>
-              <form action="/post/deleteComment" method="POST">
-                <input type="hidden" name="id" <?= "value='$comment->id'"?>>
-                <button
-                  name="comment"
-                  type="submit" 
-                  class="btn btn-outline-danger btn-sm float-right"
-                  data-toggle="tooltip" 
-                  data-placement="top"
-                  title="Eliminar">
-                  <i class="fas fa-trash-alt"></i>
-                </button>
-              </form>
-            <?php endif; ?>
-            </div>
-          </div>
-          <div class="card-body">
-            <p><?= $comment->text ?></p>
-          </div>
-          <blockquote class="blockquote text-right">
-            <footer class="blockquote-footer mr-3"><?= $comment->date ?></footer>
-          </blockquote>
-          <hr>
-          <!-- Responder -->
-          <form class="form-inline col-12" action="/post/addComment/" method="POST">
-            <input type="hidden" name="id" <?= (!empty($post->id) ? "value='$post->id'" : '') ?> >
-            <input type="hidden" name="id_padre" <?= (!empty($comment->id) ? "value='$comment->id'" : '') ?> >
-
-              <label class="sr-only" for="inlineFormInputGroupUsername2">Username</label>
-              <div class="input-group mb-2 mr-sm-2">
-                <div class="input-group-prepend">
-                  <div class="input-group-text">Responde a <?=  User::getUsernameById(intval($comment->user_id))?></div>
-                </div>
-                <textarea name="text" id="" cols="40" rows="1"></textarea>
-              </div>
-              <button type="submit" name="comment" class="btn btn-primary mb-2">Go!</button>
-          </form>
-
-          <!-- Listar Respuestas -->
-          <?php foreach(BlogPostModel::getAnswer(intval($comment->id)) as $answer): ?>
-            <div class="card ml-5 my-4">
+        <!-- Single Comment -->
+        <div id="comments">
+          <?php foreach($_SESSION["comments"] as $comment): ?>
+            <div class="card my-4">
               <div class="card-header">
               <img class="rounded-circle" style="width:70px;heigth:70px;" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($comment->avatar); ?>" /> 
               <div style="margin-top:-7%; margin-left:12%">
-                <h4 style="text-align:top;">
-                <?=  User::getUsernameById(intval($answer->user_id))?>
-                </h4>
+              <h4 style="text-align:top">
+                <?=  User::getUsernameById(intval($comment->user_id))?>
+              </h4>
                   <!-- ELIMINAR -->
-                  <?php if(!empty($user) && ($user->id == $answer->user_id || $user->id == $post->user_id)):?>
+                  <?php if(!empty($user) && ($user->id == $comment->user_id || $user->id == $post->user_id)):?>
                   <form action="/post/deleteComment" method="POST">
-                    <input type="hidden" name="id" <?= "value='$answer->id'"?>>
+                    <input type="hidden" name="id" <?= "value='$comment->id'"?>>
                     <button
                       name="comment"
                       type="submit" 
@@ -214,15 +173,63 @@
                 </div>
               </div>
               <div class="card-body">
-                <p><?= $answer->text ?></p>
+                <p><?= $comment->text ?></p>
               </div>
               <blockquote class="blockquote text-right">
-                <footer class="blockquote-footer mr-3"><?= $answer->date ?></footer>
+                <footer class="blockquote-footer mr-3"><?= $comment->date ?></footer>
               </blockquote>
+              <hr>
+              <!-- Responder -->
+              <div class="col-12">
+                  <div class="input-group mb-2">
+                    <div class="input-group-prepend">
+                      <div class="input-group-text">Responde a <?=  User::getUsernameById(intval($comment->user_id))?></div>
+                    </div>
+                      <input type="hidden" name="id" <?= "value='$post->id'" ?> >
+                      <input type="hidden" name="id_padre" <?=  "value='$comment->id'"?>>
+                      <textarea name="text" id="" cols="40" rows="1"></textarea>
+                      <button type="submit" name="comment" class="btn btn-primary mb-2 ml-2">Go!</button>
+                  </div>
+              </div>
+              <div id="<?=$comment->id?>-response">
+                  <!-- Listar Respuestas -->
+                  <?php foreach(BlogPostModel::getAnswer(intval($comment->id)) as $answer): ?>
+                    <div class="card ml-5 my-4">
+                      <div class="card-header">
+                      <img class="rounded-circle" style="width:70px;heigth:70px;" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($comment->avatar); ?>" /> 
+                      <div style="margin-top:-7%; margin-left:12%">
+                        <h4 style="text-align:top;">
+                        <?=  User::getUsernameById(intval($answer->user_id))?>
+                        </h4>
+                          <!-- ELIMINAR -->
+                          <?php if(!empty($user) && ($user->id == $answer->user_id || $user->id == $post->user_id)):?>
+                          <form action="/post/deleteComment" method="POST">
+                            <input type="hidden" name="id" <?= "value='$answer->id'"?>>
+                            <button
+                              name="comment"
+                              type="submit" 
+                              class="btn btn-outline-danger btn-sm float-right"
+                              data-toggle="tooltip" 
+                              data-placement="top"
+                              title="Eliminar">
+                              <i class="fas fa-trash-alt"></i>
+                            </button>
+                          </form>
+                        <?php endif; ?>
+                        </div>
+                      </div>
+                      <div class="card-body">
+                        <p><?= $answer->text ?></p>
+                      </div>
+                      <blockquote class="blockquote text-right">
+                        <footer class="blockquote-footer mr-3"><?= $answer->date ?></footer>
+                      </blockquote>
+                    </div>
+                  <?php endforeach; ?>
+              </div>
             </div>
           <?php endforeach; ?>
         </div>
-      <?php endforeach; ?>
     </div>
 
     <!-- Sidebar Widgets Column -->

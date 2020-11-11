@@ -847,7 +847,7 @@ class BlogPostModel
         }
     }
 
-    public static function addComment(int $post_id, int $user_id,string $text)
+    public static function addComment(int $post_id, int $user_id, string $text)
     {
          try 
          {
@@ -864,9 +864,10 @@ class BlogPostModel
             //* Si la query funciona se hacen un commit
             if($query->execute())
             {
+                $id = $pdo_conn->lastInsertId();
                 //* Se coge el id del post insertado para abrirlo al crearlo
                 $pdo_conn->commit();
-                return true;
+                return $id;
             }
             else {
                 $pdo_conn->rollback();
@@ -959,7 +960,11 @@ class BlogPostModel
             $connObj = new Services\Connection(Services\Helpers::getEnviroment());
             $pdo_conn = $connObj->getConnection();
 
-            $query = $pdo_conn->prepare("SELECT * FROM comment WHERE id = :id;");
+            $query = $pdo_conn->prepare("SELECT *,p.avatar
+                                        FROM comment
+                                        INNER JOIN `user` u on u.id = comment.user_id
+                                        INNER JOIN profile p on p.user_id = u.id
+                                         WHERE comment.id = :id;");
             $query->bindValue("id", $id);
 
             //* Si la query funciona se hacen un commit
@@ -1038,9 +1043,9 @@ class BlogPostModel
             //* Si la query funciona se hacen un commit
             if($query->execute())
             {
-                //* Se coge el id del post insertado para abrirlo al crearlo
+                $id = $pdo_conn->lastInsertId();
                 $pdo_conn->commit();
-                return true;
+                return $id;
             }
             else {
                 $pdo_conn->rollback();

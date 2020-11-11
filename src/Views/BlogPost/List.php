@@ -48,15 +48,12 @@
               <p>Creado el: <?= $post['date'] ?></p>
 
               <!-- BOTONES -->
-              <form <?="action='/post/addFavoritesOrFeed/'"?>  
-                method="post">
                 <a <?="href='/post/view/".$post["id"]."'"?>  class="btn btn-outline-success btn-sm mx-2">Read More</a>
                 <input type="hidden" name='id' <?= "value='".$post['id']."'" ?>>
                 <?php if (!empty($user->id)): ?>
                   <!-- Favoritos -->
                   <button 
                     <?php echo BlogPostModel::isInFavorites(intval($post['id']), intval($user->id)) ? "class='btn btn-danger btn-sm mx-2'" : "class='btn btn-outline-danger btn-sm mx-2'";  ?>
-                    type="submit" 
                     name="type"
                     value="favoritos"
                     data-toggle="tooltip" 
@@ -67,7 +64,6 @@
                   </button>
                   <!-- Feed -->
                   <button 
-                    type="submit" 
                     name="type"
                     value="feed"
                     <?php echo BlogPostModel::isInFeed(intval($post['id']), intval($user->id)) ? "class='btn btn-primary btn-sm mx-2'" : "class='btn btn-outline-primary btn-sm mx-2'";  ?> 
@@ -82,7 +78,6 @@
                 <?php if (!empty($user->id) && $post['user_id'] == $user->id): ?>
                   <a <?="href='/post/edit/".$post["id"]."'"?>  class="btn btn-outline-dark btn-sm mx-2"><i class="far fa-edit"></i></a>
                 <?php endif; ?>
-              </form>
             </div>
           </div>
         </div>
