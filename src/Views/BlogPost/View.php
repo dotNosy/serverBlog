@@ -150,26 +150,23 @@
           <?php foreach($_SESSION["comments"] as $comment): ?>
             <div class="card my-4">
               <div class="card-header">
-              <img class="rounded-circle" style="width:70px;heigth:70px;" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($comment->avatar); ?>" /> 
-              <div style="margin-top:-7%; margin-left:12%">
-              <h4 style="text-align:top">
-                <?=  User::getUsernameById(intval($comment->user_id))?>
-              </h4>
+                <img class="rounded-circle" style="width:70px;heigth:70px;" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($comment->avatar); ?>" /> 
+                <div style="margin-top:-7%; margin-left:12%">
+                  <h4 style="text-align:top">
+                    <?=  User::getUsernameById(intval($comment->user_id))?>
+                  </h4>
                   <!-- ELIMINAR -->
                   <?php if(!empty($user) && ($user->id == $comment->user_id || $user->id == $post->user_id)):?>
-                  <form action="/post/deleteComment" method="POST">
-                    <input type="hidden" name="id" <?= "value='$comment->id'"?>>
                     <button
-                      name="comment"
-                      type="submit" 
+                      id="<?= $comment->id?>"
+                      name="eliminar"
                       class="btn btn-outline-danger btn-sm float-right"
                       data-toggle="tooltip" 
                       data-placement="top"
                       title="Eliminar">
                       <i class="fas fa-trash-alt"></i>
                     </button>
-                  </form>
-                <?php endif; ?>
+                  <?php endif; ?>
                 </div>
               </div>
               <div class="card-body">
@@ -196,26 +193,23 @@
                   <?php foreach(BlogPostModel::getAnswer(intval($comment->id)) as $answer): ?>
                     <div class="card ml-5 my-4">
                       <div class="card-header">
-                      <img class="rounded-circle" style="width:70px;heigth:70px;" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($comment->avatar); ?>" /> 
+                      <img class="rounded-circle" style="width:70px;heigth:70px;" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($answer->avatar); ?>" /> 
                       <div style="margin-top:-7%; margin-left:12%">
-                        <h4 style="text-align:top;">
-                        <?=  User::getUsernameById(intval($answer->user_id))?>
-                        </h4>
+                          <h4 style="text-align:top;">
+                          <?=  User::getUsernameById(intval($answer->user_id))?>
+                          </h4>
                           <!-- ELIMINAR -->
                           <?php if(!empty($user) && ($user->id == $answer->user_id || $user->id == $post->user_id)):?>
-                          <form action="/post/deleteComment" method="POST">
-                            <input type="hidden" name="id" <?= "value='$answer->id'"?>>
                             <button
-                              name="comment"
-                              type="submit" 
+                              id="<?= $answer->id?>"
+                              name="eliminar"
                               class="btn btn-outline-danger btn-sm float-right"
                               data-toggle="tooltip" 
                               data-placement="top"
                               title="Eliminar">
                               <i class="fas fa-trash-alt"></i>
                             </button>
-                          </form>
-                        <?php endif; ?>
+                          <?php endif; ?>
                         </div>
                       </div>
                       <div class="card-body">

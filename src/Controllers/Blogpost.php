@@ -143,6 +143,7 @@ class Blogpost extends Controller
 
                     parent::sendToView([
                         "titulo" => "POST"
+                        ,"js" => array("addComment.js")
                         ,"css" => array("post.css")
                         ,"blogPost" => $view
                         ,"autor" => User::getUsernameById(intval($view->user_id))
@@ -664,40 +665,37 @@ class Blogpost extends Controller
                                 if(!empty($user_notificado ) && intval($user_notificado->id)!=intval($user->id))
                                 {
                                     //? El 1 representa el tipo de notificacion, 3=COMENTARIO en la base de datos
-                                    $notificacion = Models\BlogPostModel::crearNotificacion(intval($user_notificado->id),$user->id, intval($id), 3);
+                                    $notificacion = Models\BlogPostModel::crearNotificacion(intval($user_notificado->id),$user->id, intval($id), 3); 
                                 }
-
+                                
                                 $response = [
                                     "status" => true,
                                     "comment" => "<div class='card my-4'>
                                     <div class='card-header'>
-                                    <img class='rounded-circle' style='width:70px;heigth:70px;' src='data:image/jpg;charset=utf8;base64,". base64_encode($addedComment->avatar). "' /> 
+                                    <img class='rounded-circle' style='width:70px;heigth:70px;' src='data:image/jpg;charset=utf8;base64,".base64_encode($addedComment->avatar). "' /> 
                                     <div style='margin-top:-7%; margin-left:12%'>
                                     <h4 style='text-align:top'>".  User::getUsernameById(intval($addedComment->user_id))."
                                     </h4>
                                         <!-- ELIMINAR -->
-                                        <form action='/post/deleteComment' method='POST'>
-                                          <input type='hidden' name='id' value='".$addedComment->id."'>
-                                          <button
-                                            name='comment'
-                                            type='submit' 
+                                            <button
+                                            id=$insertId
+                                            name='eliminar'
                                             class='btn btn-outline-danger btn-sm float-right'
                                             data-toggle='tooltip' 
                                             data-placement='top'
                                             title='Eliminar'>
                                             <i class='fas fa-trash-alt'></i>
-                                          </button>
-                                        </form>
-                                      </div>
+                                            </button>
+                                        </div>
                                     </div>
                                     <div class='card-body'>
-                                      <p>". $addedComment->text ."</p>
+                                        <p>". $addedComment->text ."</p>
                                     </div>
                                     <blockquote class='blockquote text-right'>
-                                      <footer class='blockquote-footer mr-3'>". $addedComment->date ."</footer>
+                                        <footer class='blockquote-footer mr-3'>". $addedComment->date ."</footer>
                                     </blockquote>
                                     <hr>
-                                    <div id='$addedComment->id-response'>
+                                    <div id='$insertId-response'>
                                     <!-- Responder -->
                                         <div class='col-12'>
                                             <div class='input-group mb-2'>
@@ -705,14 +703,14 @@ class Blogpost extends Controller
                                                 <div class='input-group-text'>Responde a ". User::getUsernameById(intval($addedComment->user_id)) ."</div>
                                             </div>
                                                 <input type='hidden' name='id' value='$id'>
-                                                <input type='hidden' name='id_padre' value='". $addedComment->id ."'>
+                                                <input type='hidden' name='id_padre' value='". $insertId ."'>
                                                 <textarea name='text' id='' cols='40' rows='1'></textarea>
                                                 <button type='submit' name='comment' class='btn btn-primary mb-2 ml-2'>Go!</button>
                                             </div>
                                         </div>
                                     </div>"
                                 ];
-
+    
                                 echo json_encode($response);
                             }
                             else {
@@ -750,21 +748,17 @@ class Blogpost extends Controller
                                             <div class='card-header'>
                                             <img class='rounded-circle' style='width:70px;heigth:70px;' src='data:image/jpg;charset=utf8;base64,". base64_encode($addedComment->avatar) ."'/> 
                                             <div style='margin-top:-7%; margin-left:12%'>
-                                            <h4 style='text-align:top;'>". User::getUsernameById(intval($addedComment->user_id)) ."
-                                            </h4>
+                                            <h4 style='text-align:top;'>". User::getUsernameById(intval($addedComment->user_id)) ."</h4>
                                                 <!-- ELIMINAR -->
-                                                <form action='/post/deleteComment' method='POST'>
-                                                <input type='hidden' name='id' 'value='$addedComment->id'>
                                                 <button
-                                                    name='comment'
-                                                    type='submit' 
+                                                    id=$insertId
+                                                    name='eliminar'
                                                     class='btn btn-outline-danger btn-sm float-right'
                                                     data-toggle='tooltip' 
                                                     data-placement='top'
                                                     title='Eliminar'>
                                                     <i class='fas fa-trash-alt'></i>
                                                 </button>
-                                                </form>
                                             </div>
                                             </div>
                                             <div class='card-body'>
@@ -810,9 +804,10 @@ class Blogpost extends Controller
 
     protected function deleteComment()
     {
-        if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['comment']) && !empty($_POST['id']))
+        if ($_POST && !empty($_POST['id']))
         {
             $user = User::getUser();
+            
             if(!empty($user))
             {
                 $id = Helpers::cleanInput($_POST['id']);
@@ -830,55 +825,35 @@ class Blogpost extends Controller
                         if ($user->id == $comment->user_id || $user->id == $view->user_id) 
                         {
                             if (Models\BlogPostModel::deleteComment(intval($id))) {
-                                Helpers::sendToController("/post/view/$comment->post_id",
-                                [
-                                    "msg_comment" => "El comentario se borro con exito"
-                                ]);
+                                echo json_encode(["status" => true]);
                             }
                             //? Error eliminar
                             else {
-                                Helpers::sendToController("/post/view/$comment->post_id",
-                                [
-                                    "error" => "No se pudo eliminar el comentario :("
-                                ]);
+                                echo json_encode([ "error" => "No se pudo eliminar el comentario :("]);
                             }
                         }
                         else {
-                            Helpers::sendToController("/post/view/$comment->post_id",
-                            [
-                                "error" => "No estas autorizado para borrar este post :("
-                            ]);
+                            echo json_encode([ "error" => "No estas autorizado para borrar este post :("]);
                         }
                     }
                     //? El post no existe o no esta visible
                     else {
-                        Helpers::sendToController("/post/all",
-                        [
-                            "error" => "Ese post no esta disponible."
-                        ]);
+                        echo json_encode([ "error" => "El post no esta disponible."]);
                     }
                 }
                 //? el comentario no existe
-                else 
-                {
-                    Helpers::sendToController("/post/all",
-                    [
-                        "error" => "El comentario no se pudo borrar"
-                    ]);
+                else {
+                    echo json_encode([ "error" => "El comentario no se pudo borrar"]);
                 }
             }
             //? Usuario no logueado
-            else
-            {
-                Helpers::sendToController("/login/index",
-                [
-                    "error" => "Para comentar debes estar logeado."
-                ]);
+            else {
+                echo json_encode(["error" => "Tienes que estar logueado para eliminar un comentario"]);
             }
         }
         //? No vienes por POST
         else {
-            Helpers::sendTo404();
+            echo json_encode(["error" => "Uno o mas datos estan vacios"]);
         }
     }
 

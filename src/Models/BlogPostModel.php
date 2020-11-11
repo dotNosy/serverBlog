@@ -931,8 +931,8 @@ class BlogPostModel
             //* Si la query funciona se hacen un commit
             if($query->execute())
             {
-                //* Se coge el id del post insertado para abrirlo al crearlo
                 $list = $query->fetch(PDO::FETCH_OBJ);
+
                 if (!empty($list)) {
                     return true;
                 }
@@ -1069,7 +1069,7 @@ class BlogPostModel
             $connObj = new Services\Connection(Services\Helpers::getEnviroment());
             $pdo_conn = $connObj->getConnection();
 
-            $query = $pdo_conn->prepare("SELECT *,p.avatar FROM comment INNER JOIN `user` u on u.id = comment.user_id
+            $query = $pdo_conn->prepare("SELECT comment.*,p.avatar FROM comment INNER JOIN `user` u on u.id = comment.user_id
             INNER JOIN profile p on p.user_id = u.id WHERE comment_id = :comment_id ORDER BY date DESC;");
             $query->bindValue("comment_id", $comment_id);
 
