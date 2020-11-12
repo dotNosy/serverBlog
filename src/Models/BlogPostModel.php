@@ -345,7 +345,7 @@ class BlogPostModel
                         FROM post p
                         INNER JOIN user u on u.id = p.user_id
                         LEFT JOIN multimedia m on m.post_id = p.id
-                        WHERE u.username = :username)
+                        WHERE u.username = :username AND visible=1)
                         UNION
                     (SELECT 
                         post.id, post.user_id, u2.username ,retweet.`date` as date, post.title as title, post.`text` as text,m.pos,
@@ -359,7 +359,7 @@ class BlogPostModel
                         INNER JOIN user u on u.id = retweet.user_id
                         INNER JOIN user u2 on u2.id  = post.user_id
                         LEFT JOIN multimedia m on m.post_id = post.id
-                        WHERE retweet.user_id = u.id  and u.username = :username) 
+                        WHERE retweet.user_id = u.id  and u.username = :username AND visible=1) 
                         ORDER BY `date` DESC
                 )select * from col where row_n = 1");
 

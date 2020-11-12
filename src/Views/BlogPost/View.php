@@ -274,7 +274,7 @@
 
       <!-- SIDE IMAGENES-->
       <div class="card my-4">
-        <h5 class="card-header">Side Widget</h5>
+        <h5 class="card-header">Imagenes relacionadas</h5>
         <div class="card-body">
           <?php foreach($_SESSION["imgs"] as $img): ?>
             <?php if($img->pos == "side"): ?>

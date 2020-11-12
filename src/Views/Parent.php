@@ -81,7 +81,7 @@
                 <a class="bg-dark list-group-item list-group-item-action showNotifications" data-toggle="modal" data-target="#staticBackdrop">
                     <div class="d-flex w-100 justify-content-start align-items-center">
                         <span class="fa fa-bell fa-fw mr-3"></span>
-                        <span class="menu-collapsed">Notificaciones<span class="badge badge-pill badge-primary ml-2">5</span></span>
+                        <span class="menu-collapsed">Notificaciones<span class="badge badge-pill badge-primary ml-2"><?= ServerBlog\Models\Profile::getCountNotifications($user->id)?></span></span>
                     </div>
                 </a>
 
