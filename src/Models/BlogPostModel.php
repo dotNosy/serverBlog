@@ -164,11 +164,18 @@ class BlogPostModel
             $pdo_conn = $connObj->getConnection();
 
             //* Se hacen dos querys 
-            $query = $pdo_conn->prepare("SELECT p.id,p.user_id, u.username, fav.`date` as date, p.title as title, p.`text` as text 
-            FROM post p
-            INNER JOIN `like` as fav ON p.id = fav.post_id
-            INNER JOIN user u on u.id = p.user_id 
-            WHERE fav.user_id = :user_id ORDER BY `date` DESC");
+            $query = $pdo_conn->prepare("WITH col as(
+                                        SELECT p.id, p.user_id, u.username, fav.`date`, p.title, p.`text` as text, m.pos, CASE WHEN (m.pos <> 'portada' or m.pos is null) 
+                                        THEN NULL 
+                                        ELSE m.img 
+                                        END img, ROW_NUMBER() OVER (PARTITION BY p.id  ORDER BY FIELD(m.pos,'portada') DESC) as row_n
+                                            FROM post p
+                                            INNER JOIN `like` as fav ON p.id = fav.post_id
+                                            INNER JOIN user u on u.id = p.user_id 
+                                            LEFT JOIN multimedia m on m.post_id = fav.post_id
+                                            WHERE fav.user_id = :user_id and (m.pos = 'portada' or m.pos <> 'portada' or m.pos is null)
+                                    )
+                                    SELECT * FROM col where row_n = 1");
 
             $query->bindValue("user_id", $id);
 
@@ -520,7 +527,7 @@ class BlogPostModel
                 foreach ($imgsContent as $img) 
                 {
                     $pdo_conn->beginTransaction();
-                    $query = $pdo_conn->prepare("INSERT INTO multimedia (post_id, path, img) VALUES (:id_post, :path, :img)");
+                    $query = $pdo_conn->prepare("INSERT INTO multimedia (post_id, path, img, pos) VALUES (:id_post, :path, :img, 'side')");
                     $query->bindValue("id_post",$id_post);
                     $query->bindValue("path", $img['name']);
                     $query->bindValue("img", $img['content']);
@@ -1227,7 +1234,7 @@ class BlogPostModel
                                         INNER JOIN user u ON u.id = p.user_id
                                         INNER JOIN category_post cp ON cp.post_id = p.id
                                         INNER JOIN category c ON c.id=cp.category_id
-                                        WHERE c.name=:nombre_categoria AND p.visible=1 ORDER BY date DESC");                    
+                                        WHERE c.name=:nombre_categoria AND p.visible=1 ORDER BY date DESC;");                    
             $query->bindValue("nombre_categoria", $nombreCategoria);
             
             //* Si la query funciona se hacen un commit
@@ -1249,7 +1256,7 @@ class BlogPostModel
         }
     }
 
-    public static function categoriaConInvisibles(string $nombreCategoria)
+    public static function categoriaConInvisibles(string $nombreCategoria, int $user_id)
     {
         try 
         {
@@ -1262,8 +1269,16 @@ class BlogPostModel
                                         INNER JOIN user u ON u.id = p.user_id
                                         INNER JOIN category_post cp ON cp.post_id = p.id
                                         INNER JOIN category c ON c.id=cp.category_id
-                                        WHERE c.name=:nombre_categoria ORDER BY date DESC");                    
+                                        WHERE c.name='Guía' AND p.visible=1
+                                        UNION
+                                        SELECT p.id, p.user_id, u.username , date, title , text, cp.category_id, c.name
+                                        FROM post p
+                                        INNER JOIN user u ON u.id = p.user_id
+                                        INNER JOIN category_post cp ON cp.post_id = p.id
+                                        INNER JOIN category c ON c.id=cp.category_id
+                                        WHERE c.name=:nombre_categoria AND u.id = :user_id AND p.visible=0 ORDER BY date DESC;");                    
             $query->bindValue("nombre_categoria", $nombreCategoria);
+            $query->bindValue("user_id", $user_id);
             
             //* Si la query funciona se hacen un commit
             if($query->execute())

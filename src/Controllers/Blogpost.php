@@ -1310,17 +1310,30 @@ class Blogpost extends Controller
 
             if(!empty($user))
             {
-                //TODO: Hacer que para los mios salgan tambien invisibles
-            }
-            //* Se coge la URL (Nombre de la categoria)
-            $categoria = Models\BlogPostModel::categoria(strtolower($params[2]));
-            $categorias = array();
+                //* Se coge la URL (Nombre de la categoria)
+                $categoria = Models\BlogPostModel::categoriaConInvisibles(strtolower($params[2]), intval($user->id));
+                $categorias = array();
 
-            foreach ($categoria as $post) {
-                $categoriasPorID = Models\BlogPostModel::getCategoriasByPostID(intval($post["id"]));
-                if(!empty($categoriasPorID)){
-                    array_push($categorias,$categoriasPorID);
-                }          
+                foreach ($categoria as $post) {
+                    $categoriasPorID = Models\BlogPostModel::getCategoriasByPostID(intval($post["id"]));
+                    if(!empty($categoriasPorID)){
+                        array_push($categorias,$categoriasPorID);
+                    }  
+                }
+            }
+            else
+            {
+                //* Se coge la URL (Nombre de la categoria)
+                $categoria = Models\BlogPostModel::categoria(strtolower($params[2]));
+                $categorias = array();
+
+                foreach ($categoria as $post) {
+                    $categoriasPorID = Models\BlogPostModel::getCategoriasByPostID(intval($post["id"]));
+                    if(!empty($categoriasPorID)){
+                        array_push($categorias,$categoriasPorID);
+                    }  
+                }
+                   
             }
             
             if(!empty($categoria))
