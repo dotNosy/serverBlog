@@ -25,11 +25,21 @@ class BlogPostModel
             $pdo_conn = $connObj->getConnection();
 
             //* Se recogen los posts de la persona logeada actualmente
-            $query = $pdo_conn->prepare("SELECT post.id, post.user_id , u.username, title, CASE WHEN m.pos is null THEN  NULL ELSE m.img END img, text, date 
-                                            FROM post
-                                            INNER JOIN user u on u.id = post.user_id
-                                            LEFT JOIN multimedia m on m.post_id = post.id
-                                            WHERE user_id = :user_id and (m.pos = 'portada' OR m.pos is null)");
+            $query = $pdo_conn->prepare("
+                WITH col as(
+                    SELECT 
+                    post.id, post.user_id , u.username, title,text, date,
+                    CASE WHEN (m.pos <> 'portada' or m.pos is null) 
+                        THEN NULL 
+                        ELSE m.img 
+                    END img,
+                    ROW_NUMBER() OVER (PARTITION BY post.id  ORDER BY FIELD(m.pos,'portada') DESC) as row_n
+                    FROM post
+                    INNER JOIN user u on u.id = post.user_id
+                    LEFT JOIN multimedia m on m.post_id = post.id
+                    WHERE user_id = :user_id
+                )select * from col where row_n = 1");
+
             $query->bindValue("user_id", $id);
 
             if ($query->execute())
@@ -62,12 +72,19 @@ class BlogPostModel
             $pdo_conn = $connObj->getConnection();
 
             //* Se recogen todos los posts de la base de datos
-            $query = $pdo_conn->prepare("SELECT p.id, p.user_id,u.username, p.title, p.text, p.date, m.img
-            FROM post p
-            INNER JOIN user u on u.id = p.user_id
-            LEFT JOIN multimedia m on m.post_id = p.id
-            WHERE p.visible = 1 and ((m.pos = 'portada' and m.img IS NOT NULL) OR (m.pos is null and m.img IS NULL))
-            ORDER BY date DESC");
+            $query = $pdo_conn->prepare("
+                WITH col as(
+                    select p.id,p.`date` , p.user_id, u.username, p.title, p.`text` as text, m.pos,
+                    CASE WHEN (m.pos <> 'portada' or m.pos is null) 
+                        THEN NULL 
+                        ELSE m.img 
+                    END img, ROW_NUMBER() OVER (PARTITION BY p.id  ORDER BY FIELD(m.pos,'portada') DESC) as row_n
+                    FROM post p
+                    INNER JOIN user u on u.id = p.user_id
+                    LEFT JOIN multimedia m on m.post_id = p.id
+                    WHERE p.visible = 1 and (m.pos = 'portada' or m.pos <> 'portada' or m.pos is null)
+                    ORDER BY date DESC
+                )select * from col where row_n = 1");
 
             if ($query->execute())
             {
@@ -164,18 +181,19 @@ class BlogPostModel
             $pdo_conn = $connObj->getConnection();
 
             //* Se hacen dos querys 
-            $query = $pdo_conn->prepare("WITH col as(
-                                        SELECT p.id, p.user_id, u.username, fav.`date`, p.title, p.`text` as text, m.pos, CASE WHEN (m.pos <> 'portada' or m.pos is null) 
-                                        THEN NULL 
-                                        ELSE m.img 
-                                        END img, ROW_NUMBER() OVER (PARTITION BY p.id  ORDER BY FIELD(m.pos,'portada') DESC) as row_n
-                                            FROM post p
-                                            INNER JOIN `like` as fav ON p.id = fav.post_id
-                                            INNER JOIN user u on u.id = p.user_id 
-                                            LEFT JOIN multimedia m on m.post_id = fav.post_id
-                                            WHERE fav.user_id = :user_id and (m.pos = 'portada' or m.pos <> 'portada' or m.pos is null)
-                                    )
-                                    SELECT * FROM col where row_n = 1");
+            $query = $pdo_conn->prepare("
+                WITH col as(
+                    SELECT p.id, p.user_id, u.username, fav.`date`, p.title, p.`text` as text, m.pos, 
+                    CASE WHEN (m.pos <> 'portada' or m.pos is null) 
+                        THEN NULL 
+                        ELSE m.img 
+                    END img, ROW_NUMBER() OVER (PARTITION BY p.id  ORDER BY FIELD(m.pos,'portada') DESC) as row_n
+                    FROM post p
+                    INNER JOIN `like` as fav ON p.id = fav.post_id
+                    INNER JOIN user u on u.id = p.user_id 
+                    LEFT JOIN multimedia m on m.post_id = fav.post_id
+                    WHERE fav.user_id = :user_id and (m.pos = 'portada' or m.pos <> 'portada' or m.pos is null)
+                )SELECT * FROM col where row_n = 1");
 
             $query->bindValue("user_id", $id);
 
@@ -315,17 +333,35 @@ class BlogPostModel
             $pdo_conn = $connObj->getConnection();
 
             //* Se hacen dos querys 
-            $query = $pdo_conn->prepare("(SELECT p.id, p.user_id, u.username , date, title , text 
-            FROM post p
-            INNER JOIN user u on u.id = p.user_id 
-            WHERE u.username = :username)
-            UNION
-            (SELECT post.id, post.user_id, u2.username ,retweet.`date` as date, post.title as title, post.`text` as text 
-            FROM post 
-            INNER JOIN retweet ON post.id = retweet.post_id
-            INNER JOIN user u on u.id = retweet.user_id
-            INNER JOIN user u2 on u2.id  = post.user_id
-            WHERE retweet.user_id = u.id  and u.username = :username) ORDER BY `date` DESC");
+            $query = $pdo_conn->prepare("
+                WITH col as(
+                    (SELECT 
+                        p.id, p.user_id, u.username , date, title , text,m.pos,
+                        CASE WHEN (m.pos <> 'portada' or m.pos is null) 
+                            THEN NULL 
+                            ELSE m.img 
+                        END img,
+                        ROW_NUMBER() OVER (PARTITION BY p.id  ORDER BY FIELD(m.pos,'portada') DESC) as row_n
+                        FROM post p
+                        INNER JOIN user u on u.id = p.user_id
+                        LEFT JOIN multimedia m on m.post_id = p.id
+                        WHERE u.username = :username)
+                        UNION
+                    (SELECT 
+                        post.id, post.user_id, u2.username ,retweet.`date` as date, post.title as title, post.`text` as text,m.pos,
+                        CASE WHEN (m.pos <> 'portada' or m.pos is null) 
+                            THEN NULL 
+                            ELSE m.img 
+                        END img,
+                        ROW_NUMBER() OVER (PARTITION BY post.id  ORDER BY FIELD(m.pos,'portada') DESC) as row_n
+                        FROM post 
+                        INNER JOIN retweet ON post.id = retweet.post_id
+                        INNER JOIN user u on u.id = retweet.user_id
+                        INNER JOIN user u2 on u2.id  = post.user_id
+                        LEFT JOIN multimedia m on m.post_id = post.id
+                        WHERE retweet.user_id = u.id  and u.username = :username) 
+                        ORDER BY `date` DESC
+                )select * from col where row_n = 1");
 
             $query->bindValue("username", $username);
             $query->bindValue("user_id", $username);
@@ -796,7 +832,20 @@ class BlogPostModel
             $pdo_conn = $connObj->getConnection();
 
             //* Se hacen dos querys 
-            $query = $pdo_conn->prepare("SELECT p.id, p.user_id, u.username , date, title , text FROM post p INNER JOIN user u on u.id = p.user_id WHERE u.username = :username AND p.visible=1 ORDER BY date DESC");
+            $query = $pdo_conn->prepare("
+            WITH col as(
+                SELECT p.id, p.user_id, u.username , date, title , text,
+                CASE WHEN (m.pos <> 'portada' or m.pos is null) 
+                    THEN NULL 
+                    ELSE m.img 
+                END img,
+                ROW_NUMBER() OVER (PARTITION BY p.id  ORDER BY FIELD(m.pos,'portada') DESC) as row_n
+                FROM post p 
+                INNER JOIN user u on u.id = p.user_id
+                LEFT JOIN multimedia m on m.post_id = p.id
+                WHERE u.username = :username AND p.visible=1 ORDER BY date DESC
+            )select * from col where row_n = 1");
+
             $query->bindValue("username", $username);
 
             if ($query->execute())
@@ -1427,7 +1476,4 @@ class BlogPostModel
             $pdo_conn = NULL; 
         }
     }
-
-    
-
 }
