@@ -48,7 +48,7 @@
                           $nombreCategoria = $_SESSION['categorias'][$key]->name;
                           $idCategoria = $_SESSION['categorias'][$key]->id;
                         ?>
-                        <option value='<?= $idCategoria ?>' <?= in_array(intval($idCategoria), $_SESSION["post"]["categoriasAnteriores"]) ? 'selected' : ''?>>  <?= $nombreCategoria ?></option>
+                        <option value='<?= $idCategoria ?>' <?= !empty($_SESSION["post"]["categoriasAnteriores"]) && in_array(intval($idCategoria), $_SESSION["post"]["categoriasAnteriores"]) ? 'selected' : ''?>>  <?= $nombreCategoria ?></option>
                       <?php endforeach; ?>
                     <?php endif; ?>
                   </select>
