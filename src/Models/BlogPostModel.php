@@ -62,11 +62,11 @@ class BlogPostModel
             $pdo_conn = $connObj->getConnection();
 
             //* Se recogen todos los posts de la base de datos
-            $query = $pdo_conn->prepare("SELECT p.id, p.user_id,u.username, p.title, p.text, p.date, CASE WHEN m.pos is null THEN  NULL ELSE m.img END img
+            $query = $pdo_conn->prepare("SELECT p.id, p.user_id,u.username, p.title, p.text, p.date, m.img
             FROM post p
             INNER JOIN user u on u.id = p.user_id
             LEFT JOIN multimedia m on m.post_id = p.id
-            WHERE p.visible = 1 and (m.pos = 'portada' OR m.pos is null)
+            WHERE p.visible = 1 and ((m.pos = 'portada' and m.img IS NOT NULL) OR (m.pos is null and m.img IS NULL))
             ORDER BY date DESC");
 
             if ($query->execute())
@@ -961,7 +961,7 @@ class BlogPostModel
             $connObj = new Services\Connection(Services\Helpers::getEnviroment());
             $pdo_conn = $connObj->getConnection();
 
-            $query = $pdo_conn->prepare("SELECT *,p.avatar
+            $query = $pdo_conn->prepare("SELECT *, CASE WHEN p.avatar IS NULL THEN '' ELSE p.avatar END 
                                         FROM comment
                                         INNER JOIN `user` u on u.id = comment.user_id
                                         INNER JOIN profile p on p.user_id = u.id
