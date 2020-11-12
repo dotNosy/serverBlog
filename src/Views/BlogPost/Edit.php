@@ -28,7 +28,9 @@
             </div>
           </div>
 
+          <!-- Radio buttons visibilidad -->
           <div class="form-group">
+            <div class="col-md-9">
               <div class="custom-control custom-radio">
                   <input type="radio" id="visible" name="visibleRadio" class="custom-control-input" <?= ($post->visible) ? "checked=checked" : "" ?> value=1>
                   <label class="custom-control-label" for="visible">Público</label>
@@ -37,23 +39,26 @@
                   <input type="radio" id="noVisible" name="visibleRadio" class="custom-control-input" <?= (!$post->visible) ? "checked=checked" : "" ?> value=0>
                   <label class="custom-control-label" for="noVisible">Privado</label>
               </div>
+            </div>
           </div>
           
           <!-- Selector categoria multiple -->
           <div class="form-group">
-            <label for="categorias">Categoria:</label>
-            <select name="categorias[]" multiple class="form-control" id="categorias">
+            <label class="col-md-3" for="categorias">Categoria:</label>
+              <div class="col-md-9">
+              <select name="categorias[]" multiple class="form-control" id="categorias">
 
-              <?php if(!empty($_SESSION['categorias'])): ?>
-                <?php foreach($_SESSION['categorias'] as $key => $value): ?>
-                  <?php 
-                    $nombreCategoria = $_SESSION['categorias'][$key]->name;
-                    $idCategoria = $_SESSION['categorias'][$key]->id;
-                  ?>
-                  <option value='<?= $idCategoria ?>' <?= in_array(intval($idCategoria), $_SESSION['categoriasAnteriores']) ? 'selected' : ''?>>  <?= $nombreCategoria ?></option>
-                <?php endforeach; ?>
-              <?php endif; ?>
-            </select>
+                <?php if(!empty($_SESSION['categorias'])): ?>
+                  <?php foreach($_SESSION['categorias'] as $key => $value): ?>
+                    <?php 
+                      $nombreCategoria = $_SESSION['categorias'][$key]->name;
+                      $idCategoria = $_SESSION['categorias'][$key]->id;
+                    ?>
+                    <option value='<?= $idCategoria ?>' <?= in_array(intval($idCategoria), $_SESSION['categoriasAnteriores']) ? 'selected' : ''?>>  <?= $nombreCategoria ?></option>
+                  <?php endforeach; ?>
+                <?php endif; ?>
+              </select>
+            </div>
           </div>
 
           <!-- Imagen -->

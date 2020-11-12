@@ -9,7 +9,7 @@
               <!-- titulo input-->
               <div class="form-group">
                 <label class="col-md-3 control-label" for="titulo">Título</label>
-                <div class="col-md-6">
+                <div class="col-md-9">
                   <input id="titulo" name="titulo" type="text" placeholder="Título" class="form-control">
                 </div>
               </div>
@@ -22,6 +22,7 @@
                 </div>
               </div>
 
+              <!-- Radio buttons visibilidad -->
               <div class="form-group">
                 <div class="col-md-9">
                   <div class="custom-control custom-radio">
@@ -37,19 +38,21 @@
 
               <!-- Selector categoria multiple -->
               <div class="form-group">
-                <label for="categorias">Categoria:</label>
-                <select name="categorias[]" multiple class="form-control" id="categorias">
+                <label class="col-md-3 control-label" for="categorias">Categoria:</label>
+                  <div class="col-md-9">
+                  <select name="categorias[]" multiple class="form-control" id="categorias">
 
-                  <?php if(!empty($_SESSION['categorias'])): ?>
-                    <?php foreach($_SESSION['categorias'] as $key => $value): ?>
-                      <?php 
-                        $nombreCategoria = $_SESSION['categorias'][$key]->name;
-                        $idCategoria = $_SESSION['categorias'][$key]->id;
-                      ?>
-                      <option value='<?= $idCategoria ?>'>  <?= $nombreCategoria ?></option>
-                    <?php endforeach; ?>
-                  <?php endif; ?>
-                </select>
+                    <?php if(!empty($_SESSION['categorias'])): ?>
+                      <?php foreach($_SESSION['categorias'] as $key => $value): ?>
+                        <?php 
+                          $nombreCategoria = $_SESSION['categorias'][$key]->name;
+                          $idCategoria = $_SESSION['categorias'][$key]->id;
+                        ?>
+                        <option value='<?= $idCategoria ?>'>  <?= $nombreCategoria ?></option>
+                      <?php endforeach; ?>
+                    <?php endif; ?>
+                  </select>
+                </div>
               </div>
 
               <!-- Imagen -->
