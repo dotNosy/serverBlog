@@ -101,6 +101,7 @@ class Login extends Controller
                 {   
                     parent::sendToView([
                         "titulo" => "SIGNING UP"
+                        ,"js" => array("validateUser.js")
                         ,"css" => array("register.css")
                         ,"error" => "Uno o mas campos estan vacios"
                         ,"page" => __DIR__ . '/../Views/Register.php'
@@ -110,6 +111,7 @@ class Login extends Controller
                 {
                     parent::sendToView([
                         "titulo" => "SIGNING UP"
+                        ,"js" => array("validateUser.js")
                         ,"css" => array("register.css")
                         ,"error" => "Las contraseñas no coinciden"
                         ,"page" => __DIR__ . '/../Views/Register.php'
@@ -123,6 +125,7 @@ class Login extends Controller
                 {
                     parent::sendToView([
                         "titulo" => "SIGNING UP"
+                        ,"js" => array("validateUser.js")
                         ,"css" => array("register.css")
                         ,"error" => $errorPassword
                         ,"page" => __DIR__ . '/../Views/Register.php'
@@ -134,6 +137,7 @@ class Login extends Controller
                 {
                     parent::sendToView([
                         "titulo" => "SIGNING UP"
+                        ,"js" => array("validateUser.js")
                         ,"css" => array("register.css")
                         ,"error" => "El usuario elegido ya está registrado. Por favor escoja otro."
                         ,"page" => __DIR__ . '/../Views/Register.php'
@@ -150,6 +154,7 @@ class Login extends Controller
                 {
                     parent::sendToView([
                         "titulo" => "SIGNING UP"
+                        ,"js" => array("validateUser.js")
                         ,"css" => array("register.css")
                         ,"error" => "Hubo un problema de conexion."
                         ,"page" => __DIR__ . '/../Views/Register.php'

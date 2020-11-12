@@ -111,7 +111,7 @@ class User
 
         //! Si no se ha podido hacer la consulta
         if (!$query->execute()) {
-            //TODO: Hacer algo si no se ha podido hacer la consulta
+            return false;
         }
         //? Hay resultado
         if ($query->rowCount() > 0) {

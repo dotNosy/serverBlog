@@ -380,11 +380,43 @@ class Blogpost extends Controller
 
                 //? Si el radibutton no devulve 0 o 1
                 if($radioPost!=0 && $radioPost!=1) {
-                    //TODO: Poner datos incorrectos en rojo
+
+                    $post["titulo"] =  $tituloPost;
+                    $post["mensaje"] =  $mensajePost;
+                    $post["visible"] =  $radioPost;
+                    $post["categoriasAnteriores"] = $categorias;
+
+                    $categorias = Models\BlogPostModel::getCategorias();
+
+                    parent::sendToView([
+                        "titulo" => "ADD POST"
+                        ,"js" => array("addPost.js")
+                        ,"categorias" => $categorias
+                        ,"post" => $post
+                        ,"error" => "Ha sucedido un error inesperado, por favor intentelo de nuevo."
+                        ,"page" => __DIR__ . '/../Views/BlogPost/Add.php'
+                    ]);
+
                 }
                 //? Error titulo o mensaje vacio
                 else if (empty($tituloPost) || empty($mensajePost)) {   
-                    // TODO: Ponerle en rojo los datos que estan vacios
+
+                    $post["titulo"] =  $tituloPost;
+                    $post["mensaje"] =  $mensajePost;
+                    $post["visible"] =  $radioPost;
+                    $post["categoriasAnteriores"] = $categorias;
+
+                    $categorias = Models\BlogPostModel::getCategorias();
+
+                    parent::sendToView([
+                        "titulo" => "ADD POST"
+                        ,"js" => array("addPost.js")
+                        ,"categorias" => $categorias
+                        ,"post" => $post
+                        ,"error" => "Ha sucedido un error inesperado, por favor intentelo de nuevo."
+                        ,"page" => __DIR__ . '/../Views/BlogPost/Add.php'
+                    ]);
+
                 }
                 //? Creacion del post
                 else
@@ -406,8 +438,23 @@ class Blogpost extends Controller
                     {
                         Helpers::sendToController("/post/view/$id_post");
                     }
-                    else {
-                        //TODO: si no se ha podido crear el post
+                    else
+                    {
+                        $post["titulo"] =  $tituloPost;
+                        $post["mensaje"] =  $mensajePost;
+                        $post["visible"] =  $radioPost;
+                        $post["categoriasAnteriores"] = $categorias;
+
+                        $categorias = Models\BlogPostModel::getCategorias();
+
+                        parent::sendToView([
+                            "titulo" => "ADD POST"
+                            ,"js" => array("addPost.js")
+                            ,"categorias" => $categorias
+                            ,"post" => $post
+                            ,"error" => "Ha sucedido un error inesperado, por favor intentelo de nuevo."
+                            ,"page" => __DIR__ . '/../Views/BlogPost/Add.php'
+                        ]);
                     }
                 }
             }
