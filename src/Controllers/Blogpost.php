@@ -367,7 +367,7 @@ class Blogpost extends Controller
 
         if(!empty($user))
         {
-            if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['add']))
+            if ($_POST && isset($_POST['add']))
             {
                 $tituloPost = Helpers::cleanInput($_POST['titulo']);
                 $mensajePost = Helpers::cleanInput($_POST['mensaje']);
@@ -488,7 +488,7 @@ class Blogpost extends Controller
         if(!empty($user))
         {
             //? Si se envia el formulario (CON POST)
-            if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['edit']))
+            if ($_POST && isset($_POST['edit']))
             {
                 $id_post = Helpers::cleanInput($_POST['id']);
                 $view = Models\BlogPostModel::viewConInvisibles(intval($id_post));
@@ -1076,7 +1076,6 @@ class Blogpost extends Controller
                         array_push($categorias,$categoriasPorID);
                     }  
                 }
-                   
             }
             
             if(!empty($categoria))
@@ -1089,18 +1088,14 @@ class Blogpost extends Controller
                     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                 ]); 
             }
-            else
-            {
-                Helpers::sendToController("/post/all",
-                    [
+            else {
+                Helpers::sendToController("/post/all", [
                         "error" => "No se encontro esa categoria o no existen posts de ella."
                     ]);
             }
         }
-        else
-        {
-            Helpers::sendToController("/post/all",
-                [
+        else {
+            Helpers::sendToController("/post/all", [
                     "error" => "No se encontro esa categoria o no existen posts de ella."
                 ]);
         }
@@ -1194,5 +1189,4 @@ class Blogpost extends Controller
             }  
         }
     }
-
 }

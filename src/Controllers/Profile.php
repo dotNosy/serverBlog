@@ -148,7 +148,6 @@ class Profile extends Controller
 
     protected function notifications($params = null)
     {
-
         $user = User::getUser();
 
         if(!empty($user))
@@ -202,8 +201,9 @@ class Profile extends Controller
                     </div>");
                 }
 
-                $marcadasComoLeido = Models\Profile::marcarNotificacionesComoLeido(intval($user->id));
+                $response["count"] = Models\Profile::getCountNotifications($user->id);
 
+                $marcadasComoLeido = Models\Profile::marcarNotificacionesComoLeido(intval($user->id));
             }
             else {
                 $response['notificaciones'] = ["<div class='alert alert-danger alert-dismissible fade show' role='alert'>
@@ -224,6 +224,24 @@ class Profile extends Controller
                 "error" => "Tienes que estar logueado para ver tus notificaciones."
             ]);
         }  
+    }
+
+    protected function notificationsTimer($params = null)
+    {
+        $user = User::getUser();
+
+        if(!empty($user))
+        {    
+            $notificaciones = Models\Profile::getNotifications(intval($user->id));
+
+            if(!empty($notificaciones)){
+                $response["count"] = Models\Profile::getCountNotifications($user->id);
+            }
+            else {
+                $response["count"] = 0;
+            }
+            echo json_encode($response);
+        }
     }
 
     protected function deleteNotificationsByNotificationID($params = null)

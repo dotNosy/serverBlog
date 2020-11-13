@@ -1,4 +1,29 @@
-$(function () { 
+$(function () {
+    setInterval(function() {
+        $.ajax({
+            type: "post",
+            url: "/profile/notificationsTimer",
+            data: {},
+            dataType: "json",
+            success: function (response) {
+                console.log(response.count);
+                $("#notCount").text(response.count);
+
+                if (response.count > 0) {
+                    $("#notCount").removeClass("badge-primary");
+                    $("#notCount").addClass("badge-danger");
+                }
+                else {
+                    $("#notCount").addClass("badge-primary");
+                    $("#notCount").removeClass("badge-danger");
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }, 5000);
+
     $(".showNotifications").click(function (e) { 
         $.ajax({
             type: "post",
@@ -11,6 +36,9 @@ $(function () {
                     const element = response.notificaciones[i];
                     // console.log(element);
                     $("#notificaciones-content").append(element);
+                    $("#notCount").text("0");
+                    $("#notCount").removeClass("badge-danger");
+                    $("#notCount").addClass("badge-primary");
                 }
             },
             error: function (error) {
@@ -29,7 +57,9 @@ $(function () {
             dataType: "json",
             success: function (response) {
                 if (response.status == true) {
-
+                    $("#notCount").text("0");
+                    $("#notCount").removeClass("badge-danger");
+                    $("#notCount").addClass("badge-primary");
                 }
                 else if (response.error != "") {
                     errorBorrar(response.error);
@@ -53,6 +83,8 @@ $(function () {
             success: function (response) {
                 if (response.status == true) {
                     $('#staticBackdrop').modal('hide');
+                    $("#notCount").val("0");
+                    $("#notCount").toggleClass("badge-danger badge-primary");
                 }
                 else if (response.error != "") {
                     errorBorrar(response.error);

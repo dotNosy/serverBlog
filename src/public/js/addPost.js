@@ -1,12 +1,12 @@
-$(function () 
+$(function ()
 {
-    $("input[name='imagen']").change(function (e) { 
+    $("input[name='imagenes[]'").change(function (e) {
         uploadFile();
     });
     
     $("#listImgs").on("click", ".delete-img", function (e) {
         //LIST OF FILES FROM THE DOM ELEMENT INPUT
-        let inputFileList = $("input[name='imagen']").prop('files');
+        let inputFileList = $("input[name='imagenes[]']").prop('files');
 
         //Name of the file to delete
         const fileToDelete = $(this).parent().text();
@@ -36,7 +36,7 @@ $(function ()
         }
 
         //DOM ELEMENT INPUT FILE
-        let inputFile = $("input[name='imagen']")[0];
+        let inputFile = $("input[name='imagenes[]']")[0];
 
         //SET new file list to the input file
         inputFile.files = newList.files;
@@ -45,7 +45,7 @@ $(function ()
 
 function uploadFile()
 {
-    const fileList = $("input[name='imagen']").prop('files');
+    const fileList = $("input[name='imagenes[]']").prop('files');
     $("#listImgs").empty();
 
     for (let i = 0; i < fileList.length; i++) 
@@ -71,7 +71,6 @@ function uploadFile()
 
         //Listar las imagenes
         $("#listImgs").append("<p><i class='delete-img btn-outline-danger fas fa-times-circle mr-2'></i>"+file.name+"</p>");
-
     }
 }
 
@@ -107,7 +106,6 @@ function errorExtension()
     cleanFileInput();
 }
 
-function cleanFileInput()
-{
-    $("input[name='imagen']").val(null);
+function cleanFileInput() {
+    $("input[name='imagenes[]']").val(null);
 }

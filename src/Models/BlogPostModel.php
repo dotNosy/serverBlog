@@ -1278,12 +1278,23 @@ class BlogPostModel
             $pdo_conn = $connObj->getConnection();
 
             //* Recoge los posts que sean visibles de la categoria elegida
-            $query = $pdo_conn->prepare("SELECT p.id, p.user_id, u.username , date, title , text, cp.category_id, c.name
-                                        FROM post p
-                                        INNER JOIN user u ON u.id = p.user_id
-                                        INNER JOIN category_post cp ON cp.post_id = p.id
-                                        INNER JOIN category c ON c.id=cp.category_id
-                                        WHERE c.name=:nombre_categoria AND p.visible=1 ORDER BY date DESC;");                    
+            $query = $pdo_conn->prepare("
+            with col as(
+                SELECT 
+                    p.id, p.user_id, u.username , date, title , text, cp.category_id, c.name,
+                    CASE WHEN (m.pos <> 'portada' or m.pos is null) 
+                        THEN NULL 
+                        ELSE m.img 
+                    END img,
+                    ROW_NUMBER() OVER (PARTITION BY p.id  ORDER BY FIELD(m.pos,'portada') DESC) as row_n
+                FROM post p
+                INNER JOIN user u ON u.id = p.user_id
+                INNER JOIN category_post cp ON cp.post_id = p.id
+                INNER JOIN category c ON c.id=cp.category_id
+                LEFT JOIN multimedia m on m.post_id = p.id
+                WHERE c.name=:nombre_categoria AND p.visible=1 ORDER BY date DESC
+            )select * from col where row_n = 1");            
+
             $query->bindValue("nombre_categoria", $nombreCategoria);
             
             //* Si la query funciona se hacen un commit
@@ -1313,19 +1324,37 @@ class BlogPostModel
             $pdo_conn = $connObj->getConnection();
 
             //* Recoge los posts que sean visibles de la categoria elegida
-            $query = $pdo_conn->prepare("SELECT p.id, p.user_id, u.username , date, title , text, cp.category_id, c.name
-                                        FROM post p
-                                        INNER JOIN user u ON u.id = p.user_id
-                                        INNER JOIN category_post cp ON cp.post_id = p.id
-                                        INNER JOIN category c ON c.id=cp.category_id
-                                        WHERE c.name='Guía' AND p.visible=1
-                                        UNION
-                                        SELECT p.id, p.user_id, u.username , date, title , text, cp.category_id, c.name
-                                        FROM post p
-                                        INNER JOIN user u ON u.id = p.user_id
-                                        INNER JOIN category_post cp ON cp.post_id = p.id
-                                        INNER JOIN category c ON c.id=cp.category_id
-                                        WHERE c.name=:nombre_categoria AND u.id = :user_id AND p.visible=0 ORDER BY date DESC;");                    
+            $query = $pdo_conn->prepare("
+            WITH col as(
+                SELECT 
+                    p.id, p.user_id, u.username , date, title , text, cp.category_id, c.name,
+                    CASE WHEN (m.pos <> 'portada' or m.pos is null) 
+                        THEN NULL 
+                        ELSE m.img 
+                    END img,
+                    ROW_NUMBER() OVER (PARTITION BY p.id  ORDER BY FIELD(m.pos,'portada') DESC) as row_n
+                FROM post p
+                INNER JOIN user u ON u.id = p.user_id
+                INNER JOIN category_post cp ON cp.post_id = p.id
+                INNER JOIN category c ON c.id=cp.category_id
+                LEFT JOIN multimedia m on m.post_id = p.id
+                WHERE c.name=:nombre_categoria AND p.visible=1
+                UNION
+                SELECT 
+                    p.id, p.user_id, u.username , date, title , text, cp.category_id, c.name,
+                    CASE WHEN (m.pos <> 'portada' or m.pos is null) 
+                        THEN NULL 
+                        ELSE m.img 
+                    END img,
+                    ROW_NUMBER() OVER (PARTITION BY p.id  ORDER BY FIELD(m.pos,'portada') DESC) as row_n
+                FROM post p
+                INNER JOIN user u ON u.id = p.user_id
+                INNER JOIN category_post cp ON cp.post_id = p.id
+                INNER JOIN category c ON c.id=cp.category_id
+                LEFT JOIN multimedia m on m.post_id = p.id
+                WHERE c.name=:nombre_categoria AND u.id = :user_id AND p.visible=0 ORDER BY date DESC
+                )select * from col where row_n = 1                
+            ");                    
             $query->bindValue("nombre_categoria", $nombreCategoria);
             $query->bindValue("user_id", $user_id);
             
