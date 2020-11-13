@@ -174,7 +174,7 @@ class Login extends Controller
             //Encriptar password y añadirla a una cookie
             $localPasswd = openssl_encrypt($password, "AES-128-CTR", 
             "ServerBlogKey101813112020", 0, "1234567891011121");
-            setcookie("passwd", $localPasswd);
+            setcookie("passwd", $localPasswd, time()+60*60*24*7);
     
             Services\Helpers::sendToController("/post/feed",[
                 "script" => "
