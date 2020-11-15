@@ -51,6 +51,7 @@ class Login extends Controller
                 parent::sendToView([
                     "titulo" => "SIGNING UP"
                     ,"css" => array("login.css")
+                    ,"js" => array("validateUser.js")
                     ,"error" => "Uno o mas campos estan vacios"
                     ,"page" => __DIR__ . '/../Views/Login.php'
                 ]);
@@ -225,6 +226,32 @@ class Login extends Controller
                 echo json_encode($response);
             }else{
                 //? Si el usuario no existe = true
+                $response = false;
+                echo json_encode($response);
+            }
+        }
+
+    }
+
+    protected function comprobarContraseñaDiferente($params = null) 
+    {
+
+        if ($_SERVER['REQUEST_METHOD'] == "POST")
+        {
+            $password = Services\Helpers::cleanInput($_POST['password']);
+            $rpassword = Services\Helpers::cleanInput($_POST['rpassword']);
+            
+
+            if(empty($password) || empty($rpassword)){
+                //? Si alguno de los dos campos esta vacio
+                $response = false;
+                echo json_encode($response);
+            }else if($password != $rpassword){
+                //? Si las contraseñas no son iguales
+                $response = true;
+                echo json_encode($response);
+            }else{
+                //? Si esta todo correcto
                 $response = false;
                 echo json_encode($response);
             }
