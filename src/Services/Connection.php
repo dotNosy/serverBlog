@@ -22,8 +22,11 @@ class Connection
     }
     catch(PDOException $e) 
     {
-      //TODO: manejar excepcion o reenviar a pagina de error
-      echo "Connection failed: " . $e->getMessage();
+      Helpers::sendToController("/home"
+            ,[
+                "error" => "No se ha podido establecer la conexion con la base de datos, pruebe en unos instantes."
+             ]);
+      // echo "Connection failed: " . $e->getMessage();
       die();
     }
     catch(Exception $e)

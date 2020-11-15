@@ -81,7 +81,7 @@
                 <a class="bg-dark list-group-item list-group-item-action showNotifications" data-toggle="modal" data-target="#staticBackdrop">
                     <div class="d-flex w-100 justify-content-start align-items-center">
                         <span class="fa fa-bell fa-fw mr-3"></span>
-                        <span class="menu-collapsed">Notificaciones<span class="badge badge-pill badge-primary ml-2">5</span></span>
+                        <span class="menu-collapsed">Notificaciones<span id="notCount" class="badge badge-pill <?= ServerBlog\Models\Profile::getCountNotifications($user->id) > 0 ? 'badge-danger' : 'badge-primary'?> ml-2"><?= ServerBlog\Models\Profile::getCountNotifications($user->id)?></span></span>
                     </div>
                 </a>
 
@@ -193,9 +193,13 @@
     <script>
       $(function () {
         $('[data-toggle="tooltip"]').tooltip()
-      })
+      });
+
+      //script dinamico
+      <?php if (!empty($_SESSION["script"])) echo $_SESSION["script"]; ?>
     </script>
 
+    <!-- JS dinamicos -->
     <?php if (!empty($_SESSION['js'])): ?>
       <?php foreach ($_SESSION['js'] as $js): ?>
         <?= "<script src='/js/$js'></script>" ?>

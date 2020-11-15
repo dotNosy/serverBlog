@@ -9,8 +9,8 @@
               <!-- titulo input-->
               <div class="form-group">
                 <label class="col-md-3 control-label" for="titulo">Título</label>
-                <div class="col-md-6">
-                  <input id="titulo" name="titulo" type="text" placeholder="Título" class="form-control">
+                <div class="col-md-9">
+                  <input required id="titulo" name="titulo" type="text" placeholder="Título" class="form-control" <?= !empty($_SESSION["post"]["titulo"]) ? "value=".$_SESSION["post"]["titulo"] : ""  ?> >
                 </div>
               </div>
 
@@ -18,18 +18,19 @@
               <div class="form-group">
                 <label class="col-md-3 control-label" for="mensaje">Tu mensaje</label>
                 <div class="col-md-9">
-                  <textarea class="form-control" id="mensaje" name="mensaje" placeholder="Por favor mete tu mensaje aqui..." rows="5"></textarea>
+                  <textarea required class="form-control" id="mensaje" name="mensaje" placeholder="Por favor mete tu mensaje aqui..." rows="5"  ><?= !empty($_SESSION["post"]["mensaje"]) ? $_SESSION["post"]["mensaje"] : ""  ?></textarea>
                 </div>
               </div>
 
+              <!-- Radio buttons visibilidad -->
               <div class="form-group">
                 <div class="col-md-9">
                   <div class="custom-control custom-radio">
-                      <input type="radio" id="visible" name="visibleRadio" class="custom-control-input" checked="checked" value=1>
+                      <input type="radio" id="visible" name="visibleRadio" class="custom-control-input" <?= empty($_SESSION["post"]["visible"]) || $_SESSION["post"]["visible"]!=0 ? "checked=checked" : ""  ?> value=1>
                       <label class="custom-control-label" for="visible">Público</label>
                   </div>
                   <div class="custom-control custom-radio">
-                      <input type="radio" id="noVisible" name="visibleRadio" class="custom-control-input" value=0>
+                      <input type="radio" id="noVisible" name="visibleRadio" class="custom-control-input" <?= !empty($_SESSION["post"]["visible"]) && $_SESSION["post"]["visible"]==0 ? "checked=checked" : ""  ?> value=0>
                       <label class="custom-control-label" for="noVisible">Privado</label>
                   </div>
                 </div>
@@ -37,19 +38,21 @@
 
               <!-- Selector categoria multiple -->
               <div class="form-group">
-                <label for="categorias">Categoria:</label>
-                <select name="categorias[]" multiple class="form-control" id="categorias">
+                <label class="col-md-3 control-label" for="categorias">Categoria:</label>
+                  <div class="col-md-9">
+                  <select name="categorias[]" multiple class="form-control" id="categorias">
 
-                  <?php if(!empty($_SESSION['categorias'])): ?>
-                    <?php foreach($_SESSION['categorias'] as $key => $value): ?>
-                      <?php 
-                        $nombreCategoria = $_SESSION['categorias'][$key]->name;
-                        $idCategoria = $_SESSION['categorias'][$key]->id;
-                      ?>
-                      <option value='<?= $idCategoria ?>'>  <?= $nombreCategoria ?></option>
-                    <?php endforeach; ?>
-                  <?php endif; ?>
-                </select>
+                    <?php if(!empty($_SESSION['categorias'])): ?>
+                      <?php foreach($_SESSION['categorias'] as $key => $value): ?>
+                        <?php 
+                          $nombreCategoria = $_SESSION['categorias'][$key]->name;
+                          $idCategoria = $_SESSION['categorias'][$key]->id;
+                        ?>
+                        <option value='<?= $idCategoria ?>' <?= !empty($_SESSION["post"]["categoriasAnteriores"]) && in_array(intval($idCategoria), $_SESSION["post"]["categoriasAnteriores"]) ? 'selected' : ''?>>  <?= $nombreCategoria ?></option>
+                      <?php endforeach; ?>
+                    <?php endif; ?>
+                  </select>
+                </div>
               </div>
 
               <!-- Imagen -->

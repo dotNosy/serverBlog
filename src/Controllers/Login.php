@@ -17,30 +17,27 @@ class Login extends Controller
 
     protected function index(array $params = null) 
     {   
-        //? Si hay parametros adicionales en la URL
-        if (!empty($params) && !empty($_SESSION['URL_PARAMS']))
-        {   
-            //* Los parametros de Index tienen que ser unicamente para la vista
-            parent::sendToView(
-            [
-                "titulo" => "LOGIN"
-                ,"css" => array("login.css")
-                ,"page" => __DIR__ . '/../Views/Login.php'
-            ]);
+        $decPasswd = "";
+        //Desencriptar password de
+        if (!empty($_COOKIE['passwd'])){
+            $decPasswd = openssl_decrypt ($_COOKIE['passwd'], "AES-128-CTR", 
+            "ServerBlogKey101813112020", 0, "1234567891011121");
         }
-        else
-        {
-            parent::sendToView([
-                "titulo" => "LOGIN"
-                ,"css" => array("login.css")
-                ,"page" => __DIR__ . '/../Views/Login.php'
-             ]);
-        }
+
+        parent::sendToView([
+            "titulo" => "LOGIN"
+            ,"css" => array("login.css")
+            ,"page" => __DIR__ . '/../Views/Login.php'
+            ,"script" => "
+                $('input[name=username]').val(localStorage.getItem('login'));
+                $('input[name=password]').val('$decPasswd');
+            "
+        ]);
     }
 
     protected function login()
     {
-        if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['login']))
+        if ($_POST && isset($_POST['login']))
         {
             $username = Services\Helpers::cleanInput($_POST['username']);
             $password = Services\Helpers::cleanInput($_POST['password']);
@@ -88,74 +85,76 @@ class Login extends Controller
              ]);
         }
         //? PROCESAR FORMULARIO
-        else if ($_SERVER['REQUEST_METHOD'] == "POST")
+        else if (isset($_POST['register']))
         {
-            if (isset($_POST['register']))
-            {
-                $username = Services\Helpers::cleanInput($_POST['username']);
-                $password = Services\Helpers::cleanInput($_POST['password']);
-                $rpassword = Services\Helpers::cleanInput($_POST['rpassword']);
-                $errorPassword = "";
-                
-                //? En vez de hacer 2 calls diferentes, se podria hacer solo poner el mensaje de error en una variable y hacer una sola llamada al sendToView()
-                if (empty($username) || empty($password) || empty($rpassword)) 
-                {   
-                    parent::sendToView([
-                        "titulo" => "SIGNING UP"
-                        ,"css" => array("register.css")
-                        ,"error" => "Uno o mas campos estan vacios"
-                        ,"page" => __DIR__ . '/../Views/Register.php'
-                     ]);
-                }
-                else if ($password !== $rpassword)
-                {
-                    parent::sendToView([
-                        "titulo" => "SIGNING UP"
-                        ,"css" => array("register.css")
-                        ,"error" => "Las contraseñas no coinciden"
-                        ,"page" => __DIR__ . '/../Views/Register.php'
-                     ]);
-                }
-                
-                //* Comprobacion contraseña segura
-                Services\Controllers\Login::checkPassword($password,$errorPassword);
-                //? Si hay errores de critero en la password, devolver vista con errores 
-                if(strlen($errorPassword) > 0)
-                {
-                    parent::sendToView([
-                        "titulo" => "SIGNING UP"
-                        ,"css" => array("register.css")
-                        ,"error" => $errorPassword
-                        ,"page" => __DIR__ . '/../Views/Register.php'
-                     ]);
-                }
-
-                //? Comprobacr que el usuario no exista
-                if(Models\User::userExists($username))
-                {
-                    parent::sendToView([
-                        "titulo" => "SIGNING UP"
-                        ,"css" => array("register.css")
-                        ,"error" => "El usuario elegido ya está registrado. Por favor escoja otro."
-                        ,"page" => __DIR__ . '/../Views/Register.php'
-                     ]);
-                }
-
-                //? Si se pudo crear el usuario, lo logueamos
-                if (Models\User::add($username, $password)) 
-                {
-                    $this->tryLogin($username, $password, __DIR__ . '/../Views/Register.php','register.css');
-                }
-                //? hubo error al crear el usuario, vovler al registro
-                else
-                {
-                    parent::sendToView([
-                        "titulo" => "SIGNING UP"
-                        ,"css" => array("register.css")
-                        ,"error" => "Hubo un problema de conexion."
-                        ,"page" => __DIR__ . '/../Views/Register.php'
+            $username = Services\Helpers::cleanInput($_POST['username']);
+            $password = Services\Helpers::cleanInput($_POST['password']);
+            $rpassword = Services\Helpers::cleanInput($_POST['rpassword']);
+            $errorPassword = "";
+            
+            //? En vez de hacer 2 calls diferentes, se podria hacer solo poner el mensaje de error en una variable y hacer una sola llamada al sendToView()
+            if (empty($username) || empty($password) || empty($rpassword)) 
+            {   
+                parent::sendToView([
+                    "titulo" => "SIGNING UP"
+                    ,"js" => array("validateUser.js")
+                    ,"css" => array("register.css")
+                    ,"error" => "Uno o mas campos estan vacios"
+                    ,"page" => __DIR__ . '/../Views/Register.php'
                     ]);
-                }
+            }
+            else if ($password !== $rpassword)
+            {
+                parent::sendToView([
+                    "titulo" => "SIGNING UP"
+                    ,"js" => array("validateUser.js")
+                    ,"css" => array("register.css")
+                    ,"error" => "Las contraseñas no coinciden"
+                    ,"page" => __DIR__ . '/../Views/Register.php'
+                    ]);
+            }
+            
+            //* Comprobacion contraseña segura
+            Services\Controllers\Login::checkPassword($password,$errorPassword);
+            //? Si hay errores de critero en la password, devolver vista con errores 
+            if(strlen($errorPassword) > 0)
+            {
+                parent::sendToView([
+                    "titulo" => "SIGNING UP"
+                    ,"js" => array("validateUser.js")
+                    ,"css" => array("register.css")
+                    ,"error" => $errorPassword
+                    ,"page" => __DIR__ . '/../Views/Register.php'
+                    ]);
+            }
+
+            //? Comprobacr que el usuario no exista
+            if(Models\User::userExists($username))
+            {
+                parent::sendToView([
+                    "titulo" => "SIGNING UP"
+                    ,"js" => array("validateUser.js")
+                    ,"css" => array("register.css")
+                    ,"error" => "El usuario elegido ya está registrado. Por favor escoja otro."
+                    ,"page" => __DIR__ . '/../Views/Register.php'
+                    ]);
+            }
+
+            //? Si se pudo crear el usuario, lo logueamos
+            if (Models\User::add($username, $password)) 
+            {
+                $this->tryLogin($username, $password, __DIR__ . '/../Views/Register.php','register.css');
+            }
+            //? hubo error al crear el usuario, vovler al registro
+            else
+            {
+                parent::sendToView([
+                    "titulo" => "SIGNING UP"
+                    ,"js" => array("validateUser.js")
+                    ,"css" => array("register.css")
+                    ,"error" => "Hubo un problema de conexion."
+                    ,"page" => __DIR__ . '/../Views/Register.php'
+                ]);
             }
         }
     }
@@ -164,6 +163,7 @@ class Login extends Controller
     {
         //*Logear al user y enviar al perfil
         $user = Models\User::login($username, $password);
+
         //! USUARIO CORRECTO
         if (!empty($user) && $user instanceof Models\User) 
         {
@@ -171,8 +171,18 @@ class Login extends Controller
                 'id' => $user->getId(),
                 'username' => $user->getUsername()
                 ]);
+
+            //Encriptar password y añadirla a una cookie
+            $localPasswd = openssl_encrypt($password, "AES-128-CTR", 
+            "ServerBlogKey101813112020", 0, "1234567891011121");
+            setcookie("passwd", $localPasswd, time()+60*60*24*7);
     
-            Services\Helpers::sendToController("/post/feed");
+            Services\Helpers::sendToController("/post/feed",[
+                "script" => "
+                    localStorage.setItem('login', '$username');
+                    localStorage.setItem('passwd', '$localPasswd');
+                "
+            ]);
         }
         else if (empty($user)) 
         {
@@ -214,7 +224,6 @@ class Login extends Controller
 
     protected function comprobarUsuario($params = null) 
     {
-
         if ($_SERVER['REQUEST_METHOD'] == "POST")
         {
             $username = Services\Helpers::cleanInput($_POST['username']);

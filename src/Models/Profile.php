@@ -261,6 +261,49 @@ class Profile
         }
     }
 
+    public static function getCountNotifications(int $id)
+    {
+        try 
+        {
+            $connObj = new Services\Connection(Services\Helpers::getEnviroment());
+            $pdo_conn = $connObj->getConnection();
+
+            $query = $pdo_conn->prepare("SELECT count(n.id) count_nots
+                                        FROM notification n
+                                        INNER JOIN `user` u
+                                        ON u.id = n.notification_user_id
+                                        INNER JOIN post p 
+                                        ON n.post_id = p.id
+                                        INNER JOIN notification_type nt
+                                        ON n.type_id = nt.id 
+                                        WHERE n.user_id = :user_id AND Leido = 0;");
+            //El :name guarda el contenido de $name
+            $query->bindValue("user_id", $id);
+            
+
+
+            //* Si la query funciona se hacen un commit
+            if($query->execute())
+            {
+                //* Se coge el id del post insertado para abrirlo al crearlo
+                $notificaciones = $query->fetch(PDO::FETCH_OBJ);
+                return $notificaciones->count_nots;
+            }
+            else
+            {   
+                return false;
+            }
+            
+        } 
+        catch (Exception $e)
+        {
+            echo $e;
+            return false;
+        }finally{
+            $pdo_conn = NULL;
+        }
+    }
+
     public static function marcarNotificacionesComoLeido(int $id)
     {
         try 

@@ -1,13 +1,12 @@
-<?php if(!empty($_SESSION["blogPost"]))
-{ 
-  $post=$_SESSION["blogPost"];
-}?>
-
 <?php 
   use ServerBlog\Models\User;
   use ServerBlog\Models\BlogPostModel;
 
   $user = User::getUser();
+
+  if(!empty($_SESSION["blogPost"])){ 
+    $post=$_SESSION["blogPost"];
+  }
 ?>
 
 <!-- MENU -->
@@ -150,7 +149,11 @@
           <?php foreach($_SESSION["comments"] as $comment): ?>
             <div class="card my-4">
               <div class="card-header">
-                <img class="rounded-circle" style="width:70px;heigth:70px;" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($comment->avatar); ?>" /> 
+                <?php if(!empty($comment->avatar)):?>
+                  <img class="rounded-circle" style="width:70px;heigth:70px;" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($comment->avatar); ?>" />
+                <?php else:?>
+                  <img class="rounded-circle" style="width:70px;heigth:70px;" src="https://st.depositphotos.com/2101611/3925/v/600/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg"/>
+                <?php endif;?>
                 <div style="margin-top:-7%; margin-left:12%">
                   <h4 style="text-align:top">
                     <?=  User::getUsernameById(intval($comment->user_id))?>
@@ -193,7 +196,11 @@
                   <?php foreach(BlogPostModel::getAnswer(intval($comment->id)) as $answer): ?>
                     <div class="card ml-5 my-4">
                       <div class="card-header">
-                      <img class="rounded-circle" style="width:70px;heigth:70px;" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($answer->avatar); ?>" /> 
+                      <?php if(!empty($comment->avatar)):?>
+                        <img class="rounded-circle" style="width:70px;heigth:70px;" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($comment->avatar); ?>" />
+                      <?php else:?>
+                        <img class="rounded-circle" style="width:70px;heigth:70px;" src="https://st.depositphotos.com/2101611/3925/v/600/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg"/>
+                      <?php endif;?>
                       <div style="margin-top:-7%; margin-left:12%">
                           <h4 style="text-align:top;">
                           <?=  User::getUsernameById(intval($answer->user_id))?>
@@ -267,7 +274,7 @@
 
       <!-- SIDE IMAGENES-->
       <div class="card my-4">
-        <h5 class="card-header">Side Widget</h5>
+        <h5 class="card-header">Imagenes relacionadas</h5>
         <div class="card-body">
           <?php foreach($_SESSION["imgs"] as $img): ?>
             <?php if($img->pos == "side"): ?>

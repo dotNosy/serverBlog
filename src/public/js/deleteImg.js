@@ -19,9 +19,7 @@ $(function () {
                             if (response.status === 'error') {
                                errorBorrar();
                             }
-                            else if(response.status === true)
-                            {
-                                //TODO: Transiccion de borrar o algo
+                            else if(response.status === true){
                                 $('#' + id).parent().parent().parent().remove();
                             }
                             else {

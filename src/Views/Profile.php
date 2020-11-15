@@ -1,5 +1,4 @@
-<?php if(!empty($_SESSION["profile"]))
-{ 
+<?php if(!empty($_SESSION["profile"])) { 
     $profile=$_SESSION["profile"];
 } ?>
 
@@ -7,6 +6,13 @@
 <script>
 //kontadore bat erabiliko dugu kontroladorea funtzionatzeko
 var clicks = 1
+
+//funtzioei cooldown bat ipintzeko baribleak
+var delay = 600;
+var lastClick = 0;
+
+var delay2 = 600;
+var lastClick2 = 0;
 
 //click egitean resize() egingo du baina berriz klik egitean resizeM() egingo du
   function controlador(){
@@ -22,8 +28,12 @@ var clicks = 1
 
 // click egitean zoom egiteko
 function resize(direction) {
+  //cooldown ez bugueatzeko
+    if (lastClick >= (Date.now() - delay))
+        return;
+    lastClick = Date.now();
   //resize-en tamaina ajustatzeko
-  var size = 93.12 * direction;
+  var size = 90 * direction;
 
   var element = document.getElementById('zoom');
 
@@ -39,8 +49,12 @@ function resize(direction) {
 
 //berriz click egitean zoom-a kenduko du
 function resizeM(direction) {
+  //cooldown ez bugueatzeko
+  if (lastClick2 >= (Date.now() - delay2))
+        return;
+    lastClick2 = Date.now();
   //resizeM-n tamaina ajustatzeko
-  var size = 93.12 * direction;
+  var size = 90 * direction;
 
   var element = document.getElementById('zoom');
   
@@ -54,26 +68,13 @@ function resizeM(direction) {
   document.getElementById("container").style.backgroundColor = "white";
 }
 </script>
-
-<style type="text/css">
-    .zoomin img { height: 400px; width: 400px;
-    -webkit-transition: all 1s ease;
-    -moz-transition: all 1s ease;
-    -ms-transition: all 1s ease;
-    transition: all 1s ease; }
-    .zoomin img:hover { width: 500px; height: 500px; } 
-  </style>
   
 <div class="container" id="container">
     <hr>
   <div class="card bg-light" id="container">
     <article class="card-body mx-auto" max-width="700px" id="container">
       <h4 class="card-title mt-3 text-center">PERFIL</h4>
-
-      <!-- <img class="img-thumbnail" id="zoom" onmouseover="zoomin()" onmouseout="zoomout()" width="400px" height="400px" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($profile->avatar); ?>" /> -->
-      <div class="zoomin">
-      <img class="img-thumbnail" id="zoom" onclick="controlador()" width="400px" height="400px" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($profile->avatar); ?>" />
-      </div>
+      <img class="img-thumbnail" id="zoom" onclick="controlador()" width="500px" height="500px" src="<?= (!empty($profile->avatar) ? "data:image/jpg;charset=utf8;base64,".base64_encode($profile->avatar) : "https://st.depositphotos.com/2101611/3925/v/600/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg" ); ?>" />
       <form action="/profile/edit" method="POST" enctype="multipart/form-data">
       <!--  action="/profile" method="POST" -->
         <div class="form-group input-group">

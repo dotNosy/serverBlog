@@ -367,7 +367,7 @@ class Blogpost extends Controller
 
         if(!empty($user))
         {
-            if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['add']))
+            if ($_POST && isset($_POST['add']))
             {
                 $tituloPost = Helpers::cleanInput($_POST['titulo']);
                 $mensajePost = Helpers::cleanInput($_POST['mensaje']);
@@ -380,11 +380,43 @@ class Blogpost extends Controller
 
                 //? Si el radibutton no devulve 0 o 1
                 if($radioPost!=0 && $radioPost!=1) {
-                    //TODO: Poner datos incorrectos en rojo
+
+                    $post["titulo"] =  $tituloPost;
+                    $post["mensaje"] =  $mensajePost;
+                    $post["visible"] =  $radioPost;
+                    $post["categoriasAnteriores"] = $categorias;
+
+                    $categorias = Models\BlogPostModel::getCategorias();
+
+                    parent::sendToView([
+                        "titulo" => "ADD POST"
+                        ,"js" => array("addPost.js")
+                        ,"categorias" => $categorias
+                        ,"post" => $post
+                        ,"error" => "Ha sucedido un error inesperado, por favor intentelo de nuevo."
+                        ,"page" => __DIR__ . '/../Views/BlogPost/Add.php'
+                    ]);
+
                 }
                 //? Error titulo o mensaje vacio
                 else if (empty($tituloPost) || empty($mensajePost)) {   
-                    // TODO: Ponerle en rojo los datos que estan vacios
+
+                    $post["titulo"] =  $tituloPost;
+                    $post["mensaje"] =  $mensajePost;
+                    $post["visible"] =  $radioPost;
+                    $post["categoriasAnteriores"] = $categorias;
+
+                    $categorias = Models\BlogPostModel::getCategorias();
+
+                    parent::sendToView([
+                        "titulo" => "ADD POST"
+                        ,"js" => array("addPost.js")
+                        ,"categorias" => $categorias
+                        ,"post" => $post
+                        ,"error" => "Ha sucedido un error inesperado, por favor intentelo de nuevo."
+                        ,"page" => __DIR__ . '/../Views/BlogPost/Add.php'
+                    ]);
+
                 }
                 //? Creacion del post
                 else
@@ -406,8 +438,23 @@ class Blogpost extends Controller
                     {
                         Helpers::sendToController("/post/view/$id_post");
                     }
-                    else {
-                        //TODO: si no se ha podido crear el post
+                    else
+                    {
+                        $post["titulo"] =  $tituloPost;
+                        $post["mensaje"] =  $mensajePost;
+                        $post["visible"] =  $radioPost;
+                        $post["categoriasAnteriores"] = $categorias;
+
+                        $categorias = Models\BlogPostModel::getCategorias();
+
+                        parent::sendToView([
+                            "titulo" => "ADD POST"
+                            ,"js" => array("addPost.js")
+                            ,"categorias" => $categorias
+                            ,"post" => $post
+                            ,"error" => "Ha sucedido un error inesperado, por favor intentelo de nuevo."
+                            ,"page" => __DIR__ . '/../Views/BlogPost/Add.php'
+                        ]);
                     }
                 }
             }
@@ -441,7 +488,7 @@ class Blogpost extends Controller
         if(!empty($user))
         {
             //? Si se envia el formulario (CON POST)
-            if ($_SERVER['REQUEST_METHOD'] == "POST" && isset($_POST['edit']))
+            if ($_POST && isset($_POST['edit']))
             {
                 $id_post = Helpers::cleanInput($_POST['id']);
                 $view = Models\BlogPostModel::viewConInvisibles(intval($id_post));
@@ -667,12 +714,14 @@ class Blogpost extends Controller
                                     //? El 1 representa el tipo de notificacion, 3=COMENTARIO en la base de datos
                                     $notificacion = Models\BlogPostModel::crearNotificacion(intval($user_notificado->id),$user->id, intval($id), 3); 
                                 }
+
+                                $avatar = (!empty($addedComment->avatar)) ? "data:image/jpg;charset=utf8;base64,".base64_encode($addedComment->avatar) : "https://st.depositphotos.com/2101611/3925/v/600/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg";
                                 
                                 $response = [
                                     "status" => true,
                                     "comment" => "<div class='card my-4'>
                                     <div class='card-header'>
-                                    <img class='rounded-circle' style='width:70px;heigth:70px;' src='data:image/jpg;charset=utf8;base64,".base64_encode($addedComment->avatar). "' /> 
+                                    <img class='rounded-circle' style='width:70px;heigth:70px;' src='$avatar' /> 
                                     <div style='margin-top:-7%; margin-left:12%'>
                                     <h4 style='text-align:top'>".  User::getUsernameById(intval($addedComment->user_id))."
                                     </h4>
@@ -741,12 +790,14 @@ class Blogpost extends Controller
                                         $notificacion = Models\BlogPostModel::crearNotificacion(intval($user_notificado->user_id),$user->id, intval($id), 4);
                                     }
 
+                                    $avatar = (!empty($addedComment->avatar)) ? "data:image/jpg;charset=utf8;base64,".base64_encode($addedComment->avatar) : "https://st.depositphotos.com/2101611/3925/v/600/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg";
+
                                     $response = [
                                         "status" => true,
                                         "answer" => "
                                             <div class='card ml-5 my-4'>
                                             <div class='card-header'>
-                                            <img class='rounded-circle' style='width:70px;heigth:70px;' src='data:image/jpg;charset=utf8;base64,". base64_encode($addedComment->avatar) ."'/> 
+                                            <img class='rounded-circle' style='width:70px;heigth:70px;' src='$avatar'/> 
                                             <div style='margin-top:-7%; margin-left:12%'>
                                             <h4 style='text-align:top;'>". User::getUsernameById(intval($addedComment->user_id)) ."</h4>
                                                 <!-- ELIMINAR -->
@@ -1002,17 +1053,29 @@ class Blogpost extends Controller
 
             if(!empty($user))
             {
-                //TODO: Hacer que para los mios salgan tambien invisibles
-            }
-            //* Se coge la URL (Nombre de la categoria)
-            $categoria = Models\BlogPostModel::categoria(strtolower($params[2]));
-            $categorias = array();
+                //* Se coge la URL (Nombre de la categoria)
+                $categoria = Models\BlogPostModel::categoriaConInvisibles(strtolower($params[2]), intval($user->id));
+                $categorias = array();
 
-            foreach ($categoria as $post) {
-                $categoriasPorID = Models\BlogPostModel::getCategoriasByPostID(intval($post["id"]));
-                if(!empty($categoriasPorID)){
-                    array_push($categorias,$categoriasPorID);
-                }          
+                foreach ($categoria as $post) {
+                    $categoriasPorID = Models\BlogPostModel::getCategoriasByPostID(intval($post["id"]));
+                    if(!empty($categoriasPorID)){
+                        array_push($categorias,$categoriasPorID);
+                    }  
+                }
+            }
+            else
+            {
+                //* Se coge la URL (Nombre de la categoria)
+                $categoria = Models\BlogPostModel::categoria(strtolower($params[2]));
+                $categorias = array();
+
+                foreach ($categoria as $post) {
+                    $categoriasPorID = Models\BlogPostModel::getCategoriasByPostID(intval($post["id"]));
+                    if(!empty($categoriasPorID)){
+                        array_push($categorias,$categoriasPorID);
+                    }  
+                }
             }
             
             if(!empty($categoria))
@@ -1025,18 +1088,14 @@ class Blogpost extends Controller
                     ,"page" => __DIR__ . '/../Views/BlogPost/List.php'
                 ]); 
             }
-            else
-            {
-                Helpers::sendToController("/post/all",
-                    [
+            else {
+                Helpers::sendToController("/post/all", [
                         "error" => "No se encontro esa categoria o no existen posts de ella."
                     ]);
             }
         }
-        else
-        {
-            Helpers::sendToController("/post/all",
-                [
+        else {
+            Helpers::sendToController("/post/all", [
                     "error" => "No se encontro esa categoria o no existen posts de ella."
                 ]);
         }
@@ -1130,5 +1189,4 @@ class Blogpost extends Controller
             }  
         }
     }
-
 }
