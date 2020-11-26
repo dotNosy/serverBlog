@@ -1,0 +1,11 @@
+# Views
+
+Todas las vistas son importadas a una vista padre que contiene el diseño compartido de la aplicación. 
+
+Tambien se importan de forma dinamica los js, y css para cada vista hija
+
+![Views%/Untitled.png](Views%2090d497c9477c4f19bde18c4fa982aed8/Untitled.png)
+
+![Views%/Untitled%201.png](Views%2090d497c9477c4f19bde18c4fa982aed8/Untitled%201.png)
+
+![Views%/Untitled%202.png](Views%2090d497c9477c4f19bde18c4fa982aed8/Untitled%202.png)

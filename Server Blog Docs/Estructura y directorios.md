@@ -1,6 +1,6 @@
 # Estructura y directorios
 
-![Estructura%20y%20directorios%20aa4025e0638b4d60b2f3d5230319ac42/IMG_20201125_171036_287.jpg](Estructura%20y%20directorios%20aa4025e0638b4d60b2f3d5230319ac42/IMG_20201125_171036_287.jpg)
+![Estructura%20y%20directorios%/IMG_20201125_171036_287.jpg](Estructura%20y%20directorios%20aa4025e0638b4d60b2f3d5230319ac42/IMG_20201125_171036_287.jpg)
 
 Cada carpeta del proyecto tiene una unica responsabilidad
 
@@ -26,4 +26,4 @@ Son clases que no encajan en ninguno de los demas directorios, pueden ser clases
 
 Resumen del flujo de la aplicacion
 
-![Estructura%20y%20directorios%20aa4025e0638b4d60b2f3d5230319ac42/IMG_20201125_172531_377.jpg](Estructura%20y%20directorios%20aa4025e0638b4d60b2f3d5230319ac42/IMG_20201125_172531_377.jpg)
+![Estructura%20y%20directorios%/IMG_20201125_172531_377.jpg](Estructura%20y%20directorios%/IMG_20201125_172531_377.jpg)
