@@ -72,8 +72,7 @@ class Login extends Controller
     }
 
     protected function register($params = null) 
-    {
-        
+    {  
         //? VISTA FORMULARIO
         if ($_SERVER['REQUEST_METHOD'] == "GET")
         {
@@ -239,18 +238,15 @@ class Login extends Controller
                 echo json_encode($response);
             }
         }
-
     }
 
     protected function comprobarContraseñaDiferente($params = null) 
     {
-
         if ($_SERVER['REQUEST_METHOD'] == "POST")
         {
             $password = Services\Helpers::cleanInput($_POST['password']);
             $rpassword = Services\Helpers::cleanInput($_POST['rpassword']);
             
-
             if(empty($password) || empty($rpassword)){
                 //? Si alguno de los dos campos esta vacio
                 $response = false;
@@ -265,6 +261,5 @@ class Login extends Controller
                 echo json_encode($response);
             }
         }
-
     }
 }

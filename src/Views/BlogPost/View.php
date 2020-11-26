@@ -12,26 +12,25 @@
 <!-- MENU -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
   <div class="container">
-    <a class="navbar-brand" href="#">Start Bootstrap</a>
+    <a class="navbar-brand" href="#">Mas de  "<?= $_SESSION["autor"] ?>"</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarResponsive">
       <ul class="navbar-nav ml-auto">
         <li class="nav-item active">
-          <a class="nav-link" href="#">Home
+          <a class="nav-link" <?= "href='/post/feed/".$_SESSION['autor']."'"?> >Feed
             <span class="sr-only">(current)</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">About</a>
+          <a class="nav-link"<?= "href='/post/author/".$_SESSION['autor']."'"?>>Redactados</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Services</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Contact</a>
-        </li>
+        <?php if (!empty($user->id) && $post->user_id == $user->id): ?>
+          <li class="nav-item">
+            <a class="nav-link" <?="href='/post/edit/".$post->id."'"?>>Editar</a>
+          </li>
+        <?php endif; ?>
       </ul>
     </div>
   </div>
@@ -196,8 +195,8 @@
                   <?php foreach(BlogPostModel::getAnswer(intval($comment->id)) as $answer): ?>
                     <div class="card ml-5 my-4">
                       <div class="card-header">
-                      <?php if(!empty($comment->avatar)):?>
-                        <img class="rounded-circle" style="width:70px;heigth:70px;" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($comment->avatar); ?>" />
+                      <?php if(!empty($answer->avatar)):?>
+                        <img class="rounded-circle" style="width:70px;heigth:70px;" src="data:image/jpg;charset=utf8;base64,<?php echo base64_encode($answer->avatar); ?>" />
                       <?php else:?>
                         <img class="rounded-circle" style="width:70px;heigth:70px;" src="https://st.depositphotos.com/2101611/3925/v/600/depositphotos_39258143-stock-illustration-businessman-avatar-profile-picture.jpg"/>
                       <?php endif;?>

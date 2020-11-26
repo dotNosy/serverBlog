@@ -458,6 +458,4 @@ class Profile
             $pdo_conn = NULL;
         }
     }
-
-    
 }

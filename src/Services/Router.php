@@ -56,7 +56,7 @@ class Router
                 switch ($url[0])
                 {
                     case "":
-                        $url[0] = "home";
+                        $url[0] = "login";
                     break;
 
                     case "post":
