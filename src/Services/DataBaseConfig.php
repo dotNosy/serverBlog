@@ -15,7 +15,7 @@ class DatabaseConfig
         switch ($app_status) 
         {
             case "dev":
-                $this->servername = "localhost";
+                $this->servername = "10.20.30.172";
                 $this->dbName = "blog";
                 $this->username = "root";
                 $this->password = "2dw3";
