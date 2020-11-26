@@ -9,7 +9,7 @@
     <div class="col-md-6 p-5">
         <form class="form-horizontal" action="/post/edit" method="POST" enctype="multipart/form-data">
         <fieldset>
-          <legend class="text-center">Nuevo post</legend>
+          <legend class="text-center">Editar post</legend>
           <input type="hidden" name="id" <?="value='$post->id'"?>>
 
           <!-- titulo input-->
